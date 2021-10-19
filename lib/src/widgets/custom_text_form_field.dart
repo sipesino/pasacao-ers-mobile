@@ -3,20 +3,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
 
 class CustomTextFormField extends StatefulWidget {
-  final TextInputType keyboardType;
-  final IconData prefixIcon;
-  final FormFieldValidator validator;
-  final String label;
-  final int? maxLines;
-  final FormFieldSetter<String>? onSaved;
-  final TextInputAction inputAction;
-  final FocusNode? focusNode;
-  final bool isReadOnly;
-  final TextEditingController? controller;
-  final String? initialValue;
-  final VoidCallback? onTap;
-  final Key? key;
-
   CustomTextFormField({
     required this.keyboardType,
     required this.prefixIcon,
@@ -32,6 +18,20 @@ class CustomTextFormField extends StatefulWidget {
     this.onTap,
     this.key,
   }) : super(key: key);
+
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final String? initialValue;
+  final TextInputAction inputAction;
+  final bool isReadOnly;
+  final Key? key;
+  final TextInputType keyboardType;
+  final String label;
+  final int? maxLines;
+  final FormFieldSetter<String>? onSaved;
+  final VoidCallback? onTap;
+  final IconData prefixIcon;
+  final FormFieldValidator validator;
 
   @override
   CustomTextFormFieldState createState() => CustomTextFormFieldState();

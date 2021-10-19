@@ -49,10 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 120,
               height: 120,
               child: CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://bit.ly/3lD1cKX',
-                ),
-                backgroundColor: Colors.transparent,
+                backgroundImage: AssetImage('assets/images/avatar-image.png'),
+                backgroundColor: chromeColor.withOpacity(0.5),
               ),
             ),
             SizedBox(height: 15),
@@ -98,7 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      SizedBox(width: 5),
+                      SizedBox(width: 10),
                       EmergencyContact(
                         contact_name: 'Mom',
                         contact_number: '09123456789',

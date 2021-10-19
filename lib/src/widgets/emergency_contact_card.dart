@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pers/src/constants.dart';
 import 'package:pers/src/theme.dart';
 
 class EmergencyContact extends StatelessWidget {
@@ -15,7 +16,7 @@ class EmergencyContact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(left: 15),
+      margin: EdgeInsets.only(left: 10),
       child: Container(
         width: 150,
         height: 150,
@@ -40,8 +41,11 @@ class EmergencyContact extends StatelessWidget {
               child: Container(
                 height: 50.0,
                 width: 50.0,
-                color: Color(0xffFF0E58),
-                child: SizedBox.shrink(),
+                color: chromeColor.withOpacity(0.5),
+                child: Image(
+                  image: AssetImage('assets/images/avatar-image.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(height: 10),
@@ -80,7 +84,7 @@ class EmergencyContactCard extends StatelessWidget {
       child: Material(
         child: Container(
           width: double.infinity,
-          height: 150,
+          height: 120,
           padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -103,7 +107,11 @@ class EmergencyContactCard extends StatelessWidget {
                   SizedBox(
                     height: 60,
                     width: 60,
-                    child: CircleAvatar(),
+                    child: CircleAvatar(
+                      backgroundImage:
+                          AssetImage('assets/images/avatar-image.png'),
+                      backgroundColor: chromeColor.withOpacity(0.5),
+                    ),
                   ),
                   SizedBox(width: 15),
                   Column(

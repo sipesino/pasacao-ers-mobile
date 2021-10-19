@@ -29,6 +29,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   bool readOnly = true;
 
+  String sampleName = 'Richard';
+
   final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Name is required'),
     MinLengthValidator(2, errorText: 'At least 2 characters is required'),
@@ -109,10 +111,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
               children: [
                 ClipOval(
                   child: Material(
+                    color: chromeColor.withOpacity(0.5),
                     child: Ink.image(
-                      image: NetworkImage(
-                        'https://bit.ly/3lD1cKX',
-                      ),
+                      image: AssetImage('assets/images/avatar-image.png'),
                       fit: BoxFit.cover,
                       width: 120,
                       height: 120,
