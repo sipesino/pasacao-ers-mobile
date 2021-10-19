@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/theme.dart';
 
 class EmergencyContact extends StatelessWidget {
@@ -16,11 +15,23 @@ class EmergencyContact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1.5,
+      margin: EdgeInsets.only(left: 15),
       child: Container(
         width: 150,
         height: 150,
         padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              offset: new Offset(-10, 10),
+              blurRadius: 20.0,
+              spreadRadius: 4.0,
+            ),
+          ],
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -65,54 +76,68 @@ class EmergencyContactCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1.5,
-      child: Container(
-        width: double.infinity,
-        height: 120,
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  height: 60,
-                  width: 60,
-                  child: CircleAvatar(),
-                ),
-                SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      this.contact_name,
-                      style: DefaultTextTheme.headline3,
-                    ),
-                    Text(
-                      this.contact_number,
-                      style: DefaultTextTheme.subtitle2,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: IconButton(
-                padding: new EdgeInsets.all(0.0),
-                onPressed: () {},
-                icon: Container(
-                  child: Icon(
-                    Icons.arrow_forward_ios_rounded,
-                  ),
-                ),
-                iconSize: 20,
+      elevation: 0,
+      child: Material(
+        child: Container(
+          width: double.infinity,
+          height: 150,
+          padding: const EdgeInsets.all(20.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                offset: new Offset(-10, 10),
+                blurRadius: 20.0,
+                spreadRadius: 4.0,
               ),
-            )
-          ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 60,
+                    width: 60,
+                    child: CircleAvatar(),
+                  ),
+                  SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        this.contact_name,
+                        style: DefaultTextTheme.headline3,
+                      ),
+                      Text(
+                        this.contact_number,
+                        style: DefaultTextTheme.subtitle2,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: 20,
+                height: 20,
+                child: IconButton(
+                  padding: new EdgeInsets.all(0.0),
+                  onPressed: () {},
+                  icon: Container(
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                    ),
+                  ),
+                  iconSize: 20,
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

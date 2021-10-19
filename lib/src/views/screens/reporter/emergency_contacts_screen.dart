@@ -32,7 +32,27 @@ class EmergencyContactsScreen extends StatelessWidget {
                       EmergencyContactCard(
                         contact_name: 'Juan',
                         contact_number: '09296871657',
-                      )
+                      ),
+                      EmergencyContactCard(
+                        contact_name: 'Juan',
+                        contact_number: '09296871657',
+                      ),
+                      EmergencyContactCard(
+                        contact_name: 'Juan',
+                        contact_number: '09296871657',
+                      ),
+                      EmergencyContactCard(
+                        contact_name: 'Juan',
+                        contact_number: '09296871657',
+                      ),
+                      EmergencyContactCard(
+                        contact_name: 'Juan',
+                        contact_number: '09296871657',
+                      ),
+                      EmergencyContactCard(
+                        contact_name: 'Juan',
+                        contact_number: '09296871657',
+                      ),
                     ],
                   ),
                 ),

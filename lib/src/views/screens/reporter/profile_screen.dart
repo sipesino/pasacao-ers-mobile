@@ -22,8 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           constraints: BoxConstraints(minHeight: constraints.maxHeight),
           child: IntrinsicHeight(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: _buildColumn(),
             ),
           ),
@@ -67,6 +66,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.grey,
               ),
             ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed('/reporter/home/emergency_contacts');
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Emergency Contacts',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SingleChildScrollView(
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 5),
+                      EmergencyContact(
+                        contact_name: 'Mom',
+                        contact_number: '09123456789',
+                      ),
+                      EmergencyContact(
+                        contact_name: 'Dad',
+                        contact_number: '09123456789',
+                      ),
+                      EmergencyContact(
+                        contact_name: 'Brother',
+                        contact_number: '09123456789',
+                      ),
+                      EmergencyContact(
+                        contact_name: 'Sister',
+                        contact_number: '09123456789',
+                      ),
+                      EmergencyContact(
+                        contact_name: 'Uncle',
+                        contact_number: '09123456789',
+                      ),
+                      EmergencyContact(
+                        contact_name: 'Aunt',
+                        contact_number: '09123456789',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -75,142 +136,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildBottomContainer() {
     return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context)
-                      .pushNamed('/reporter/home/emergency_contacts');
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Emergency Contacts',
-                      style: TextStyle(color: primaryColor),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 18,
-                      color: primaryColor,
-                    ),
-                  ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/reporter/home/profile');
+              },
+              label: Text(
+                'Personal Information',
+                style: TextStyle(
+                  color: primaryColor,
                 ),
               ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    EmergencyContact(
-                      contact_name: 'Mom',
-                      contact_number: '09123456789',
-                    ),
-                    EmergencyContact(
-                      contact_name: 'Dad',
-                      contact_number: '09123456789',
-                    ),
-                    EmergencyContact(
-                      contact_name: 'Brother',
-                      contact_number: '09123456789',
-                    ),
-                    EmergencyContact(
-                      contact_name: 'Sister',
-                      contact_number: '09123456789',
-                    ),
-                    EmergencyContact(
-                      contact_name: 'Uncle',
-                      contact_number: '09123456789',
-                    ),
-                    EmergencyContact(
-                      contact_name: 'Aunt',
-                      contact_number: '09123456789',
-                    ),
-                  ],
+              icon: Icon(
+                CustomIcons.person,
+                color: accentColor,
+                size: 20,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: () {},
+              label: Text(
+                'Incidents Reported',
+                style: TextStyle(
+                  color: primaryColor,
                 ),
               ),
-            ],
-          ),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.of(context).pushNamed('/reporter/home/profile');
-            },
-            label: Text(
-              'Personal Information',
-              style: TextStyle(
-                color: primaryColor,
+              icon: Icon(
+                CustomIcons.siren,
+                color: accentColor,
+                size: 20,
               ),
             ),
-            icon: Icon(
-              CustomIcons.person,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'Incidents Reported',
-              style: TextStyle(
-                color: primaryColor,
+            TextButton.icon(
+              onPressed: () {},
+              label: Text(
+                'Settings',
+                style: TextStyle(
+                  color: primaryColor,
+                ),
+              ),
+              icon: Icon(
+                CustomIcons.settings,
+                color: accentColor,
+                size: 20,
               ),
             ),
-            icon: Icon(
-              CustomIcons.siren,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'Settings',
-              style: TextStyle(
-                color: primaryColor,
+            TextButton.icon(
+              onPressed: () {},
+              label: Text(
+                'About',
+                style: TextStyle(
+                  color: primaryColor,
+                ),
+              ),
+              icon: Icon(
+                CustomIcons.about,
+                color: accentColor,
+                size: 20,
               ),
             ),
-            icon: Icon(
-              CustomIcons.settings,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'About',
-              style: TextStyle(
-                color: primaryColor,
+            TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).popAndPushNamed('/');
+              },
+              label: Text(
+                'Logout',
+                style: TextStyle(
+                  color: primaryColor,
+                ),
+              ),
+              icon: Icon(
+                CustomIcons.logout,
+                color: accentColor,
+                size: 20,
               ),
             ),
-            icon: Icon(
-              CustomIcons.about,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.of(context).popAndPushNamed('/');
-            },
-            label: Text(
-              'Logout',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.logout,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

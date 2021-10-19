@@ -22,9 +22,21 @@ class _HotlineCardState extends State<HotlineCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 1.5,
-      child: Padding(
+      elevation: 0,
+      child: Container(
         padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              offset: new Offset(-10, 10),
+              blurRadius: 20.0,
+              spreadRadius: 4.0,
+            ),
+          ],
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[

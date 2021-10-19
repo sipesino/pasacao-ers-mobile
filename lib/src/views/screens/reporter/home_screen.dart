@@ -25,6 +25,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraint) {
       return SingleChildScrollView(
+        clipBehavior: Clip.none,
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: constraint.maxHeight),
           child: Padding(
@@ -56,10 +57,11 @@ class HomeScreen extends StatelessWidget {
                       Radius.circular(5),
                     ),
                     boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        offset: Offset(0.0, 3),
-                        blurRadius: 1,
+                      new BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        offset: new Offset(-10, 10),
+                        blurRadius: 20.0,
+                        spreadRadius: 4.0,
                       ),
                     ],
                   ),
@@ -125,7 +127,6 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 15),
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
@@ -143,7 +144,6 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(height: 15),
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
@@ -160,9 +160,6 @@ class HomeScreen extends StatelessWidget {
                       'Theft or Roberry',
                     );
                   },
-                ),
-                SizedBox(
-                  height: 15,
                 ),
                 IncidentButton(
                   gradient: LinearGradient(
@@ -181,9 +178,6 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(
-                  height: 15,
-                ),
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
@@ -201,9 +195,6 @@ class HomeScreen extends StatelessWidget {
                     );
                   },
                 ),
-                SizedBox(
-                  height: 15,
-                ),
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
@@ -220,9 +211,6 @@ class HomeScreen extends StatelessWidget {
                       'Drowning Incident',
                     );
                   },
-                ),
-                SizedBox(
-                  height: 15,
                 ),
               ],
             ),
