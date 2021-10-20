@@ -1,7 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -16,67 +17,14 @@ class DescriptionScreen extends StatefulWidget {
 }
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
-  List<Asset> images = <Asset>[];
-  // ignore: unused_field
-  String _error = 'No Error Dectected';
+  List<XFile> incidentImages = [];
+
   final _formKey = GlobalKey<FormState>();
   bool _load = false;
 
-  Widget buildGridView() {
-    return GridView.count(
-      scrollDirection: Axis.horizontal,
-      crossAxisCount: 1,
-      children: List.generate(images.length, (index) {
-        Asset asset = images[index];
-        return AssetThumb(
-          asset: asset,
-          width: 100,
-          height: 100,
-        );
-      }),
-    );
-  }
-
-  Future<void> loadAssets() async {
-    List<Asset> resultList = <Asset>[];
-    String error = 'No Error Detected';
-
-    try {
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 10,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(
-          takePhotoIcon: "chat",
-          doneButtonTitle: "Fatto",
-        ),
-        materialOptions: MaterialOptions(
-          actionBarTitle: "Gallery",
-          allViewTitle: "All Photos",
-          useDetailsView: true,
-          selectCircleStrokeColor: "#000000",
-          selectionLimitReachedText:
-              'Selection full. You can only select up to 10 images',
-        ),
-      );
-    } on Exception catch (e) {
-      error = e.toString();
-    }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      images = resultList;
-      _error = error;
-    });
-  }
-
   final validator = MultiValidator([
-    RequiredValidator(errorText: 'Name is required'),
-    MinLengthValidator(2, errorText: 'At least 2 characters is required'),
+    RequiredValidator(errorText: 'Fill this in too'),
+    MinLengthValidator(10, errorText: 'At least 10 characters is required'),
   ]);
 
   @override
@@ -107,14 +55,17 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraint) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraint.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Form(
-                        key: _formKey,
-                        child: _buildColumn(args),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints:
+                          BoxConstraints(minHeight: constraint.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Form(
+                          key: _formKey,
+                          child: _buildColumn(args),
+                        ),
                       ),
                     ),
                   ),
@@ -140,8 +91,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       );
 
   Widget _buildTopContainer(ScreenArguments args) => Expanded(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
           child: Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,39 +130,71 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   'Attach images of the incident (Optional)',
                   style: TextStyle(color: Colors.grey),
                 ),
-                OutlinedButton(
-                  onPressed: loadAssets,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        FontAwesomeIcons.plus,
-                        color: primaryColor,
-                        size: 12,
-                      ),
-                      SizedBox(width: 5),
-                      Text(
-                        'Attach',
-                        style: TextStyle(
-                          color: primaryColor,
+                SizedBox(height: 5),
+                incidentImages.length == 0
+                    ? GestureDetector(
+                        onTap: () => showModalBottomSheet(
+                          context: context,
+                          builder: ((builder) => choosePhoto()),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                          ),
+                          backgroundColor: Colors.transparent,
+                        ),
+                        child: Container(
+                          height: 120,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(
+                              width: 1,
+                              color: contentColorLightTheme.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Icon(
+                            CustomIcons.add_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        height: 120,
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: 3 / 2,
+                            crossAxisSpacing: 20,
+                            mainAxisSpacing: 20,
+                          ),
+                          itemBuilder: (BuildContext context, index) {
+                            return SizedBox(
+                              width: 50,
+                              height: 50,
+                              child: Image(
+                                image:
+                                    FileImage(File(incidentImages[index].path))
+                                        as ImageProvider,
+                              ),
+                            );
+                          },
+                          itemCount: incidentImages.length,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 100,
-                  child: buildGridView(),
-                ),
               ],
             ),
           ),
         ),
       );
 
-  Widget _buildBottomContainer() => SizedBox(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 20),
+  Widget _buildBottomContainer() => SizedBox.fromSize(
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20),
+          color: Colors.white,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -259,4 +242,73 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ),
         ),
       );
+
+  Widget choosePhoto() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(15),
+      margin: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.gallery);
+            },
+            icon: Icon(
+              Icons.photo,
+              color: accentColor,
+            ),
+            label: Text(
+              'Gallery',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: VerticalDivider(
+              width: 1,
+              color: Colors.grey,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.camera);
+            },
+            icon: Icon(
+              Icons.camera,
+              color: accentColor,
+            ),
+            label: Text(
+              'Camera',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void takePhoto(ImageSource source) async {
+    ImagePicker _picker = ImagePicker();
+
+    if (source == ImageSource.gallery) {
+      List<XFile> selectedImages = (await _picker.pickMultiImage())!;
+      setState(() {
+        incidentImages.addAll(selectedImages);
+      });
+      return;
+    }
+    final pickedFile = await _picker.pickImage(source: source);
+    setState(() {
+      incidentImages.add(pickedFile!);
+    });
+    Navigator.pop(context);
+  }
 }

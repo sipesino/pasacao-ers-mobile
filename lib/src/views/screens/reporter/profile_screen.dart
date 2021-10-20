@@ -45,12 +45,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: CircleAvatar(
-                backgroundImage: AssetImage('assets/images/avatar-image.png'),
-                backgroundColor: chromeColor.withOpacity(0.5),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10.0), //or 15.0
+              child: Container(
+                height: 120.0,
+                width: 120.0,
+                color: chromeColor.withOpacity(0.5),
+                child: Image(
+                  image: AssetImage('assets/images/avatar-image.png'),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SizedBox(height: 15),

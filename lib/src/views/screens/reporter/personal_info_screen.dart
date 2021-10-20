@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
@@ -75,6 +76,20 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                readOnly = !readOnly;
+              });
+            },
+            icon: Icon(
+              readOnly ? FontAwesomeIcons.edit : Icons.check,
+              size: 20,
+              color: accentColor,
+            ),
+          )
+        ],
       ),
       body: LayoutBuilder(builder: (context, constraints) {
         return SingleChildScrollView(
@@ -160,9 +175,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           GenderDropDown(),
           const SizedBox(height: 15),
           BirthDatePicker(),
-          const SizedBox(height: 30),
-          UpdateProfileButton(),
-          const SizedBox(height: 15),
         ],
       ),
     );
@@ -228,30 +240,34 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             validator: birthdateValidator,
           ),
         ),
-        SizedBox(
-          width: 10,
-        ),
-        Column(
-          children: [
-            Text(''),
-            Container(
-              width: 80,
-              child: OutlinedButton(
-                focusNode: bdayFocusNode,
-                onPressed: readOnly ? null : _showDatePicker,
-                child: Text('Set'),
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(
-                    EdgeInsets.all(20),
+        readOnly
+            ? SizedBox.shrink()
+            : Row(
+                children: [
+                  SizedBox(width: 10),
+                  Column(
+                    children: [
+                      Text(''),
+                      Container(
+                        width: 80,
+                        child: OutlinedButton(
+                          focusNode: bdayFocusNode,
+                          onPressed: readOnly ? null : _showDatePicker,
+                          child: Text('Set'),
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all(
+                              EdgeInsets.all(20),
+                            ),
+                            backgroundColor: MaterialStateProperty.all(
+                              Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  backgroundColor: MaterialStateProperty.all(
-                    Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        )
+                ],
+              )
       ],
     );
   }
@@ -282,23 +298,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           child: child,
         ),
       );
-
-  Widget UpdateProfileButton() {
-    return SizedBox(
-      height: 50,
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            readOnly = false;
-          });
-        },
-        child: Text('Update Profile'),
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(accentColor),
-        ),
-      ),
-    );
-  }
 
   void _showDatePicker() {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');

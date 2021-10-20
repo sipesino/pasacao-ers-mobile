@@ -6,6 +6,7 @@ import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 
+// ignore: must_be_immutable
 class NewPasswordScreen extends StatelessWidget {
   NewPasswordScreen({Key? key, required this.forgotPassword}) : super(key: key);
 

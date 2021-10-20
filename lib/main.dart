@@ -38,6 +38,7 @@ class _MERSState extends State<MERS> {
   @override
   Widget build(BuildContext context) {
     final MainModel _model = MainModel();
+    precacheImage(AssetImage("assets/images/avatar-image.png"), context);
     return ScopedModel(
       model: _model,
       child: MaterialApp(

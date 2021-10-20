@@ -16,7 +16,6 @@ class EmergencyContact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.only(left: 10),
       child: Container(
         width: 150,
         height: 150,
@@ -85,7 +84,7 @@ class EmergencyContactCard extends StatelessWidget {
         child: Container(
           width: double.infinity,
           height: 120,
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),
@@ -104,13 +103,16 @@ class EmergencyContactCard extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    height: 60,
-                    width: 60,
-                    child: CircleAvatar(
-                      backgroundImage:
-                          AssetImage('assets/images/avatar-image.png'),
-                      backgroundColor: chromeColor.withOpacity(0.5),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10.0), //or 15.0
+                    child: Container(
+                      height: 100.0,
+                      width: 100.0,
+                      color: chromeColor.withOpacity(0.5),
+                      child: Image(
+                        image: AssetImage('assets/images/avatar-image.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                   SizedBox(width: 15),

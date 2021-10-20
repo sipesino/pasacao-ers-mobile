@@ -113,8 +113,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFF5168FF),
                       Color(0xFF51ABF7),
+                      Color(0xFF5168FF),
                     ],
                   ),
                   icon: CustomIcons.cross,
@@ -130,8 +130,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFF9665FA),
                       Color(0xff6685FC),
+                      Color(0xFF9665FA),
                     ],
                   ),
                   icon: FontAwesomeIcons.carCrash,
@@ -147,8 +147,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFF9665FA),
                       Color(0xFFEF60A3),
+                      Color(0xFF9665FA),
                     ],
                   ),
                   icon: CustomIcons.criminal,
@@ -164,8 +164,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFFaa4465),
                       Color(0xFFdb7f8e),
+                      Color(0xFFaa4465),
                     ],
                   ),
                   icon: FontAwesomeIcons.fistRaised,
@@ -181,8 +181,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFFFE5F75),
                       Color(0xFFFC9842),
+                      Color(0xFFFE5F75),
                     ],
                   ),
                   icon: CustomIcons.fire,
@@ -198,8 +198,8 @@ class HomeScreen extends StatelessWidget {
                 IncidentButton(
                   gradient: LinearGradient(
                     colors: <Color>[
-                      Color(0xFF64A3E0),
                       Color(0xFF35E688),
+                      Color(0xFF64A3E0),
                     ],
                   ),
                   icon: CustomIcons.drowning,

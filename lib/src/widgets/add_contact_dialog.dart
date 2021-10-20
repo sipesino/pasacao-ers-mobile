@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/phone_validator.dart';
@@ -14,6 +17,9 @@ class AddContactDialog extends StatefulWidget {
 }
 
 class _AddContactDialogState extends State<AddContactDialog> {
+  XFile? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
   final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Name is required'),
     MinLengthValidator(2, errorText: 'At least 2 characters is required'),
@@ -58,13 +64,27 @@ class _AddContactDialogState extends State<AddContactDialog> {
                           child: Material(
                             color: chromeColor.withOpacity(0.5),
                             child: Ink.image(
-                              image:
-                                  AssetImage('assets/images/avatar-image.png'),
+                              image: _imageFile == null
+                                  ? AssetImage('assets/images/avatar-image.png')
+                                  : FileImage(File(_imageFile!.path))
+                                      as ImageProvider,
                               fit: BoxFit.cover,
                               width: 120,
                               height: 120,
                               child: InkWell(
-                                onTap: () {},
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: ((builder) => choosePhoto()),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.transparent,
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -109,7 +129,10 @@ class _AddContactDialogState extends State<AddContactDialog> {
                         backgroundColor: MaterialStateProperty.all(accentColor),
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
                 ],
               ),
             ),
@@ -156,4 +179,64 @@ class _AddContactDialogState extends State<AddContactDialog> {
           child: child,
         ),
       );
+
+  Widget choosePhoto() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(15),
+      margin: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.gallery);
+            },
+            icon: Icon(
+              Icons.photo,
+              color: accentColor,
+            ),
+            label: Text(
+              'Gallery',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: VerticalDivider(
+              width: 1,
+              color: Colors.grey,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.camera);
+            },
+            icon: Icon(
+              Icons.camera,
+              color: accentColor,
+            ),
+            label: Text(
+              'Camera',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void takePhoto(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    setState(() {
+      _imageFile = pickedFile;
+    });
+    Navigator.pop(context);
+  }
 }

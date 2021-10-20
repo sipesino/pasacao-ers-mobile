@@ -53,6 +53,7 @@ class CustomTextFormFieldState extends State<CustomTextFormField> {
             key: widget.key,
             readOnly: widget.isReadOnly,
             maxLines: widget.maxLines,
+            minLines: 1,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             textInputAction: widget.inputAction,
             enableSuggestions: false,

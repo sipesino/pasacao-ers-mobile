@@ -29,8 +29,8 @@ dependencies:
   intl: ^0.17.0
   location: ^4.3.0
   permission_handler: ^8.1.6
-  multi_image_picker2: ^5.0.2
   google_maps_flutter: ^2.0.11
+  image_picker: ^0.8.4+3
 
 dev_dependencies:
   flutter_lints: ^1.0.0
