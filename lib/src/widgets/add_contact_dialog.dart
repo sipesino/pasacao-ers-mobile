@@ -5,6 +5,8 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
+import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/phone_validator.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
@@ -17,8 +19,11 @@ class AddContactDialog extends StatefulWidget {
 }
 
 class _AddContactDialogState extends State<AddContactDialog> {
-  XFile? _imageFile;
   final ImagePicker _picker = ImagePicker();
+  final _formKey = GlobalKey<FormState>();
+
+  bool _load = false;
+  XFile? _imageFile;
 
   final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Name is required'),
@@ -30,126 +35,185 @@ class _AddContactDialogState extends State<AddContactDialog> {
     PhoneValidator(),
   ]);
 
+  //form field values
+  String? contact_name;
+  String? contact_number;
+  String? contact_image = 'assets/images/avatar-image.png';
+
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(horizontal: 20),
-      child: SingleChildScrollView(
-        child: Stack(
-          children: [
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: Colors.white,
+    Widget loadingIndicator = _load
+        ? new Container(
+            width: 70.0,
+            height: 70.0,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.all(
+                Radius.circular(5),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Text(
-                      'Add Emergency Contact',
-                      style: DefaultTextTheme.headline5,
-                    ),
+            ),
+            child: new Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: new Center(
+                child: new CircularProgressIndicator(),
+              ),
+            ),
+          )
+        : new Container();
+
+    return Stack(
+      children: [
+        Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: EdgeInsets.symmetric(horizontal: 20),
+          child: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.white,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Center(
-                    child: Stack(
-                      children: <Widget>[
-                        ClipOval(
-                          child: Material(
-                            color: chromeColor.withOpacity(0.5),
-                            child: Ink.image(
-                              image: _imageFile == null
-                                  ? AssetImage('assets/images/avatar-image.png')
-                                  : FileImage(File(_imageFile!.path))
-                                      as ImageProvider,
-                              fit: BoxFit.cover,
-                              width: 120,
-                              height: 120,
-                              child: InkWell(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    builder: ((builder) => choosePhoto()),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
-                                      ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Center(
+                          child: Text(
+                            'Add Emergency Contact',
+                            style: DefaultTextTheme.headline5,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Center(
+                          child: Stack(
+                            children: <Widget>[
+                              ClipOval(
+                                child: Material(
+                                  color: chromeColor.withOpacity(0.5),
+                                  child: Ink.image(
+                                    image: _imageFile == null
+                                        ? AssetImage(
+                                            'assets/images/avatar-image.png')
+                                        : FileImage(File(_imageFile!.path))
+                                            as ImageProvider,
+                                    fit: BoxFit.cover,
+                                    width: 120,
+                                    height: 120,
+                                    child: InkWell(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          builder: ((builder) => choosePhoto()),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10),
+                                            ),
+                                          ),
+                                          backgroundColor: Colors.transparent,
+                                        );
+                                      },
                                     ),
-                                    backgroundColor: Colors.transparent,
-                                  );
-                                },
+                                  ),
+                                ),
                               ),
+                              Positioned(
+                                bottom: 0,
+                                right: 5,
+                                child: buildEditIcon(Colors.blue),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CustomTextFormField(
+                          keyboardType: TextInputType.name,
+                          prefixIcon: CustomIcons.person,
+                          validator: nameValidator,
+                          label: 'Name',
+                          onSaved: (val) {
+                            contact_name = val;
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        CustomTextFormField(
+                          keyboardType: TextInputType.phone,
+                          prefixIcon: CustomIcons.telephone,
+                          validator: mobileNoValidator,
+                          label: 'Mobile Number',
+                          onSaved: (val) {
+                            contact_number = val;
+                          },
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                setState(() {
+                                  _load = true;
+                                  addEmergencyContacts(
+                                    EmergencyContact(
+                                      contact_name: contact_name!,
+                                      contact_number: contact_number!,
+                                      contact_image: contact_image!,
+                                    ),
+                                  );
+                                });
+                                setState(() {
+                                  _load = false;
+                                });
+                                Navigator.pop(context);
+                              }
+                            },
+                            child: Text('Add Contact'),
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(accentColor),
                             ),
                           ),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 5,
-                          child: buildEditIcon(Colors.blue),
+                        SizedBox(
+                          height: 10,
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    color: Colors.red,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                  CustomTextFormField(
-                    keyboardType: TextInputType.name,
-                    prefixIcon: CustomIcons.person,
-                    validator: nameValidator,
-                    label: 'Name',
-                    onSaved: (val) {},
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CustomTextFormField(
-                    keyboardType: TextInputType.phone,
-                    prefixIcon: CustomIcons.telephone,
-                    validator: mobileNoValidator,
-                    label: 'Mobile Number',
-                    onSaved: (val) {},
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: Text('Add Contact'),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(accentColor),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-            Positioned(
-              top: 0,
-              right: 0,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                color: Colors.red,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        new Align(
+          child: loadingIndicator,
+          alignment: FractionalOffset.center,
+        ),
+      ],
     );
   }
 
@@ -233,10 +297,11 @@ class _AddContactDialogState extends State<AddContactDialog> {
   }
 
   void takePhoto(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-    setState(() {
-      _imageFile = pickedFile;
-    });
     Navigator.pop(context);
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null)
+      setState(() {
+        _imageFile = pickedFile;
+      });
   }
 }

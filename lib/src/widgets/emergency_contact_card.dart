@@ -111,7 +111,7 @@ class EmergencyContactCard2 extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10.0), //or 15.0
+                    borderRadius: BorderRadius.circular(10.0),
                     child: Container(
                       height: 100.0,
                       width: 100.0,

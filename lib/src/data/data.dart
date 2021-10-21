@@ -1,6 +1,6 @@
 import 'package:pers/src/models/emergency_contact.dart';
 
-const List<EmergencyContact> _emergencyContacts = [
+List<EmergencyContact> _emergencyContacts = [
   EmergencyContact(
     contact_name: 'Guy Dunn',
     contact_number: '+63 898 555 9138',
@@ -55,4 +55,8 @@ const List<EmergencyContact> _emergencyContacts = [
 
 List<EmergencyContact> getEmergencyContacts() {
   return _emergencyContacts;
+}
+
+void addEmergencyContacts(EmergencyContact contact) {
+  _emergencyContacts.add(contact);
 }
