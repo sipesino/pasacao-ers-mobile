@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/widgets/add_contact_dialog.dart';
 import 'package:pers/src/widgets/emergency_contact_card.dart';
 
@@ -28,33 +29,13 @@ class EmergencyContactsScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Column(
-                  children: [
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    EmergencyContactCard2(
-                      contact_name: 'Juan',
-                      contact_number: '09296871657',
-                    ),
-                    SizedBox(height: 30),
-                  ],
+                  children: getEmergencyContacts().map((e) {
+                    return EmergencyContactCard2(
+                      contact_name: e.contact_name,
+                      contact_number: e.contact_number,
+                      contact_image: e.contact_image,
+                    );
+                  }).toList(),
                 ),
               ),
             ),

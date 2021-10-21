@@ -74,11 +74,13 @@ class EmergencyContactCard extends StatelessWidget {
 class EmergencyContactCard2 extends StatelessWidget {
   final String contact_name;
   final String contact_number;
+  final String contact_image;
 
   const EmergencyContactCard2({
     Key? key,
     required this.contact_name,
     required this.contact_number,
+    this.contact_image = 'assets/images/avatar-image.png',
   }) : super(key: key);
 
   @override
@@ -115,7 +117,7 @@ class EmergencyContactCard2 extends StatelessWidget {
                       width: 100.0,
                       color: chromeColor.withOpacity(0.5),
                       child: Image(
-                        image: AssetImage('assets/images/avatar-image.png'),
+                        image: AssetImage(contact_image),
                         fit: BoxFit.cover,
                       ),
                     ),
