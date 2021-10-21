@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
@@ -29,6 +32,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   String? mobile_no;
 
   bool readOnly = true;
+
+  XFile? _imageFile;
 
   String sampleName = 'Richard';
 
@@ -128,12 +133,24 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                   child: Material(
                     color: chromeColor.withOpacity(0.5),
                     child: Ink.image(
-                      image: AssetImage('assets/images/avatar-image.png'),
+                      image: _imageFile == null
+                          ? AssetImage('assets/images/avatar-image.png')
+                          : FileImage(File(_imageFile!.path)) as ImageProvider,
                       fit: BoxFit.cover,
                       width: 120,
                       height: 120,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () => showModalBottomSheet(
+                          context: context,
+                          builder: (builder) => choosePhoto(),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                            ),
+                          ),
+                          backgroundColor: Colors.transparent,
+                        ),
                       ),
                     ),
                   ),
@@ -315,5 +332,67 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       });
       mobileFocusNode.requestFocus();
     });
+  }
+
+  Widget choosePhoto() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: EdgeInsets.all(15),
+      margin: EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(5),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.gallery);
+            },
+            icon: Icon(
+              Icons.photo,
+              color: accentColor,
+            ),
+            label: Text(
+              'Gallery',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: VerticalDivider(
+              width: 1,
+              color: Colors.grey,
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () {
+              takePhoto(ImageSource.camera);
+            },
+            icon: Icon(
+              Icons.camera,
+              color: accentColor,
+            ),
+            label: Text(
+              'Camera',
+              style: TextStyle(color: primaryColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void takePhoto(ImageSource source) async {
+    Navigator.pop(context);
+    ImagePicker _picker = new ImagePicker();
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null)
+      setState(() {
+        _imageFile = pickedFile;
+      });
   }
 }
