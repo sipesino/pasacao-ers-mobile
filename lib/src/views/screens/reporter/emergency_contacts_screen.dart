@@ -29,27 +29,27 @@ class EmergencyContactsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),
-                    EmergencyContactCard(
+                    EmergencyContactCard2(
                       contact_name: 'Juan',
                       contact_number: '09296871657',
                     ),

@@ -2,23 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/theme.dart';
 
-class EmergencyContact extends StatelessWidget {
+class EmergencyContactCard extends StatelessWidget {
   // final ImageProvider image;
   final String contact_name;
   final String contact_number;
+  final String contact_image;
 
-  const EmergencyContact({
+  const EmergencyContactCard({
     Key? key,
     required this.contact_name,
     required this.contact_number,
+    this.contact_image = 'assets/images/avatar-image.png',
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Container(
-        width: 150,
-        height: 150,
+        width: 160,
+        height: 160,
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -38,11 +40,11 @@ class EmergencyContact extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(10.0), //or 15.0
               child: Container(
-                height: 50.0,
-                width: 50.0,
+                height: 60.0,
+                width: 60.0,
                 color: chromeColor.withOpacity(0.5),
                 child: Image(
-                  image: AssetImage('assets/images/avatar-image.png'),
+                  image: AssetImage(contact_image),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -51,12 +53,15 @@ class EmergencyContact extends StatelessWidget {
             Text(
               this.contact_name,
               style: DefaultTextTheme.headline4,
+              overflow: TextOverflow.clip,
+              softWrap: false,
             ),
             Text(
               this.contact_number,
               style: TextStyle(
                 fontStyle: FontStyle.italic,
                 color: Colors.grey,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -66,11 +71,11 @@ class EmergencyContact extends StatelessWidget {
   }
 }
 
-class EmergencyContactCard extends StatelessWidget {
+class EmergencyContactCard2 extends StatelessWidget {
   final String contact_name;
   final String contact_number;
 
-  const EmergencyContactCard({
+  const EmergencyContactCard2({
     Key? key,
     required this.contact_name,
     required this.contact_number,

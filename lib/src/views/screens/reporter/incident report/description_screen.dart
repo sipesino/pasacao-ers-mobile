@@ -145,7 +145,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           backgroundColor: Colors.transparent,
                         ),
                         child: Container(
-                          height: 120,
+                          height: 200,
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(5),
@@ -161,28 +161,66 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                           ),
                         ),
                       )
-                    : SizedBox(
-                        height: 120,
-                        child: GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: 200,
-                            childAspectRatio: 3 / 2,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
+                    : Center(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          child: Wrap(
+                            alignment: WrapAlignment.start,
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: List.generate(
+                              incidentImages.length,
+                              (index) {
+                                return Stack(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        boxShadow: [
+                                          new BoxShadow(
+                                            color: Colors.grey.withOpacity(0.3),
+                                            offset: new Offset(-10, 10),
+                                            blurRadius: 20.0,
+                                            spreadRadius: 4.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: Image.file(
+                                          File(incidentImages[index].path),
+                                          width: 110,
+                                          height: 110,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: SizedBox(
+                                        width: 22,
+                                        height: 22,
+                                        child: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              incidentImages.removeAt(index);
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.close,
+                                            size: 18.0,
+                                            color: Colors.white,
+                                          ),
+                                          padding: EdgeInsets.all(0),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           ),
-                          itemBuilder: (BuildContext context, index) {
-                            return SizedBox(
-                              width: 50,
-                              height: 50,
-                              child: Image(
-                                image:
-                                    FileImage(File(incidentImages[index].path))
-                                        as ImageProvider,
-                              ),
-                            );
-                          },
-                          itemCount: incidentImages.length,
                         ),
                       ),
               ],
@@ -297,18 +335,23 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
   void takePhoto(ImageSource source) async {
     ImagePicker _picker = ImagePicker();
-
-    if (source == ImageSource.gallery) {
-      List<XFile> selectedImages = (await _picker.pickMultiImage())!;
-      setState(() {
-        incidentImages.addAll(selectedImages);
-      });
-      return;
-    }
-    final pickedFile = await _picker.pickImage(source: source);
-    setState(() {
-      incidentImages.add(pickedFile!);
-    });
     Navigator.pop(context);
+    try {
+      if (source == ImageSource.gallery) {
+        List<XFile> selectedImages = (await _picker.pickMultiImage()) ?? [];
+        if (selectedImages.isNotEmpty)
+          setState(() {
+            incidentImages.addAll(selectedImages);
+          });
+      } else {
+        final pickedFile = await _picker.pickImage(source: source) ?? null;
+        if (pickedFile != null)
+          setState(() {
+            incidentImages.add(pickedFile);
+          });
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
+    }
   }
 }
