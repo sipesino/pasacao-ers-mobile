@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.0),
+                borderRadius: BorderRadius.circular(10.0),
                 child: Image(
                   image: AssetImage('assets/images/avatar-image.png'),
                   fit: BoxFit.cover,

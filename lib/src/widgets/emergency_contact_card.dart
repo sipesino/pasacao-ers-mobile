@@ -26,7 +26,7 @@ class EmergencyContactCard extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(10),
           boxShadow: [
             new BoxShadow(
               color: Colors.grey.withOpacity(0.3),
@@ -98,7 +98,7 @@ class EmergencyContactCard2 extends StatelessWidget {
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(10),
             boxShadow: [
               new BoxShadow(
                 color: Colors.grey.withOpacity(0.3),

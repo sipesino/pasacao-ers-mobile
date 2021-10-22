@@ -91,7 +91,7 @@ class _AddContactDialogState extends State<AddContactDialog> {
                 Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
                   child: Form(
@@ -227,6 +227,13 @@ class _AddContactDialogState extends State<AddContactDialog> {
                             style: ButtonStyle(
                               backgroundColor:
                                   MaterialStateProperty.all(accentColor),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),

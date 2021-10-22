@@ -23,7 +23,7 @@ class IncidentButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.all(
-            Radius.circular(5),
+            Radius.circular(10),
           ),
           color: Colors.white,
           boxShadow: [

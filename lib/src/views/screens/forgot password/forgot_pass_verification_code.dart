@@ -111,7 +111,7 @@ class _ForgotPasswordVerificationState
               height: 80,
               decoration: BoxDecoration(
                 color: accentColor.withOpacity(0.1),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
+                borderRadius: BorderRadius.all(Radius.circular(10)),
               ),
               child: Icon(
                 CustomIcons.opened_mail,
@@ -156,7 +156,7 @@ class _ForgotPasswordVerificationState
                 selectedColor: chromeColor,
                 errorBorderColor: Colors.redAccent,
                 shape: PinCodeFieldShape.box,
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(10),
                 fieldHeight: 50,
                 fieldWidth: 50,
                 activeFillColor: Colors.grey[200],

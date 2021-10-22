@@ -63,7 +63,7 @@ class CustomPasswordTextFormFieldState
     return InputDecoration(
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide(
           color: contentColorLightTheme.withOpacity(0.2),
           width: 1,

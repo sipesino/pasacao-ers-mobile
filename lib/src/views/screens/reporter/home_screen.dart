@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.white,
                     border: Border.all(width: 1),
                     borderRadius: BorderRadius.all(
-                      Radius.circular(5),
+                      Radius.circular(10),
                     ),
                     boxShadow: [
                       new BoxShadow(

@@ -28,6 +28,9 @@ class BottomContainer extends StatelessWidget {
             child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: accentColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
               ),
               onPressed: onPressed,
               child: const Icon(

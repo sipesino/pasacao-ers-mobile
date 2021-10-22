@@ -306,10 +306,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           width: 10,
         ),
         Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(''),
             SizedBox(
               width: 80,
+              height: 65,
               child: OutlinedButton(
                 focusNode: bdayFocusNode,
                 onPressed: () {
@@ -330,11 +332,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 },
                 child: Text('Set'),
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(
-                    EdgeInsets.all(20),
-                  ),
                   backgroundColor: MaterialStateProperty.all(
                     Colors.white,
+                  ),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
                 ),
               ),
@@ -425,6 +429,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         style: OutlinedButton.styleFrom(
           primary: Colors.black,
           side: const BorderSide(width: 1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
         ),
         icon: const Icon(
           FontAwesomeIcons.google,

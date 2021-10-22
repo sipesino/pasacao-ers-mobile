@@ -238,6 +238,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           style: OutlinedButton.styleFrom(
             primary: Colors.black,
             side: const BorderSide(width: 1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
           ),
           icon: const Icon(
             CustomIcons.google,
