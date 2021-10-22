@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -54,7 +53,6 @@ class _AddContactDialogState extends State<AddContactDialog> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     contact_image = widget.editContact
         ? widget.contact_image

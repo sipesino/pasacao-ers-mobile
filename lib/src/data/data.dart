@@ -62,7 +62,5 @@ void addEmergencyContacts(EmergencyContact contact) {
 }
 
 void editEmergencyContact(EmergencyContact contact, int index) {
-  print('Old Value: ${_emergencyContacts[index].toString()}');
-  print('New Value: ${contact.toString()}');
   _emergencyContacts[index] = contact;
 }

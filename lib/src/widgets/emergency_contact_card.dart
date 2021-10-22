@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/theme.dart';
@@ -54,7 +55,7 @@ class EmergencyContactCard extends StatelessWidget {
             Text(
               this.contact_name,
               style: DefaultTextTheme.headline4,
-              overflow: TextOverflow.clip,
+              overflow: TextOverflow.ellipsis,
               softWrap: false,
             ),
             Text(
@@ -108,39 +109,40 @@ class EmergencyContactCard2 extends StatelessWidget {
             ],
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10.0),
-                    child: Container(
-                      height: 100.0,
-                      width: 100.0,
-                      color: chromeColor.withOpacity(0.5),
-                      child: Image(
-                        image: AssetImage(contact_image),
-                        fit: BoxFit.cover,
-                      ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Container(
+                  height: 100.0,
+                  width: 100.0,
+                  color: chromeColor.withOpacity(0.5),
+                  child: Image(
+                    image: AssetImage(contact_image),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              SizedBox(width: 15),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      this.contact_name,
+                      style: DefaultTextTheme.headline3,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
                     ),
-                  ),
-                  SizedBox(width: 15),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        this.contact_name,
-                        style: DefaultTextTheme.headline3,
-                      ),
-                      Text(
-                        this.contact_number,
-                        style: DefaultTextTheme.subtitle2,
-                      ),
-                    ],
-                  ),
-                ],
+                    Text(
+                      this.contact_number,
+                      style: DefaultTextTheme.subtitle2,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 width: 20,
