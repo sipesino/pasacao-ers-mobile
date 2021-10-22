@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -140,17 +139,21 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                       width: 120,
                       height: 120,
                       child: InkWell(
-                        onTap: () => showModalBottomSheet(
-                          context: context,
-                          builder: (builder) => choosePhoto(),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                            ),
-                          ),
-                          backgroundColor: Colors.transparent,
-                        ),
+                        onTap: () {
+                          readOnly
+                              ? () {}
+                              : showModalBottomSheet(
+                                  context: context,
+                                  builder: (builder) => choosePhoto(),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10),
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                );
+                        },
                       ),
                     ),
                   ),
@@ -158,7 +161,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                 Positioned(
                   bottom: 0,
                   right: 4,
-                  child: buildEditIcon(Colors.blue),
+                  child:
+                      readOnly ? SizedBox.shrink() : buildEditIcon(Colors.blue),
                 ),
               ],
             ),
@@ -192,6 +196,8 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           GenderDropDown(),
           const SizedBox(height: 15),
           BirthDatePicker(),
+          const SizedBox(height: 15),
+          ChangePasswordButton(),
         ],
       ),
     );
@@ -286,6 +292,15 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                 ],
               )
       ],
+    );
+  }
+
+  Widget ChangePasswordButton() {
+    return TextButton(
+      onPressed: () {
+        Navigator.pushNamed(context, '/reporter/home/profile/new_password');
+      },
+      child: Text('Change Password'),
     );
   }
 

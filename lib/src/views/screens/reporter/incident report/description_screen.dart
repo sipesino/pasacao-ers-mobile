@@ -58,6 +58,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: SingleChildScrollView(
+                    clipBehavior: Clip.none,
                     child: ConstrainedBox(
                       constraints:
                           BoxConstraints(minHeight: constraint.maxHeight),
@@ -92,6 +93,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
   Widget _buildTopContainer(ScreenArguments args) => Expanded(
         child: SingleChildScrollView(
+          clipBehavior: Clip.none,
           physics: NeverScrollableScrollPhysics(),
           child: Container(
             child: Column(
@@ -132,7 +134,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 ),
                 SizedBox(height: 5),
                 incidentImages.length == 0
-                    ? GestureDetector(
+                    ? InkWell(
                         onTap: () => showModalBottomSheet(
                           context: context,
                           builder: ((builder) => choosePhoto()),
@@ -168,58 +170,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                             alignment: WrapAlignment.start,
                             spacing: 10,
                             runSpacing: 10,
-                            children: List.generate(
-                              incidentImages.length,
-                              (index) {
-                                return Stack(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(5),
-                                        boxShadow: [
-                                          new BoxShadow(
-                                            color: Colors.grey.withOpacity(0.3),
-                                            offset: new Offset(-10, 10),
-                                            blurRadius: 20.0,
-                                            spreadRadius: 4.0,
-                                          ),
-                                        ],
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(5),
-                                        child: Image.file(
-                                          File(incidentImages[index].path),
-                                          width: 110,
-                                          height: 110,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: SizedBox(
-                                        width: 22,
-                                        height: 22,
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              incidentImages.removeAt(index);
-                                            });
-                                          },
-                                          icon: Icon(
-                                            Icons.close,
-                                            size: 18.0,
-                                            color: Colors.white,
-                                          ),
-                                          padding: EdgeInsets.all(0),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
+                            clipBehavior: Clip.none,
+                            children: displayIncidentImages(),
                           ),
                         ),
                       ),
@@ -353,5 +305,100 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     } on Exception catch (e) {
       print('Error: $e');
     }
+  }
+
+  List<Widget> displayIncidentImages() {
+    List<Widget> images = [];
+    images.addAll(
+      List.generate(
+        incidentImages.length,
+        (index) {
+          return Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(5),
+                  boxShadow: [
+                    new BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      offset: new Offset(-10, 10),
+                      blurRadius: 20.0,
+                      spreadRadius: 4.0,
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Image.file(
+                    File(incidentImages[index].path),
+                    width: 110,
+                    height: 110,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        incidentImages.removeAt(index);
+                      });
+                    },
+                    icon: Icon(
+                      Icons.close,
+                      size: 18.0,
+                      color: Colors.white,
+                    ),
+                    padding: EdgeInsets.all(0),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    images.add(
+      InkWell(
+        onTap: () => showModalBottomSheet(
+          context: context,
+          builder: ((builder) => choosePhoto()),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+        child: Container(
+          width: 110,
+          height: 110,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+            border: Border.all(color: Colors.grey),
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                offset: new Offset(-10, 10),
+                blurRadius: 20.0,
+                spreadRadius: 4.0,
+              ),
+            ],
+          ),
+          child: Icon(
+            Icons.add,
+            color: Colors.grey,
+          ),
+        ),
+      ),
+    );
+    return images;
   }
 }

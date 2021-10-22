@@ -67,6 +67,8 @@ class _MERSState extends State<MERS> {
           '/reporter/home/emergency_contacts': (context) =>
               EmergencyContactsScreen(),
           '/reporter/home/profile': (context) => PersonalInformationScreen(),
+          '/reporter/home/profile/new_password': (context) =>
+              NewPasswordScreen(forgotPassword: false),
         },
         theme: lightThemeData(context),
       ),

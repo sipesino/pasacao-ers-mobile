@@ -12,7 +12,19 @@ import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class AddContactDialog extends StatefulWidget {
-  AddContactDialog({Key? key}) : super(key: key);
+  final bool editContact;
+  final String contact_name;
+  final String contact_number;
+  final String contact_image;
+  final int index;
+  AddContactDialog({
+    Key? key,
+    this.editContact = false,
+    this.contact_name = '',
+    this.contact_number = '',
+    this.contact_image = '',
+    this.index = 0,
+  }) : super(key: key);
 
   @override
   _AddContactDialogState createState() => _AddContactDialogState();
@@ -38,7 +50,16 @@ class _AddContactDialogState extends State<AddContactDialog> {
   //form field values
   String? contact_name;
   String? contact_number;
-  String? contact_image = 'assets/images/avatar-image.png';
+  String? contact_image;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    contact_image = widget.editContact
+        ? widget.contact_image
+        : 'assets/images/avatar-image.png';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +104,9 @@ class _AddContactDialogState extends State<AddContactDialog> {
                       children: [
                         Center(
                           child: Text(
-                            'Add Emergency Contact',
+                            widget.editContact
+                                ? 'Edit Emergency Contact'
+                                : 'Add Emergency Contact',
                             style: DefaultTextTheme.headline5,
                           ),
                         ),
@@ -97,11 +120,13 @@ class _AddContactDialogState extends State<AddContactDialog> {
                                 child: Material(
                                   color: chromeColor.withOpacity(0.5),
                                   child: Ink.image(
-                                    image: _imageFile == null
-                                        ? AssetImage(
-                                            'assets/images/avatar-image.png')
-                                        : FileImage(File(_imageFile!.path))
-                                            as ImageProvider,
+                                    image: widget.editContact
+                                        ? AssetImage(widget.contact_image)
+                                        : _imageFile == null
+                                            ? AssetImage(
+                                                'assets/images/avatar-image.png')
+                                            : FileImage(File(_imageFile!.path))
+                                                as ImageProvider,
                                     fit: BoxFit.cover,
                                     width: 120,
                                     height: 120,
@@ -139,6 +164,8 @@ class _AddContactDialogState extends State<AddContactDialog> {
                           prefixIcon: CustomIcons.person,
                           validator: nameValidator,
                           label: 'Name',
+                          initialValue:
+                              widget.editContact ? widget.contact_name : '',
                           onSaved: (val) {
                             contact_name = val;
                           },
@@ -151,6 +178,8 @@ class _AddContactDialogState extends State<AddContactDialog> {
                           prefixIcon: CustomIcons.telephone,
                           validator: mobileNoValidator,
                           label: 'Mobile Number',
+                          initialValue:
+                              widget.editContact ? widget.contact_number : '',
                           onSaved: (val) {
                             contact_number = val;
                           },
@@ -164,23 +193,39 @@ class _AddContactDialogState extends State<AddContactDialog> {
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
                                 _formKey.currentState!.save();
-                                setState(() {
-                                  _load = true;
-                                  addEmergencyContacts(
-                                    EmergencyContact(
-                                      contact_name: contact_name!,
-                                      contact_number: contact_number!,
-                                      contact_image: contact_image!,
-                                    ),
-                                  );
-                                });
-                                setState(() {
-                                  _load = false;
-                                });
-                                Navigator.pop(context);
+                                if (widget.editContact) {
+                                  Navigator.pop(context);
+                                  setState(() {
+                                    editEmergencyContact(
+                                      new EmergencyContact(
+                                        contact_name: contact_name!,
+                                        contact_number: contact_number!,
+                                        contact_image: contact_image!,
+                                      ),
+                                      widget.index,
+                                    );
+                                  });
+                                } else {
+                                  setState(() {
+                                    _load = true;
+                                    addEmergencyContacts(
+                                      EmergencyContact(
+                                        contact_name: contact_name!,
+                                        contact_number: contact_number!,
+                                        contact_image: contact_image!,
+                                      ),
+                                    );
+                                  });
+                                  setState(() {
+                                    _load = false;
+                                  });
+                                  Navigator.pop(context);
+                                }
                               }
                             },
-                            child: Text('Add Contact'),
+                            child: Text(
+                              widget.editContact ? 'Save' : 'Add Contact',
+                            ),
                             style: ButtonStyle(
                               backgroundColor:
                                   MaterialStateProperty.all(accentColor),

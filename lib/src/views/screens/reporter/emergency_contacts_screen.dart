@@ -34,6 +34,7 @@ class EmergencyContactsScreen extends StatelessWidget {
                       contact_name: e.contact_name,
                       contact_number: e.contact_number,
                       contact_image: e.contact_image,
+                      index: getEmergencyContacts().indexOf(e),
                     );
                   }).toList(),
                 ),
