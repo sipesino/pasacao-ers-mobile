@@ -8,8 +8,14 @@ import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/incident_button.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key, required this.args}) : super(key: key);
   final ScreenArguments args;
+  final ScrollController controller;
+
+  HomeScreen({
+    Key? key,
+    required this.args,
+    required this.controller,
+  }) : super(key: key);
 
   final ButtonStyle elivatedButtonStyle = ElevatedButton.styleFrom(
     onPrimary: Colors.black87,
@@ -25,6 +31,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraint) {
       return SingleChildScrollView(
+        controller: controller,
         clipBehavior: Clip.none,
         child: ConstrainedBox(
           constraints: BoxConstraints(minHeight: constraint.maxHeight),

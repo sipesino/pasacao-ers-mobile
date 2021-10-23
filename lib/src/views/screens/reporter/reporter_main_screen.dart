@@ -6,6 +6,7 @@ import 'package:pers/src/views/screens/reporter/alerts_screen.dart';
 import 'package:pers/src/views/screens/reporter/home_screen.dart';
 import 'package:pers/src/views/screens/reporter/locations_screen.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
+import 'package:pers/src/widgets/scroll_to_hide.dart';
 
 class ReporterMainScreen extends StatefulWidget {
   ReporterMainScreen({Key? key}) : super(key: key);
@@ -36,6 +37,20 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
     );
   }
 
+  late ScrollController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
@@ -44,7 +59,10 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
         child: PageView(
           controller: pageController,
           children: [
-            HomeScreen(args: args),
+            HomeScreen(
+              args: args,
+              controller: controller,
+            ),
             AlertsScreen(),
             LocationsScreen(),
             ProfileScreen(args: args),
@@ -56,14 +74,17 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: _barItems,
-        currentIndex: _selectedIndex,
-        unselectedItemColor: chromeColor,
-        unselectedIconTheme: IconThemeData(color: chromeColor),
-        selectedItemColor: accentColor,
-        selectedIconTheme: IconThemeData(color: accentColor),
-        onTap: onTap,
+      bottomNavigationBar: ScrollToHideWidget(
+        controller: controller,
+        child: BottomNavigationBar(
+          items: _barItems,
+          currentIndex: _selectedIndex,
+          unselectedItemColor: chromeColor,
+          unselectedIconTheme: IconThemeData(color: chromeColor),
+          selectedItemColor: accentColor,
+          selectedIconTheme: IconThemeData(color: accentColor),
+          onTap: onTap,
+        ),
       ),
     );
   }

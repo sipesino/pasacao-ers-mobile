@@ -209,6 +209,11 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                       ),
                     ],
                   ),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ),
               SizedBox(width: 10),
@@ -225,6 +230,11 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   child: Text('Continue'),
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(accentColor),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -317,7 +327,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     new BoxShadow(
                       color: Colors.grey.withOpacity(0.3),
@@ -328,7 +338,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                   child: Image.file(
                     File(incidentImages[index].path),
                     width: 110,
@@ -341,8 +351,8 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 top: 0,
                 right: 0,
                 child: SizedBox(
-                  width: 22,
-                  height: 22,
+                  width: 24,
+                  height: 24,
                   child: IconButton(
                     onPressed: () {
                       setState(() {
@@ -381,7 +391,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           height: 110,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.grey),
             boxShadow: [
               new BoxShadow(
