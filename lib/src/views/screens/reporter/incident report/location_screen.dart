@@ -85,23 +85,24 @@ class _LocationScreenState extends State<LocationScreen> {
             SizedBox(
               height: 50,
               width: 100,
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.keyboard_arrow_left,
-                      color: primaryColor,
-                    ),
-                    Text(
-                      'Back',
-                      style: TextStyle(
-                        color: primaryColor,
-                      ),
-                    ),
-                  ],
+                icon: Icon(
+                  Icons.keyboard_arrow_left,
+                  color: primaryColor,
+                ),
+                label: Text(
+                  'Back',
+                  style: TextStyle(
+                    color: primaryColor,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
             ),
@@ -119,6 +120,11 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Text('Continue'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(accentColor),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -3,22 +3,6 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
 
 class CustomTextFormField extends StatefulWidget {
-  CustomTextFormField({
-    required this.keyboardType,
-    required this.prefixIcon,
-    required this.validator,
-    required this.label,
-    required this.onSaved,
-    this.maxLines = 1,
-    this.focusNode,
-    this.controller,
-    this.inputAction = TextInputAction.next,
-    this.isReadOnly = false,
-    this.initialValue,
-    this.onTap,
-    this.key,
-  }) : super(key: key);
-
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? initialValue;
@@ -31,7 +15,27 @@ class CustomTextFormField extends StatefulWidget {
   final FormFieldSetter<String>? onSaved;
   final VoidCallback? onTap;
   final IconData prefixIcon;
-  final FormFieldValidator validator;
+  final FormFieldValidator? validator;
+  final AutovalidateMode validationMode;
+  final bool isOptional;
+
+  CustomTextFormField({
+    required this.keyboardType,
+    required this.prefixIcon,
+    required this.label,
+    required this.onSaved,
+    this.validator,
+    this.maxLines = 1,
+    this.focusNode,
+    this.controller,
+    this.inputAction = TextInputAction.next,
+    this.isReadOnly = false,
+    this.initialValue,
+    this.onTap,
+    this.key,
+    this.isOptional = false,
+    this.validationMode = AutovalidateMode.onUserInteraction,
+  }) : super(key: key);
 
   @override
   CustomTextFormFieldState createState() => CustomTextFormFieldState();
@@ -44,17 +48,32 @@ class CustomTextFormFieldState extends State<CustomTextFormField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.label,
-            style: TextStyle(color: contentColorLightTheme),
+          Text.rich(
+            TextSpan(
+              text: widget.label,
+              style: TextStyle(color: contentColorLightTheme),
+              children: <InlineSpan>[
+                widget.isOptional
+                    ? TextSpan(
+                        text: ' (Optional)',
+                        style: TextStyle(color: Colors.grey),
+                      )
+                    : TextSpan(),
+              ],
+            ),
           ),
           SizedBox(height: 5),
           TextFormField(
+            textCapitalization: (widget.label == 'First Name' ||
+                    widget.label == 'Last Name' ||
+                    widget.label == 'Victim Name')
+                ? TextCapitalization.words
+                : TextCapitalization.sentences,
             key: widget.key,
             readOnly: widget.isReadOnly,
             maxLines: widget.maxLines,
             minLines: 1,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            autovalidateMode: widget.validationMode,
             textInputAction: widget.inputAction,
             enableSuggestions: false,
             keyboardType: widget.keyboardType,

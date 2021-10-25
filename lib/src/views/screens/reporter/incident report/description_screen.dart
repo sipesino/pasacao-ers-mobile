@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,6 +6,7 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class DescriptionScreen extends StatefulWidget {
@@ -19,13 +19,39 @@ class DescriptionScreen extends StatefulWidget {
 class _DescriptionScreenState extends State<DescriptionScreen> {
   List<XFile> incidentImages = [];
 
+  late TextEditingController controller;
+
   final _formKey = GlobalKey<FormState>();
   bool _load = false;
 
-  final validator = MultiValidator([
+  final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Fill this in too'),
-    MinLengthValidator(10, errorText: 'At least 10 characters is required'),
+    MinLengthValidator(2, errorText: 'At least 2 characters is required'),
   ]);
+
+  final ageValidator = MultiValidator([
+    RequiredValidator(errorText: 'Fill this in too'),
+    PatternValidator(
+      r'(^(?=.*[1-9])\d*\.?\d*$)',
+      errorText: 'Whole numbers only',
+    ),
+  ]);
+
+  final sexValidator = MultiValidator([
+    RequiredValidator(errorText: 'Fill this in too'),
+  ]);
+
+  @override
+  void initState() {
+    controller = new TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,95 +117,188 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         ],
       );
 
-  Widget _buildTopContainer(ScreenArguments args) => Expanded(
-        child: SingleChildScrollView(
-          clipBehavior: Clip.none,
-          physics: NeverScrollableScrollPhysics(),
-          child: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Text(
-                  'Incident Description',
-                  style: DefaultTextTheme.headline2,
-                ),
-                Text(
-                  'Please provide the specific details of the incident',
-                  style: DefaultTextTheme.subtitle1,
-                ),
-                const SizedBox(height: 30),
-                CustomTextFormField(
-                  keyboardType: TextInputType.text,
-                  prefixIcon: CustomIcons.siren,
-                  validator: validator,
-                  label: 'Incident Type',
-                  onSaved: (val) {},
-                  isReadOnly: true,
-                  initialValue: args.incidentType,
-                ),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  keyboardType: TextInputType.text,
-                  prefixIcon: CustomIcons.description,
-                  validator: validator,
-                  label: 'Description',
-                  onSaved: (val) {},
-                  maxLines: 5,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Attach images of the incident (Optional)',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                SizedBox(height: 5),
-                incidentImages.length == 0
-                    ? InkWell(
-                        onTap: () => showModalBottomSheet(
-                          context: context,
-                          builder: ((builder) => choosePhoto()),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10),
-                            ),
-                          ),
-                          backgroundColor: Colors.transparent,
-                        ),
-                        child: Container(
-                          height: 200,
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(
-                              width: 1,
-                              color: contentColorLightTheme.withOpacity(0.2),
-                            ),
-                          ),
-                          child: Icon(
-                            CustomIcons.add_image,
-                            size: 50,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          child: Wrap(
-                            alignment: WrapAlignment.start,
-                            spacing: 10,
-                            runSpacing: 10,
-                            clipBehavior: Clip.none,
-                            children: displayIncidentImages(),
-                          ),
-                        ),
-                      ),
-              ],
-            ),
+  Widget _buildTopContainer(ScreenArguments args) {
+    double height = 116;
+
+    return Expanded(
+      child: SingleChildScrollView(
+        clipBehavior: Clip.none,
+        physics: NeverScrollableScrollPhysics(),
+        child: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 20),
+              Text(
+                'Incident Description',
+                style: DefaultTextTheme.headline2,
+              ),
+              Text(
+                'Please provide the specific details of the incident',
+                style: DefaultTextTheme.subtitle1,
+              ),
+              const SizedBox(height: 30),
+              _buildIncidentTypeTextFormField(args),
+              const SizedBox(height: 10),
+              _buildVictimNameTextFormField(),
+              const SizedBox(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: _buildSexTextFormField(),
+                  ),
+                  SizedBox(width: 10),
+                  SizedBox(
+                    width: 120,
+                    child: _buildAgeTextFormField(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              _buildDescriptionTextFormField(),
+              const SizedBox(height: 20),
+              _buildIncidentImages(),
+            ],
           ),
         ),
-      );
+      ),
+    );
+  }
+
+  Widget _buildDescriptionTextFormField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.text,
+      prefixIcon: CustomIcons.description,
+      validator: nameValidator,
+      label: 'Description',
+      onSaved: (val) {},
+      maxLines: 5,
+    );
+  }
+
+  Widget _buildVictimNameTextFormField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.text,
+      prefixIcon: CustomIcons.description,
+      validator: nameValidator,
+      label: 'Victim Name',
+      onSaved: (val) {},
+      isOptional: true,
+    );
+  }
+
+  Widget _buildSexTextFormField() {
+    return CustomDropDownButton(
+      hintText: 'Sex',
+      icon: CustomIcons.sex,
+      validator: sexValidator,
+      onSaved: (val) {},
+      focusNode: FocusNode(),
+      items: [
+        'Male',
+        'Female',
+      ],
+      isOptional: true,
+    );
+  }
+
+  Widget _buildAgeTextFormField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.number,
+      prefixIcon: CustomIcons.age,
+      validator: ageValidator,
+      label: 'Age',
+      onSaved: (val) {},
+      isOptional: true,
+    );
+  }
+
+  Widget _buildIncidentTypeTextFormField(ScreenArguments args) {
+    return CustomTextFormField(
+      keyboardType: TextInputType.text,
+      prefixIcon: CustomIcons.siren,
+      label: 'Incident Type',
+      onSaved: (val) {},
+      isReadOnly: true,
+      initialValue: args.incidentType,
+    );
+  }
+
+  Widget _buildIncidentImages() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: 'Attach images of the incident',
+            style: TextStyle(color: contentColorLightTheme),
+            children: <InlineSpan>[
+              TextSpan(
+                text: ' (Optional)',
+                style: TextStyle(color: Colors.grey),
+              )
+            ],
+          ),
+        ),
+        SizedBox(height: 5),
+        incidentImages.length == 0
+            ? InkWell(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  builder: ((builder) => choosePhoto()),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10),
+                    ),
+                  ),
+                  backgroundColor: Colors.transparent,
+                ),
+                child: Container(
+                  height: 100,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      width: 1,
+                      color: contentColorLightTheme.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        CustomIcons.add_image,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                      Text(
+                        'Click here',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : Center(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Wrap(
+                    alignment: WrapAlignment.start,
+                    spacing: 10,
+                    runSpacing: 10,
+                    clipBehavior: Clip.none,
+                    children: displayIncidentImages(),
+                  ),
+                ),
+              ),
+      ],
+    );
+  }
 
   Widget _buildBottomContainer() => SizedBox.fromSize(
         child: Container(

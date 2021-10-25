@@ -21,7 +21,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       label: 'Home',
     ),
     BottomNavigationBarItem(
-      icon: Icon(CustomIcons.siren_filled),
+      icon: Icon(CustomIcons.siren_2),
       label: 'Operations',
     ),
     BottomNavigationBarItem(

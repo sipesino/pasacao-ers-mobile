@@ -10,6 +10,7 @@ class CustomDropDownButton extends StatefulWidget {
   final FormFieldValidator validator;
   final FormFieldSetter<String>? onSaved;
   final bool isDisabled;
+  final bool isOptional;
 
   const CustomDropDownButton({
     required this.items,
@@ -18,7 +19,8 @@ class CustomDropDownButton extends StatefulWidget {
     required this.focusNode,
     required this.validator,
     required this.onSaved,
-    required this.isDisabled,
+    this.isDisabled = false,
+    this.isOptional = false,
   });
 
   @override
@@ -34,44 +36,69 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Sex',
-          style: TextStyle(color: contentColorLightTheme),
+        Text.rich(
+          TextSpan(
+            text: widget.hintText,
+            style: TextStyle(color: contentColorLightTheme),
+            children: <InlineSpan>[
+              widget.isOptional
+                  ? TextSpan(
+                      text: ' (Optional)',
+                      style: TextStyle(color: Colors.grey),
+                    )
+                  : TextSpan(),
+            ],
+          ),
         ),
         SizedBox(height: 5),
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-            border: Border.all(
-              color: isTapped
-                  ? contentColorLightTheme.withOpacity(0.2)
-                  : Colors.grey.withOpacity(0.5),
-              width: 1,
-            ),
           ),
-          child: DropdownButtonFormField<String>(
+          child: DropdownButtonFormField(
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: widget.validator,
             onSaved: widget.onSaved,
             decoration: InputDecoration(
+              prefixIcon: Icon(
+                CustomIcons.sex,
+                color: contentColorLightTheme,
+              ),
               hintText: widget.hintText,
               hintStyle: TextStyle(
                 color: Colors.grey,
                 fontSize: 16,
               ),
-              focusedBorder: InputBorder.none,
-              filled: true,
               fillColor: Colors.white,
-              icon: Icon(
-                CustomIcons.sex,
-                color: contentColorLightTheme,
-                size: 20,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(
+                  color: contentColorLightTheme.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 6, horizontal: -4),
-              enabledBorder: InputBorder.none,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(5),
+                borderSide: BorderSide(
+                  color: contentColorLightTheme.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.redAccent,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: chromeColor,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(5.5),
+              ),
+              filled: true,
             ),
             autofocus: false,
             iconEnabledColor: contentColorLightTheme,
@@ -92,9 +119,9 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
             }).toList(),
             onChanged: widget.isDisabled
                 ? null
-                : (newValue) {
+                : (String? val) {
                     setState(() {
-                      dropdownValue = newValue;
+                      dropdownValue = val;
                       isTapped = !isTapped;
                       widget.focusNode.requestFocus();
                     });
