@@ -18,22 +18,34 @@ class ReporterMainScreen extends StatefulWidget {
 class _ReporterMainScreenState extends State<ReporterMainScreen> {
   PageController pageController = new PageController();
   int _selectedIndex = 0;
+
   List<BottomNavigationBarItem> _barItems = <BottomNavigationBarItem>[
-    BottomNavigationBarItem(icon: Icon(CustomIcons.home), label: 'Home'),
-    BottomNavigationBarItem(icon: Icon(CustomIcons.warning), label: 'Alerts'),
     BottomNavigationBarItem(
-        icon: Icon(CustomIcons.location_pin), label: 'Locations'),
-    BottomNavigationBarItem(icon: Icon(CustomIcons.user), label: 'Profile'),
+      icon: Icon(CustomIcons.home),
+      label: 'Home',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(CustomIcons.warning),
+      label: 'Alerts',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(CustomIcons.location_pin),
+      label: 'Locations',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(CustomIcons.user),
+      label: 'Profile',
+    ),
   ];
 
-  void onTap(int index) {
+  void onTap(int index) async {
     setState(() {
       _selectedIndex = index;
     });
     pageController.animateToPage(
       index,
       duration: Duration(milliseconds: 300),
-      curve: Curves.bounceInOut,
+      curve: Curves.easeIn,
     );
   }
 

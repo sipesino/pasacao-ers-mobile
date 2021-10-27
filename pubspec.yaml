@@ -27,10 +27,11 @@ dependencies:
   cupertino_stepper: ^0.2.0
   tuple: ^2.0.0
   intl: ^0.17.0
-  location: ^4.3.0
   permission_handler: ^8.1.6
   google_maps_flutter: ^2.0.11
   image_picker: ^0.8.4+3
+  location: ^4.3.0
+  flutter_polyline_points: ^1.0.0
 
 dev_dependencies:
   flutter_lints: ^1.0.0
@@ -43,6 +44,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/mock_images/
+    - assets/json/
 
   fonts:
     - family: CustomIcons

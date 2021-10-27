@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:location/location.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -159,12 +158,12 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   icon: CustomIcons.criminal,
-                  label: 'Theft or Roberry',
+                  label: 'Theft or Robbery',
                   onPressed: () {
                     navigateToIncidentReportScreen(
                       context,
                       CustomIcons.criminal,
-                      'Theft or Roberry',
+                      'Theft or Robbery',
                     );
                   },
                 ),
@@ -233,7 +232,6 @@ class HomeScreen extends StatelessWidget {
     String incidentType,
   ) async {
     PermissionHandler.checkLocationPermission();
-    Location location = new Location();
 
     Navigator.of(context).pushNamed(
       '/reporter/home/report/description',
@@ -241,7 +239,6 @@ class HomeScreen extends StatelessWidget {
         incidentType: incidentType,
         user: args.user,
         icon: icon,
-        location: location,
       ),
     );
   }

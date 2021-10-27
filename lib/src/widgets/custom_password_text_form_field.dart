@@ -8,6 +8,7 @@ class CustomPasswordTextFormField extends StatefulWidget {
   final String label;
   final FormFieldSetter<String>? onSaved;
   final ValueChanged<String>? onChanged;
+  final String? initialValue;
 
   CustomPasswordTextFormField({
     Key? key,
@@ -16,6 +17,7 @@ class CustomPasswordTextFormField extends StatefulWidget {
     required this.label,
     required this.onSaved,
     required this.onChanged,
+    this.initialValue,
   }) : super(key: key);
 
   @override
@@ -50,6 +52,7 @@ class CustomPasswordTextFormFieldState
               label: widget.label,
               prefixIcon: widget.prefixIcon,
             ),
+            initialValue: widget.initialValue,
           ),
         ],
       ),

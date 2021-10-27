@@ -118,8 +118,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       );
 
   Widget _buildTopContainer(ScreenArguments args) {
-    double height = 116;
-
     return Expanded(
       child: SingleChildScrollView(
         clipBehavior: Clip.none,

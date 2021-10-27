@@ -12,6 +12,7 @@ import 'package:pers/src/views/screens/reporter/incident%20report/description_sc
 import 'package:pers/src/views/screens/reporter/incident%20report/location_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/summary_screen.dart';
 import 'package:pers/src/views/screens/reporter/login_registration/login_registration_screen.dart';
+import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/personal_info_screen.dart';
 import 'package:pers/src/views/screens/reporter/reporter_main_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_login_screen.dart';
@@ -64,6 +65,7 @@ class _MERSState extends State<MERS> {
           '/reporter/home/report/location': (context) => LocationScreen(),
           '/reporter/home/report/summary': (context) => SummaryScreen(),
           '/reporter/home/hotlines': (context) => HotlinesScreen(),
+          '/reporter/home/map': (context) => MapScreen(),
           '/reporter/home/emergency_contacts': (context) =>
               EmergencyContactsScreen(),
           '/reporter/home/profile': (context) => PersonalInformationScreen(),

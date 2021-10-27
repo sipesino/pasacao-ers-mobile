@@ -1,3 +1,4 @@
+// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -14,8 +15,11 @@ class LoginScreen extends StatefulWidget {
   static const String idScreen = 'login';
   final MainModel model;
   final GlobalKey<ScaffoldState> scaffold_key;
-  const LoginScreen({Key? key, required this.model, required this.scaffold_key})
-      : super(key: key);
+  const LoginScreen({
+    Key? key,
+    required this.model,
+    required this.scaffold_key,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -197,6 +201,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         label: 'Email',
         prefixIcon: CustomIcons.mail,
         validator: emailValidator,
+        initialValue: 'admin@email.com',
       );
 
   Widget PasswordTextField() => CustomPasswordTextFormField(
@@ -207,6 +212,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         onSaved: (value) {
           password = value;
         },
+        initialValue: 'admin',
       );
 
   Widget FormDivider() => Row(

@@ -2,11 +2,17 @@ import 'package:permission_handler/permission_handler.dart';
 
 class PermissionHandler {
   static void checkLocationPermission() async {
-    var _status = await Permission.location.status;
-    print("Location Permission: $_status");
-    if (!_status.isGranted) {
-      _status = await Permission.location.request();
-      print("Location Permission: $_status");
+    var _status = await Permission.location.serviceStatus;
+
+    if (_status.isDisabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    var _pstatus = await Permission.location.status;
+    print("Location Permission: $_pstatus");
+    if (!_pstatus.isGranted) {
+      _pstatus = await Permission.location.request();
+      print("Location Permission: $_pstatus");
     }
   }
 
