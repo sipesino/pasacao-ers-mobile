@@ -18,6 +18,7 @@ class DescriptionScreen extends StatefulWidget {
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
   List<XFile> incidentImages = [];
+  bool not_victim = false;
 
   late TextEditingController controller;
 
@@ -138,22 +139,33 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
               const SizedBox(height: 30),
               _buildIncidentTypeTextFormField(args),
               const SizedBox(height: 10),
-              _buildVictimNameTextFormField(),
+              _buildVictimCheckBox(),
               const SizedBox(height: 10),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _buildSexTextFormField(),
-                  ),
-                  SizedBox(width: 10),
-                  SizedBox(
-                    width: 120,
-                    child: _buildAgeTextFormField(),
-                  ),
-                ],
+              AnimatedSwitcher(
+                duration: Duration(milliseconds: 400),
+                child: not_victim
+                    ? Column(
+                        children: [
+                          _buildVictimNameTextFormField(),
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: _buildSexTextFormField(),
+                              ),
+                              SizedBox(width: 10),
+                              SizedBox(
+                                width: 120,
+                                child: _buildAgeTextFormField(),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                      )
+                    : SizedBox.shrink(),
               ),
-              const SizedBox(height: 10),
               _buildDescriptionTextFormField(),
               const SizedBox(height: 20),
               _buildIncidentImages(),
@@ -161,6 +173,36 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Row _buildVictimCheckBox() {
+    return Row(
+      children: [
+        SizedBox(
+          width: 20,
+          height: 20,
+          child: Checkbox(
+            value: not_victim,
+            onChanged: (value) {
+              setState(() {
+                not_victim = value!;
+              });
+            },
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              not_victim = !not_victim;
+            });
+          },
+          child: Text(
+            'I\'m not the victim',
+            style: TextStyle(color: primaryColor),
+          ),
+        ),
+      ],
     );
   }
 
