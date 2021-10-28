@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pers/src/constants.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -19,6 +22,15 @@ class HotlineCard extends StatefulWidget {
 }
 
 class _HotlineCardState extends State<HotlineCard> {
+  getIcon() {
+    if (widget.hotline_type == 'Police')
+      return Icons.local_police;
+    else if (widget.hotline_type == "Medic")
+      return FontAwesomeIcons.hospitalSymbol;
+    else
+      return CustomIcons.fire;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,40 +40,64 @@ class _HotlineCardState extends State<HotlineCard> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              offset: new Offset(-10, 10),
-              blurRadius: 10.0,
-              spreadRadius: 0.0,
-            ),
-          ],
+          boxShadow: boxShadow,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  widget.hotline_number,
-                  style: DefaultTextTheme.headline3,
-                ),
-                Text(
-                  widget.agency_name,
-                  style: DefaultTextTheme.subtitle1,
-                ),
-              ],
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: accentColor.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                getIcon(),
+                size: 30,
+                color: accentColor,
+              ),
             ),
-            IconButton(
-                onPressed: () => setState(() {
-                      _makePhoneCall('tel:${widget.hotline_number}');
-                    }),
-                icon: Icon(
-                  Icons.phone,
-                  color: Colors.green,
-                  size: 30,
-                )),
+            SizedBox(
+              width: 20,
+            ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    widget.hotline_number,
+                    style: DefaultTextTheme.headline4,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    widget.agency_name,
+                    style: DefaultTextTheme.subtitle1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            ClipOval(
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: ElevatedButton(
+                  onPressed: () => setState(() {
+                    _makePhoneCall('tel:${widget.hotline_number}');
+                  }),
+                  child: Icon(
+                    Icons.phone,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(EdgeInsets.zero),
+                    backgroundColor: MaterialStateProperty.all(Colors.green),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

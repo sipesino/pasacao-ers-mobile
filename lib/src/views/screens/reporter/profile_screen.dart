@@ -58,14 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: chromeColor.withOpacity(0.5),
                 border: Border.all(width: 5, color: Colors.white),
                 borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  new BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    offset: new Offset(-10, 10),
-                    blurRadius: 20.0,
-                    spreadRadius: 4.0,
-                  ),
-                ],
+                boxShadow: boxShadow,
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),

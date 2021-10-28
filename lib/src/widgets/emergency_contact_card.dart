@@ -27,14 +27,7 @@ class EmergencyContactCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              offset: new Offset(-10, 10),
-              blurRadius: 10.0,
-              spreadRadius: 0.0,
-            ),
-          ],
+          boxShadow: boxShadow,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -99,14 +92,7 @@ class EmergencyContactCard2 extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                offset: new Offset(-10, 10),
-                blurRadius: 10.0,
-                spreadRadius: 0.0,
-              ),
-            ],
+            boxShadow: boxShadow,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,

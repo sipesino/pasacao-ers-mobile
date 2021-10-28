@@ -18,8 +18,8 @@ class LocationCard extends StatelessWidget {
             new BoxShadow(
               color: Colors.grey.withOpacity(0.3),
               offset: new Offset(-10, 10),
-              blurRadius: 10.0,
-              spreadRadius: 0.0,
+              blurRadius: 15.0,
+              spreadRadius: -10.0,
             ),
           ],
         ),

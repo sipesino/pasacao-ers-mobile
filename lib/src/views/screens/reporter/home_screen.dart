@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -65,14 +66,7 @@ class HomeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.all(
                         Radius.circular(10),
                       ),
-                      boxShadow: [
-                        new BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          offset: new Offset(-10, 10),
-                          blurRadius: 20.0,
-                          spreadRadius: 4.0,
-                        ),
-                      ],
+                      boxShadow: boxShadow,
                     ),
                     child: Material(
                       // elevation: 5,

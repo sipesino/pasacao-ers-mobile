@@ -10,6 +10,15 @@ const fireDefaultColor = accentColor;
 const crimeDefaultColor = Color(0xFF4F70A1);
 const medicalDefaultColor = Color(0xFF81C6D6);
 
+final List<BoxShadow> boxShadow = <BoxShadow>[
+  BoxShadow(
+    color: Colors.grey.withOpacity(0.3),
+    offset: new Offset(-10, 10),
+    blurRadius: 15.0,
+    spreadRadius: -10.0,
+  ),
+];
+
 final String crimePng = 'assets/images/crime.png';
 final String medicalPng = 'assets/images/medical.png';
 final String firePng = 'assets/images/fire.png';
