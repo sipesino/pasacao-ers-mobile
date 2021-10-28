@@ -6,11 +6,13 @@ class AlertsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        child: Text(
-          'Under Construction',
-          style: DefaultTextTheme.headline4,
+    return SafeArea(
+      child: Center(
+        child: Container(
+          child: Text(
+            'Under Construction',
+            style: DefaultTextTheme.headline4,
+          ),
         ),
       ),
     );

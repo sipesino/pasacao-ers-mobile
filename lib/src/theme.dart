@@ -38,10 +38,10 @@ ThemeData lightThemeData(BuildContext context) {
     // ),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: Colors.white,
-      selectedItemColor: primaryColor.withOpacity(0.7),
+      selectedItemColor: accentColor,
+      selectedLabelStyle: TextStyle(color: accentColor),
       unselectedItemColor: primaryColor.withOpacity(0.32),
       selectedIconTheme: const IconThemeData(color: chromeColor),
-      showUnselectedLabels: true,
     ),
   );
 }
@@ -106,12 +106,12 @@ const TextTheme DefaultTextTheme = TextTheme(
     height: 1.5,
   ),
   subtitle1: TextStyle(
-    fontSize: 16,
+    fontSize: 14,
     color: contentColorLightTheme,
   ),
   subtitle2: TextStyle(
     fontStyle: FontStyle.normal,
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.grey,
   ),
 );

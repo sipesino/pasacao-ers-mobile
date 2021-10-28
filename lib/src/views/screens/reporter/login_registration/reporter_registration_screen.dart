@@ -138,24 +138,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Map<String, dynamic> user_data = {
                   "first_name": first_name,
                   "last_name": last_name,
-                  "mobile_no": mobile_no,
+                  // "mobile_no": mobile_no,
                   "email": email,
                   "password": password,
-                  "sex": sex,
-                  "birthdate": birthdate,
-                  "account_type": 'Reporter',
+                  // "sex": sex,
+                  // "birthdate": birthdate,
+                  // "account_type": 'Reporter',
                 };
 
                 user = User.fromMap(user_data);
 
                 widget.model
                     .postAPICall(
-                  'http://192.168.56.1/pers/api/user/addUser.php',
+                  'http://143.198.92.250/api/users',
                   user_data,
                 )
                     .then((value) {
-                  var status_code = value["statuscode"];
-                  if (status_code == 200) {
+                  var status_code = value["success"];
+                  if (status_code) {
                     Navigator.of(context).pushNamedAndRemoveUntil(
                         '/reporter/home', (Route<dynamic> route) => false,
                         arguments: ScreenArguments(
@@ -164,7 +164,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     setState(() {
                       _load = false;
                     });
-                    print(value["msg"]);
+                    print(value["message"]);
                   } else {
                     setState(() {
                       _load = false;
@@ -172,12 +172,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         behavior: SnackBarBehavior.floating,
-                        content: new Text(value["msg"]),
+                        content: new Text(value["message"]),
                         backgroundColor: Colors.red,
                         duration: new Duration(seconds: 5),
                       ),
                     );
-                    print(value["msg"]);
+                    print(value["message"]);
                   }
                 }, onError: (error) {
                   setState(() {

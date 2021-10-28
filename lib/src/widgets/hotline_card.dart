@@ -32,8 +32,8 @@ class _HotlineCardState extends State<HotlineCard> {
             new BoxShadow(
               color: Colors.grey.withOpacity(0.3),
               offset: new Offset(-10, 10),
-              blurRadius: 20.0,
-              spreadRadius: 4.0,
+              blurRadius: 10.0,
+              spreadRadius: 0.0,
             ),
           ],
         ),

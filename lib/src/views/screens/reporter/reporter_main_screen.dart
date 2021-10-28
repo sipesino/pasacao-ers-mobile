@@ -5,8 +5,10 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/views/screens/reporter/alerts_screen.dart';
 import 'package:pers/src/views/screens/reporter/home_screen.dart';
 import 'package:pers/src/views/screens/reporter/locations_screen.dart';
+import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
 import 'package:pers/src/widgets/scroll_to_hide.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class ReporterMainScreen extends StatefulWidget {
   ReporterMainScreen({Key? key}) : super(key: key);
@@ -17,9 +19,10 @@ class ReporterMainScreen extends StatefulWidget {
 
 class _ReporterMainScreenState extends State<ReporterMainScreen> {
   PageController pageController = new PageController();
+  late ScreenArguments args;
   int _selectedIndex = 0;
 
-  List<BottomNavigationBarItem> _barItems = <BottomNavigationBarItem>[
+  List<BottomNavigationBarItem> _barItems = [
     BottomNavigationBarItem(
       icon: Icon(CustomIcons.home),
       label: 'Home',
@@ -38,24 +41,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
     ),
   ];
 
-  void onTap(int index) async {
-    setState(() {
-      _selectedIndex = index;
-    });
-    pageController.animateToPage(
-      index,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeIn,
-    );
-  }
-
-  late ScrollController controller;
-
-  @override
-  void initState() {
-    super.initState();
-    controller = ScrollController();
-  }
+  ScrollController controller = ScrollController();
 
   @override
   void dispose() {
@@ -65,8 +51,9 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+    args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
     return Scaffold(
+      extendBody: true,
       body: SafeArea(
         child: PageView(
           controller: pageController,
@@ -88,14 +75,46 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
       ),
       bottomNavigationBar: ScrollToHideWidget(
         controller: controller,
-        child: BottomNavigationBar(
-          items: _barItems,
-          currentIndex: _selectedIndex,
-          unselectedItemColor: chromeColor,
-          unselectedIconTheme: IconThemeData(color: chromeColor),
-          selectedItemColor: accentColor,
-          selectedIconTheme: IconThemeData(color: accentColor),
-          onTap: onTap,
+        child: Container(
+          clipBehavior: Clip.none,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            boxShadow: [
+              new BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                offset: new Offset(0, -5),
+                blurRadius: 20.0,
+                spreadRadius: 4.0,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            child: BottomNavigationBar(
+              items: _barItems,
+              currentIndex: _selectedIndex,
+              unselectedItemColor: chromeColor,
+              unselectedIconTheme: IconThemeData(color: chromeColor),
+              selectedItemColor: accentColor,
+              selectedIconTheme: IconThemeData(color: accentColor),
+              onTap: (index) {
+                pageController.animateToPage(
+                  index,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.ease,
+                );
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+            ),
+          ),
         ),
       ),
     );
