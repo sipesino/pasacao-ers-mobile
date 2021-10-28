@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/constants.dart';
@@ -32,7 +33,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
       label: 'Alerts',
     ),
     BottomNavigationBarItem(
-      icon: Icon(CustomIcons.location_pin),
+      icon: Icon(FontAwesomeIcons.mapMarked),
       label: 'Locations',
     ),
     BottomNavigationBarItem(
@@ -63,7 +64,9 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
               controller: controller,
             ),
             AlertsScreen(),
-            LocationsScreen(),
+            LocationsScreen(
+              controller: controller,
+            ),
             ProfileScreen(args: args),
           ],
           onPageChanged: (index) {
@@ -113,6 +116,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
                   _selectedIndex = index;
                 });
               },
+              showUnselectedLabels: true,
             ),
           ),
         ),

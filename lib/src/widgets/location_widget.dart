@@ -14,14 +14,7 @@ class LocationCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              offset: new Offset(-10, 10),
-              blurRadius: 15.0,
-              spreadRadius: -10.0,
-            ),
-          ],
+          boxShadow: boxShadow,
         ),
         child: Row(
           children: [

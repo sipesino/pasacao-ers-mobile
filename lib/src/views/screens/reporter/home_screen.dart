@@ -29,6 +29,122 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<IncidentButton> incident_buttons = [
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFF51ABF7),
+            Color(0xFF5168FF),
+          ],
+        ),
+        icon: CustomIcons.cross,
+        label: 'Medical Emergency',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            CustomIcons.cross,
+            'Medical Emergency',
+          );
+        },
+      ),
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xff6685FC),
+            Color(0xFF9665FA),
+          ],
+        ),
+        icon: FontAwesomeIcons.carCrash,
+        label: 'Vehicle Accident',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            FontAwesomeIcons.carCrash,
+            'Vehicle Accident',
+          );
+        },
+      ),
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFFEF60A3),
+            Color(0xFF9665FA),
+          ],
+        ),
+        icon: CustomIcons.criminal,
+        label: 'Theft or Robbery',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            CustomIcons.criminal,
+            'Theft or Robbery',
+          );
+        },
+      ),
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFFdb7f8e),
+            Color(0xFFaa4465),
+          ],
+        ),
+        icon: FontAwesomeIcons.fistRaised,
+        label: 'Assault',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            FontAwesomeIcons.fistRaised,
+            'Assault',
+          );
+        },
+      ),
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFFFC9842),
+            Color(0xFFFE5F75),
+          ],
+        ),
+        icon: CustomIcons.fire,
+        label: 'Fire Incident',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            CustomIcons.fire,
+            'Fire Incident',
+          );
+        },
+      ),
+      IncidentButton(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: <Color>[
+            Color(0xFF35E688),
+            Color(0xFF64A3E0),
+          ],
+        ),
+        icon: CustomIcons.drowning,
+        label: 'Drowning',
+        onPressed: () {
+          navigateToIncidentReportScreen(
+            context,
+            CustomIcons.drowning,
+            'Drowning Incident',
+          );
+        },
+      ),
+    ];
     return SafeArea(
       child: LayoutBuilder(builder: (context, constraint) {
         return SingleChildScrollView(
@@ -113,107 +229,8 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 15),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xFF51ABF7),
-                        Color(0xFF5168FF),
-                      ],
-                    ),
-                    icon: CustomIcons.cross,
-                    label: 'Medical Emergency',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        CustomIcons.cross,
-                        'Medical Emergency',
-                      );
-                    },
-                  ),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xff6685FC),
-                        Color(0xFF9665FA),
-                      ],
-                    ),
-                    icon: FontAwesomeIcons.carCrash,
-                    label: 'Vehicle Accident',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        FontAwesomeIcons.carCrash,
-                        'Vehicle Accident',
-                      );
-                    },
-                  ),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xFFEF60A3),
-                        Color(0xFF9665FA),
-                      ],
-                    ),
-                    icon: CustomIcons.criminal,
-                    label: 'Theft or Robbery',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        CustomIcons.criminal,
-                        'Theft or Robbery',
-                      );
-                    },
-                  ),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xFFdb7f8e),
-                        Color(0xFFaa4465),
-                      ],
-                    ),
-                    icon: FontAwesomeIcons.fistRaised,
-                    label: 'Assault',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        FontAwesomeIcons.fistRaised,
-                        'Assault',
-                      );
-                    },
-                  ),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xFFFC9842),
-                        Color(0xFFFE5F75),
-                      ],
-                    ),
-                    icon: CustomIcons.fire,
-                    label: 'Fire Incident',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        CustomIcons.fire,
-                        'Fire Incident',
-                      );
-                    },
-                  ),
-                  IncidentButton(
-                    gradient: LinearGradient(
-                      colors: <Color>[
-                        Color(0xFF35E688),
-                        Color(0xFF64A3E0),
-                      ],
-                    ),
-                    icon: CustomIcons.drowning,
-                    label: 'Drowning',
-                    onPressed: () {
-                      navigateToIncidentReportScreen(
-                        context,
-                        CustomIcons.drowning,
-                        'Drowning Incident',
-                      );
-                    },
+                  Column(
+                    children: incident_buttons,
                   ),
                 ],
               ),

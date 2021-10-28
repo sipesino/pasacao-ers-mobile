@@ -13,9 +13,9 @@ const medicalDefaultColor = Color(0xFF81C6D6);
 final List<BoxShadow> boxShadow = <BoxShadow>[
   BoxShadow(
     color: Colors.grey.withOpacity(0.3),
-    offset: new Offset(-10, 10),
+    offset: new Offset(0, 10),
     blurRadius: 15.0,
-    spreadRadius: -10.0,
+    spreadRadius: 0.0,
   ),
 ];
 
