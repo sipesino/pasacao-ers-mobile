@@ -8,9 +8,7 @@ import 'package:pers/src/views/screens/Forgot%20Password/forgot_pass_verificatio
 import 'package:pers/src/views/screens/forgot%20password/new_password_screen.dart';
 import 'package:pers/src/views/screens/reporter/emergency_contacts_screen.dart';
 import 'package:pers/src/views/screens/reporter/hotlines_screen.dart';
-import 'package:pers/src/views/screens/reporter/incident%20report/description_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/incident_report_screen.dart';
-import 'package:pers/src/views/screens/reporter/incident%20report/location_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/summary_screen.dart';
 import 'package:pers/src/views/screens/reporter/login_registration/login_registration_screen.dart';
 import 'package:pers/src/views/screens/reporter/map_screen.dart';

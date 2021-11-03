@@ -5,14 +5,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class DescriptionScreen extends StatefulWidget {
-  DescriptionScreen({Key? key}) : super(key: key);
+  final ScreenArguments args;
+  DescriptionScreen({
+    Key? key,
+    required this.args,
+  }) : super(key: key);
 
   @override
   State<DescriptionScreen> createState() => _DescriptionScreenState();
@@ -24,7 +27,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   late TextEditingController controller;
 
   final _formKey = GlobalKey<FormState>();
-  bool _load = false;
 
   String? incident_type;
   String? patient_name;
@@ -64,125 +66,55 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-    Widget loadingIndicator = _load
-        ? new Container(
-            width: 70.0,
-            height: 70.0,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.all(
-                Radius.circular(5),
-              ),
-            ),
-            child: new Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: new Center(
-                child: new CircularProgressIndicator(),
-              ),
-            ),
-          )
-        : new Container();
+    return Form(
+      key: _formKey,
+      child: _buildTopContainer(),
+    );
+  }
 
-    return Stack(
+  Widget _buildTopContainer() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Scaffold(
-          body: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraint) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: SingleChildScrollView(
-                    clipBehavior: Clip.none,
-                    child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraint.maxHeight),
-                      child: IntrinsicHeight(
-                        child: Form(
-                          key: _formKey,
-                          child: _buildColumn(args),
+        const SizedBox(height: 10),
+        _buildIncidentTypeTextFormField(),
+        const SizedBox(height: 10),
+        _buildVictimCheckBox(),
+        const SizedBox(height: 10),
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 300),
+          child: not_victim
+              ? Column(
+                  children: [
+                    _buildVictimNameTextFormField(),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _buildSexTextFormField(),
                         ),
-                      ),
+                        SizedBox(width: 10),
+                        SizedBox(
+                          width: 120,
+                          child: _buildAgeTextFormField(),
+                        ),
+                      ],
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
+                    const SizedBox(height: 10),
+                  ],
+                )
+              : SizedBox.shrink(),
         ),
-        new Align(
-          child: loadingIndicator,
-          alignment: FractionalOffset.center,
-        ),
+        _buildDescriptionTextFormField(),
+        const SizedBox(height: 20),
+        _buildIncidentImages(),
       ],
     );
   }
 
-  Widget _buildColumn(ScreenArguments args) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildTopContainer(args),
-          _buildBottomContainer(args),
-        ],
-      );
-
-  Widget _buildTopContainer(ScreenArguments args) {
-    return Expanded(
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Incident Description',
-                style: DefaultTextTheme.headline3,
-              ),
-              Text(
-                'Please provide the specific details of the incident',
-                style: DefaultTextTheme.subtitle1,
-              ),
-              const SizedBox(height: 30),
-              _buildIncidentTypeTextFormField(args),
-              const SizedBox(height: 10),
-              _buildVictimCheckBox(),
-              const SizedBox(height: 10),
-              AnimatedSwitcher(
-                duration: Duration(milliseconds: 300),
-                child: not_victim
-                    ? Column(
-                        children: [
-                          _buildVictimNameTextFormField(),
-                          const SizedBox(height: 10),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: _buildSexTextFormField(),
-                              ),
-                              SizedBox(width: 10),
-                              SizedBox(
-                                width: 120,
-                                child: _buildAgeTextFormField(),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                        ],
-                      )
-                    : SizedBox.shrink(),
-              ),
-              _buildDescriptionTextFormField(),
-              const SizedBox(height: 20),
-              _buildIncidentImages(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIncidentTypeTextFormField(ScreenArguments args) {
+  Widget _buildIncidentTypeTextFormField() {
     return CustomTextFormField(
       validator: sexValidator,
       keyboardType: TextInputType.text,
@@ -192,7 +124,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         incident_type = val;
       },
       isReadOnly: true,
-      initialValue: args.incidentType,
+      initialValue: widget.args.incidentType,
     );
   }
 
@@ -349,88 +281,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       ],
     );
   }
-
-  Widget _buildBottomContainer(ScreenArguments args) => Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 100,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                label: Text(
-                  'Back',
-                  style: TextStyle(
-                    color: primaryColor,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                icon: Icon(
-                  Icons.keyboard_arrow_left,
-                  color: primaryColor,
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            SizedBox(
-              height: 50,
-              width: 100,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-
-                    //if reporter is the victim then retrieve patient name, sex and age information to his profile.
-                    if (!not_victim) {
-                      patient_name =
-                          '${args.user!.first_name!} ${args.user!.last_name!}';
-                      sex = args.user!.sex!;
-                      age = '10';
-                      //TODO: uncomment calcualte age method below
-                      // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
-                    }
-
-                    var report = IncidentReport(
-                      incident_type: incident_type,
-                      patient_name: patient_name,
-                      sex: sex,
-                      age: age,
-                      description: description,
-                      incident_images: incident_images,
-                    );
-
-                    Navigator.of(context).pushNamed(
-                      '/reporter/home/report/location',
-                      arguments: ScreenArguments(
-                        incident_report: report,
-                        user: args.user,
-                      ),
-                    );
-                  }
-                },
-                child: Text('Continue'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(accentColor),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
 
   Widget choosePhoto() {
     return Container(
