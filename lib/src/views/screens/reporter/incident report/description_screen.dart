@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
-import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
@@ -25,8 +24,6 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   bool not_victim = false;
 
   late TextEditingController controller;
-
-  final _formKey = GlobalKey<FormState>();
 
   String? incident_type;
   String? patient_name;
@@ -67,12 +64,12 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _formKey,
-      child: _buildTopContainer(),
+      key: widget.form_key,
+      child: _buildColumn(),
     );
   }
 
-  Widget _buildTopContainer() {
+  Widget _buildColumn() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,

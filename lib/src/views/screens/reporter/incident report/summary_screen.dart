@@ -94,9 +94,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
                   Text(
                     'Incident Report Summary',
                     style: DefaultTextTheme.headline2,
@@ -105,9 +103,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     'Please review all the information stated below',
                     style: DefaultTextTheme.subtitle1,
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  SizedBox(height: 20),
                   CustomLabel(
                     label: 'Incident Type',
                     value: args.incident_report!.incident_type!,
@@ -142,46 +138,53 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     label: 'Location',
                     value: args.incident_report!.location!,
                   ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Wrap(
-                      alignment: WrapAlignment.start,
-                      spacing: 10,
-                      runSpacing: 10,
-                      clipBehavior: Clip.none,
-                      children: List.generate(
-                        args.incident_report!.incident_images!.length,
-                        (index) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                new BoxShadow(
-                                  color: Colors.grey.withOpacity(0.3),
-                                  offset: new Offset(-10, 10),
-                                  blurRadius: 20.0,
-                                  spreadRadius: 4.0,
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.file(
-                                File(args.incident_report!
-                                    .incident_images![index].path),
-                                width: 110,
-                                height: 110,
-                                fit: BoxFit.cover,
+                  SizedBox(height: 10),
+                  args.incident_report!.incident_images != null &&
+                          args.incident_report!.incident_images!.isNotEmpty
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Incident Images',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: primaryColor,
                               ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                            SizedBox(height: 5),
+                            Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: Wrap(
+                                alignment: WrapAlignment.start,
+                                spacing: 10,
+                                runSpacing: 10,
+                                clipBehavior: Clip.none,
+                                children: List.generate(
+                                  args.incident_report!.incident_images!.length,
+                                  (index) {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          boxShadow: boxShadow),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.file(
+                                          File(args.incident_report!
+                                              .incident_images![index].path),
+                                          width: 110,
+                                          height: 110,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : SizedBox.shrink(),
                 ],
               ),
             ),
