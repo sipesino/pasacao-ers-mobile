@@ -249,11 +249,10 @@ class HomeScreen extends StatelessWidget {
     PermissionHandler.checkLocationPermission();
 
     Navigator.of(context).pushNamed(
-      '/reporter/home/report/description',
+      '/reporter/home/report',
       arguments: ScreenArguments(
         incidentType: incidentType,
         user: args.user,
-        icon: icon,
       ),
     );
   }

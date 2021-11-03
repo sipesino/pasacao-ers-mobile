@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
@@ -17,13 +19,19 @@ class DescriptionScreen extends StatefulWidget {
 }
 
 class _DescriptionScreenState extends State<DescriptionScreen> {
-  List<XFile> incidentImages = [];
   bool not_victim = false;
 
   late TextEditingController controller;
 
   final _formKey = GlobalKey<FormState>();
   bool _load = false;
+
+  String? incident_type;
+  String? patient_name;
+  String? sex;
+  String? age;
+  String? description;
+  List<XFile> incident_images = [];
 
   final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Fill this in too'),
@@ -39,7 +47,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
   ]);
 
   final sexValidator = MultiValidator([
-    RequiredValidator(errorText: 'Fill this in too'),
+    RequiredValidator(errorText: 'Sex is required'),
   ]);
 
   @override
@@ -114,23 +122,21 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildTopContainer(args),
-          _buildBottomContainer(),
+          _buildBottomContainer(args),
         ],
       );
 
   Widget _buildTopContainer(ScreenArguments args) {
     return Expanded(
-      child: SingleChildScrollView(
-        clipBehavior: Clip.none,
-        physics: NeverScrollableScrollPhysics(),
-        child: Container(
+      child: Center(
+        child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 20),
               Text(
                 'Incident Description',
-                style: DefaultTextTheme.headline2,
+                style: DefaultTextTheme.headline3,
               ),
               Text(
                 'Please provide the specific details of the incident',
@@ -142,7 +148,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
               _buildVictimCheckBox(),
               const SizedBox(height: 10),
               AnimatedSwitcher(
-                duration: Duration(milliseconds: 400),
+                duration: Duration(milliseconds: 300),
                 child: not_victim
                     ? Column(
                         children: [
@@ -173,6 +179,20 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildIncidentTypeTextFormField(ScreenArguments args) {
+    return CustomTextFormField(
+      validator: sexValidator,
+      keyboardType: TextInputType.text,
+      prefixIcon: CustomIcons.siren,
+      label: 'Incident Type',
+      onSaved: (val) {
+        incident_type = val;
+      },
+      isReadOnly: true,
+      initialValue: args.incidentType,
     );
   }
 
@@ -212,7 +232,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       prefixIcon: CustomIcons.description,
       validator: nameValidator,
       label: 'Description',
-      onSaved: (val) {},
+      onSaved: (String? val) {
+        description = val;
+      },
       maxLines: 5,
     );
   }
@@ -223,8 +245,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       prefixIcon: CustomIcons.description,
       validator: nameValidator,
       label: 'Victim Name',
-      onSaved: (val) {},
-      isOptional: true,
+      onSaved: (String? val) {
+        patient_name = val;
+      },
     );
   }
 
@@ -232,14 +255,13 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     return CustomDropDownButton(
       hintText: 'Sex',
       icon: CustomIcons.sex,
-      validator: sexValidator,
-      onSaved: (val) {},
+      items: ['Male', 'Female'],
+      onSaved: (val) {
+        sex = val;
+      },
+      validator: (value) => value == null ? 'Sex is required' : null,
+      isDisabled: false,
       focusNode: FocusNode(),
-      items: [
-        'Male',
-        'Female',
-      ],
-      isOptional: true,
     );
   }
 
@@ -249,19 +271,9 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       prefixIcon: CustomIcons.age,
       validator: ageValidator,
       label: 'Age',
-      onSaved: (val) {},
-      isOptional: true,
-    );
-  }
-
-  Widget _buildIncidentTypeTextFormField(ScreenArguments args) {
-    return CustomTextFormField(
-      keyboardType: TextInputType.text,
-      prefixIcon: CustomIcons.siren,
-      label: 'Incident Type',
-      onSaved: (val) {},
-      isReadOnly: true,
-      initialValue: args.incidentType,
+      onSaved: (String? val) {
+        age = val;
+      },
     );
   }
 
@@ -282,7 +294,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
           ),
         ),
         SizedBox(height: 5),
-        incidentImages.length == 0
+        incident_images.length == 0
             ? InkWell(
                 onTap: () => showModalBottomSheet(
                   context: context,
@@ -324,81 +336,99 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   ),
                 ),
               )
-            : Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Wrap(
-                    alignment: WrapAlignment.start,
-                    spacing: 10,
-                    runSpacing: 10,
-                    clipBehavior: Clip.none,
-                    children: displayIncidentImages(),
-                  ),
+            : Container(
+                width: MediaQuery.of(context).size.width,
+                child: Wrap(
+                  alignment: WrapAlignment.start,
+                  spacing: 10,
+                  runSpacing: 10,
+                  clipBehavior: Clip.none,
+                  children: displayIncidentImages(),
                 ),
               ),
       ],
     );
   }
 
-  Widget _buildBottomContainer() => SizedBox.fromSize(
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 20),
-          color: Colors.white,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                height: 50,
-                width: 100,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.keyboard_arrow_left,
-                        color: primaryColor,
-                      ),
-                      Text(
-                        'Back',
-                        style: TextStyle(
-                          color: primaryColor,
-                        ),
-                      ),
-                    ],
+  Widget _buildBottomContainer(ScreenArguments args) => Container(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        color: Colors.white,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            SizedBox(
+              height: 50,
+              width: 100,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                label: Text(
+                  'Back',
+                  style: TextStyle(
+                    color: primaryColor,
                   ),
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
+                ),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: Icon(
+                  Icons.keyboard_arrow_left,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+            SizedBox(width: 10),
+            SizedBox(
+              height: 50,
+              width: 100,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+
+                    //if reporter is the victim then retrieve patient name, sex and age information to his profile.
+                    if (!not_victim) {
+                      patient_name =
+                          '${args.user!.first_name!} ${args.user!.last_name!}';
+                      sex = args.user!.sex!;
+                      age = '10';
+                      //TODO: uncomment calcualte age method below
+                      // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
+                    }
+
+                    var report = IncidentReport(
+                      incident_type: incident_type,
+                      patient_name: patient_name,
+                      sex: sex,
+                      age: age,
+                      description: description,
+                      incident_images: incident_images,
+                    );
+
+                    Navigator.of(context).pushNamed(
+                      '/reporter/home/report/location',
+                      arguments: ScreenArguments(
+                        incident_report: report,
+                        user: args.user,
+                      ),
+                    );
+                  }
+                },
+                child: Text('Continue'),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(accentColor),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 10),
-              SizedBox(
-                height: 50,
-                width: 100,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                      '/reporter/home/report/location',
-                      arguments: ScreenArguments(),
-                    );
-                  },
-                  child: Text('Continue'),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
 
@@ -462,13 +492,13 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
         List<XFile> selectedImages = (await _picker.pickMultiImage()) ?? [];
         if (selectedImages.isNotEmpty)
           setState(() {
-            incidentImages.addAll(selectedImages);
+            incident_images.addAll(selectedImages);
           });
       } else {
         final pickedFile = await _picker.pickImage(source: source) ?? null;
         if (pickedFile != null)
           setState(() {
-            incidentImages.add(pickedFile);
+            incident_images.add(pickedFile);
           });
       }
     } on Exception catch (e) {
@@ -480,7 +510,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
     List<Widget> images = [];
     images.addAll(
       List.generate(
-        incidentImages.length,
+        incident_images.length,
         (index) {
           return Stack(
             children: [
@@ -499,7 +529,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: Image.file(
-                    File(incidentImages[index].path),
+                    File(incident_images[index].path),
                     width: 110,
                     height: 110,
                     fit: BoxFit.cover,
@@ -515,7 +545,7 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
                   child: IconButton(
                     onPressed: () {
                       setState(() {
-                        incidentImages.removeAt(index);
+                        incident_images.removeAt(index);
                       });
                     },
                     icon: Icon(
@@ -569,5 +599,24 @@ class _DescriptionScreenState extends State<DescriptionScreen> {
       ),
     );
     return images;
+  }
+
+  calculateAge(DateTime birthDate) {
+    String now = DateFormat("yyyy-MM-dd").format(DateTime.now());
+    print(now);
+    DateTime currentDate = DateTime.parse(now);
+    int age = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDate.day;
+      int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
   }
 }

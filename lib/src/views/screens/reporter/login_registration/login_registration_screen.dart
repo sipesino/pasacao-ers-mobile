@@ -18,6 +18,7 @@ class LoginRegistrationScreen extends StatefulWidget {
 class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   int screen_index = 0;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +70,13 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                 child: SizedBox(
                   width: 142,
                   child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).popAndPushNamed(
-                        '/responder/login',
-                      );
-                    },
+                    onPressed: isLoading
+                        ? null
+                        : () {
+                            Navigator.of(context).popAndPushNamed(
+                              '/responder/login',
+                            );
+                          },
                     style: OutlinedButton.styleFrom(
                       primary: Colors.black,
                       side: const BorderSide(width: 1),
@@ -97,6 +100,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                     LoginScreen(
                       model: this.widget.model,
                       scaffold_key: _scaffoldKey,
+                      isLoading: isLoading,
                     ),
                     RegistrationScreen(
                       model: this.widget.model,

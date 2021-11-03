@@ -1,4 +1,3 @@
-// import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -11,14 +10,18 @@ import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
 
+// ignore: must_be_immutable
 class LoginScreen extends StatefulWidget {
   static const String idScreen = 'login';
   final MainModel model;
   final GlobalKey<ScaffoldState> scaffold_key;
-  const LoginScreen({
+  bool? isLoading;
+
+  LoginScreen({
     Key? key,
     required this.model,
     required this.scaffold_key,
+    this.isLoading,
   }) : super(key: key);
 
   @override
@@ -28,7 +31,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   late User user;
-  bool _load = false;
   String? email;
   String? password;
 
@@ -45,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraint) {
-        Widget loadingIndicator = _load
+        Widget loadingIndicator = widget.isLoading!
             ? new Container(
                 width: 70.0,
                 height: 70.0,
@@ -96,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
                 setState(() {
-                  _load = true;
+                  widget.isLoading = true;
                 });
                 Map<String, String> credentials = {
                   "email": email!,
@@ -133,12 +135,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                         ),
                       );
                       setState(() {
-                        _load = false;
+                        widget.isLoading = false;
                       });
                     });
                   } else {
                     setState(() {
-                      _load = false;
+                      widget.isLoading = false;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

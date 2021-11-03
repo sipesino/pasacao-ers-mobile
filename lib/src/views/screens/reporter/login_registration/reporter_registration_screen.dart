@@ -285,6 +285,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Flexible(
           flex: 3,
@@ -306,9 +307,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           width: 10,
         ),
         Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(''),
+            SizedBox(
+              height: 25,
+            ),
             SizedBox(
               width: 80,
               height: 65,

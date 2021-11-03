@@ -19,6 +19,6 @@ final List<BoxShadow> boxShadow = <BoxShadow>[
   ),
 ];
 
-final String crimePng = 'assets/images/crime.png';
-final String medicalPng = 'assets/images/medical.png';
-final String firePng = 'assets/images/fire.png';
+const String crimePng = 'assets/images/crime.png';
+const String medicalPng = 'assets/images/medical.png';
+const String firePng = 'assets/images/fire.png';

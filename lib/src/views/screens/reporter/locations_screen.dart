@@ -16,90 +16,71 @@ class LocationsScreen extends StatefulWidget {
   State<LocationsScreen> createState() => _LocationsScreenState();
 }
 
-class _LocationsScreenState extends State<LocationsScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _hideFabAnimation;
-
-  bool _handleScrollNotification(ScrollNotification notification) {
-    if (notification.depth == 0) {
-      if (notification is UserScrollNotification) {
-        final UserScrollNotification userScroll = notification;
-        switch (userScroll.direction) {
-          case ScrollDirection.forward:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
-              _hideFabAnimation.forward();
-            }
-            break;
-          case ScrollDirection.reverse:
-            if (userScroll.metrics.maxScrollExtent !=
-                userScroll.metrics.minScrollExtent) {
-              _hideFabAnimation.reverse();
-            }
-            break;
-          case ScrollDirection.idle:
-            break;
-        }
-      }
-    }
-    return false;
-  }
+class _LocationsScreenState extends State<LocationsScreen> {
+  var _isVisible;
 
   @override
   void initState() {
     super.initState();
-    _hideFabAnimation = AnimationController(
-      vsync: this,
-      duration: kThemeAnimationDuration,
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _hideFabAnimation.dispose();
+    _isVisible = true;
+    widget.controller!.addListener(() {
+      if (widget.controller!.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_isVisible == true) {
+          setState(() {
+            _isVisible = false;
+          });
+        }
+      } else {
+        if (widget.controller!.position.userScrollDirection ==
+            ScrollDirection.forward) {
+          if (_isVisible == false) {
+            setState(() {
+              _isVisible = true;
+            });
+          }
+        }
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: _handleScrollNotification,
-      child: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraint) {
-            return Stack(
-              children: [
-                SingleChildScrollView(
-                  controller: widget.controller,
-                  child: ConstrainedBox(
-                    constraints:
-                        BoxConstraints(minHeight: constraint.maxHeight),
-                    child: IntrinsicHeight(
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: _buildColumn(),
-                      ),
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraint) {
+          return Stack(
+            children: [
+              SingleChildScrollView(
+                controller: widget.controller,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: _buildColumn(),
                     ),
                   ),
                 ),
-                Positioned(
-                  bottom: 15,
-                  right: 15,
-                  child: ScaleTransition(
-                    scale: _hideFabAnimation,
-                    child: FloatingActionButton(
-                      backgroundColor: accentColor,
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/reporter/home/map');
-                      },
-                      child: Icon(CustomIcons.map),
-                    ),
+              ),
+              Positioned(
+                bottom: 15,
+                right: 15,
+                child: new Visibility(
+                  visible: _isVisible,
+                  child: new FloatingActionButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/reporter/home/map');
+                    },
+                    tooltip: 'Map',
+                    child: Icon(CustomIcons.map),
+                    backgroundColor: accentColor,
                   ),
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

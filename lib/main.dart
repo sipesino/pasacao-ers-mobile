@@ -9,6 +9,7 @@ import 'package:pers/src/views/screens/forgot%20password/new_password_screen.dar
 import 'package:pers/src/views/screens/reporter/emergency_contacts_screen.dart';
 import 'package:pers/src/views/screens/reporter/hotlines_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/description_screen.dart';
+import 'package:pers/src/views/screens/reporter/incident%20report/incident_report_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/location_screen.dart';
 import 'package:pers/src/views/screens/reporter/incident%20report/summary_screen.dart';
 import 'package:pers/src/views/screens/reporter/login_registration/login_registration_screen.dart';
@@ -60,9 +61,7 @@ class _MERSState extends State<MERS> {
               NewPasswordScreen(forgotPassword: true),
           '/forgot_password/email/verification/new_password': (context) =>
               NewPasswordScreen(forgotPassword: true),
-          '/reporter/home/report': (context) => ResponderMainScreen(),
-          '/reporter/home/report/description': (context) => DescriptionScreen(),
-          '/reporter/home/report/location': (context) => LocationScreen(),
+          '/reporter/home/report': (context) => IncidentReportScreen(),
           '/reporter/home/report/summary': (context) => SummaryScreen(),
           '/reporter/home/hotlines': (context) => HotlinesScreen(),
           '/reporter/home/map': (context) => MapScreen(),

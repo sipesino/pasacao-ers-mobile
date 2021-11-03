@@ -6,10 +6,8 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/views/screens/reporter/alerts_screen.dart';
 import 'package:pers/src/views/screens/reporter/home_screen.dart';
 import 'package:pers/src/views/screens/reporter/locations_screen.dart';
-import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
 import 'package:pers/src/widgets/scroll_to_hide.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 
 class ReporterMainScreen extends StatefulWidget {
   ReporterMainScreen({Key? key}) : super(key: key);
@@ -54,7 +52,6 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
     return Scaffold(
-      extendBody: true,
       body: SafeArea(
         child: PageView(
           controller: pageController,
