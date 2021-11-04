@@ -45,6 +45,16 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     MinLengthValidator(2, errorText: 'At least 2 characters is required'),
   ]);
 
+  final addressValidator = MultiValidator([
+    RequiredValidator(errorText: 'Fill this in too'),
+    MinLengthValidator(2, errorText: 'At least 10 characters is required'),
+  ]);
+
+  final landmarkValidator = MultiValidator([
+    RequiredValidator(errorText: 'Fill this in too'),
+    MinLengthValidator(2, errorText: 'At least 8 characters is required'),
+  ]);
+
   final ageValidator = MultiValidator([
     RequiredValidator(errorText: 'Fill this in too'),
     PatternValidator(
@@ -170,36 +180,45 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 15.0),
             child: Row(
+              mainAxisSize: MainAxisSize.max,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    height: 50,
-                    width: 100,
-                    child: ElevatedButton(
-                      onPressed: onStepContinue,
-                      child: Text('Continue'),
-                      style: ElevatedButton.styleFrom(
-                        primary: accentColor,
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: SizedBox(
+                      height: 50,
+                      width: 100,
+                      child: ElevatedButton(
+                        onPressed: onStepContinue,
+                        child: Text('Continue'),
+                        style: ElevatedButton.styleFrom(
+                          primary: accentColor,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(width: 10),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: SizedBox(
-                    height: 50,
-                    width: 100,
-                    child: TextButton(
-                      onPressed: onStepCancel,
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: accentColor),
+                currentStep == 0
+                    ? SizedBox.shrink()
+                    : Column(
+                        children: [
+                          SizedBox(width: 10),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox(
+                              height: 50,
+                              width: 100,
+                              child: TextButton(
+                                onPressed: onStepCancel,
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: accentColor),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                ),
               ],
             ),
           );
@@ -275,6 +294,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           child: _switchValue
               ? SizedBox.shrink()
               : CustomTextFormField(
+                  validator: addressValidator,
                   keyboardType: TextInputType.streetAddress,
                   prefixIcon: Icons.pin_drop_outlined,
                   label: 'Address',
@@ -283,6 +303,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         ),
         SizedBox(height: 10),
         CustomTextFormField(
+          validator: landmarkValidator,
           keyboardType: TextInputType.streetAddress,
           prefixIcon: Icons.business_rounded,
           label: 'Landmark',

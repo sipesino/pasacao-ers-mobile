@@ -50,6 +50,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
     return Stack(
       children: [
         Scaffold(
+          appBar: AppBar(),
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraint) {
@@ -60,7 +61,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     child: IntrinsicHeight(
                       child: Form(
                         key: _formKey,
-                        child: _buildColumn(args),
+                        child: _buildTopContainer(args),
                       ),
                     ),
                   ),
@@ -77,14 +78,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
     );
   }
 
-  Widget _buildColumn(ScreenArguments args) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildTopContainer(args),
-          _buildBottomContainer(),
-        ],
-      );
-
   Widget _buildTopContainer(ScreenArguments args) => Expanded(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
@@ -92,7 +85,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
             child: SingleChildScrollView(
               clipBehavior: Clip.none,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   SizedBox(height: 20),
                   Text(
@@ -108,21 +101,22 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     label: 'Incident Type',
                     value: args.incident_report!.incident_type!,
                   ),
-                  CustomLabel(
-                    label: 'Patient Name',
-                    value: args.incident_report!.patient_name!,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Wrap(
                     children: [
-                      Expanded(
+                      CustomLabel(
+                        label: 'Patient Name',
+                        value: args.incident_report!.patient_name!,
+                      ),
+                      SizedBox(width: 30),
+                      SizedBox(
+                        width: 100,
                         child: CustomLabel(
                           label: 'Sex',
                           value: args.incident_report!.sex!,
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
+                      SizedBox(width: 30),
+                      SizedBox(
                         child: CustomLabel(
                           label: 'Age',
                           value: args.incident_report!.age!,
@@ -135,7 +129,11 @@ class _SummaryScreenState extends State<SummaryScreen> {
                     value: args.incident_report!.description!,
                   ),
                   CustomLabel(
-                    label: 'Location',
+                    label: 'Address',
+                    value: args.incident_report!.location!,
+                  ),
+                  CustomLabel(
+                    label: 'Landmark',
                     value: args.incident_report!.location!,
                   ),
                   SizedBox(height: 10),
@@ -185,60 +183,26 @@ class _SummaryScreenState extends State<SummaryScreen> {
                           ],
                         )
                       : SizedBox.shrink(),
+                  SizedBox(height: 30),
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: Text('Submit Report'),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(accentColor),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-      );
-
-  Widget _buildBottomContainer() => Container(
-        padding: EdgeInsets.all(20),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              height: 50,
-              width: 100,
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                label: Text(
-                  'Back',
-                  style: TextStyle(
-                    color: primaryColor,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                icon: Icon(
-                  Icons.keyboard_arrow_left,
-                  color: primaryColor,
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: Text('Submit Report'),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(accentColor),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
         ),
       );
 }
