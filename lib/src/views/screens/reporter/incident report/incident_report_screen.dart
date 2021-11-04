@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
@@ -9,7 +8,6 @@ import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/views/screens/reporter/incident%20report/location_screen.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
@@ -30,12 +28,16 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   bool not_victim = false;
   bool _switchValue = true;
+  bool toLocation = false;
 
   String? incident_type;
   String? patient_name;
   String? sex;
   String? age;
   String? description;
+  String? address;
+  String? landmark;
+
   List<XFile> incident_images = [];
 
   final nameValidator = MultiValidator([
@@ -59,46 +61,47 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
 
-    pushSummaryScreen() {
-      if (form_keys[0].currentState!.validate()) {
-        form_keys[0].currentState!.save();
-
-        //if reporter is the victim then retrieve patient name, sex and age information to his profile.
-        if (!not_victim) {
-          patient_name = '${args.user!.first_name!} ${args.user!.last_name!}';
-          sex = args.user!.sex!;
-          age = '10';
-          //TODO: uncomment calcualte age method below
-          // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
-        }
-
-        var report = IncidentReport(
-          incident_type: incident_type,
-          patient_name: patient_name,
-          sex: sex,
-          age: age,
-          description: description,
-          incident_images: incident_images,
-          location: 'Location',
-        );
-
-        Navigator.pushNamed(
-          context,
-          '/reporter/home/report/summary',
-          arguments: ScreenArguments(
-            incident_report: report,
-            user: args.user,
-          ),
-        );
-      }
-    }
-
     goTo(int step) {
       setState(() => currentStep = step);
     }
 
     next() {
-      currentStep + 1 != 2 ? goTo(currentStep + 1) : pushSummaryScreen();
+      if (currentStep + 1 != 2) {
+        if (!toLocation && form_keys[0].currentState!.validate()) {
+          form_keys[0].currentState!.save();
+
+          //if reporter is the victim then retrieve patient name, sex and age information to his profile.
+          if (!not_victim) {
+            patient_name = '${args.user!.first_name!} ${args.user!.last_name!}';
+            sex = args.user!.sex!;
+            age = '10';
+            //TODO: uncomment calcualte age method below
+            // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
+          }
+          goTo(currentStep + 1);
+        }
+      } else {
+        if (form_keys[1].currentState!.validate()) {
+          form_keys[1].currentState!.save();
+          var report = IncidentReport(
+            incident_type: incident_type,
+            patient_name: patient_name,
+            sex: sex,
+            age: age,
+            description: description,
+            incident_images: incident_images,
+            location: 'location',
+          );
+          Navigator.pushNamed(
+            context,
+            '/reporter/home/report/summary',
+            arguments: ScreenArguments(
+              incident_report: report,
+              user: args.user,
+            ),
+          );
+        }
+      }
     }
 
     cancel() {
@@ -136,6 +139,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           style: DefaultTextTheme.subtitle1,
         ),
         content: Form(
+          key: form_keys[1],
           child: _buildLocation(),
         ),
         isActive: currentStep == 1,
@@ -155,19 +159,51 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           ),
         ),
       ),
-      body: Theme(
-        data: ThemeData(
-          colorScheme: ColorScheme.light(primary: accentColor),
-          textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
-              .apply(bodyColor: primaryColor),
-        ),
-        child: Stepper(
-          steps: steps,
-          currentStep: currentStep,
-          onStepContinue: next,
-          onStepCancel: cancel,
-          onStepTapped: (step) => goTo(step),
-        ),
+      body: Stepper(
+        steps: steps,
+        currentStep: currentStep,
+        onStepContinue: next,
+        onStepCancel: cancel,
+        onStepTapped: (step) => goTo(step),
+        controlsBuilder: (BuildContext context,
+            {VoidCallback? onStepContinue, VoidCallback? onStepCancel}) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 15.0),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 50,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: onStepContinue,
+                      child: Text('Continue'),
+                      style: ElevatedButton.styleFrom(
+                        primary: accentColor,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                    height: 50,
+                    width: 100,
+                    child: TextButton(
+                      onPressed: onStepCancel,
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: accentColor),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -223,7 +259,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         SizedBox(height: 10),
         Row(
           children: [
-            Text('Get location automatically'),
+            Text('Get my location automatically'),
             Switch(
               value: _switchValue,
               onChanged: (value) {
