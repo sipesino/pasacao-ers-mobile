@@ -208,10 +208,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           children: [
             Text(
               'Hello!',
-              style: DefaultTextTheme.headline1,
+              style: DefaultTextTheme.headline2,
             ),
             Text(
-              'Get emergency alerts by \nsigning up.',
+              'Get emergency alerts by signing up.',
               style: DefaultTextTheme.subtitle1,
             ),
             const SizedBox(height: 20),

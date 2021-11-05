@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -8,8 +7,9 @@ class IncidentReport {
   final String? sex;
   final String? age;
   final String? description;
-  final String? location;
   final List<XFile>? incident_images;
+  final String? address;
+  final String? landmark;
 
   IncidentReport({
     this.incident_type,
@@ -17,8 +17,9 @@ class IncidentReport {
     this.sex,
     this.age,
     this.description,
-    this.location,
     this.incident_images,
+    this.address,
+    this.landmark,
   });
 
   IncidentReport copyWith({
@@ -29,6 +30,8 @@ class IncidentReport {
     String? description,
     String? location,
     List<XFile>? incident_images,
+    String? address,
+    String? landmark,
   }) {
     return IncidentReport(
       incident_type: incident_type ?? this.incident_type,
@@ -36,44 +39,15 @@ class IncidentReport {
       sex: sex ?? this.sex,
       age: age ?? this.age,
       description: description ?? this.description,
-      location: location ?? this.location,
       incident_images: incident_images ?? this.incident_images,
+      address: address ?? this.address,
+      landmark: landmark ?? this.landmark,
     );
   }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'incident_type': incident_type,
-      'patient_name': patient_name,
-      'sex': sex,
-      'age': age,
-      'description': description,
-      'location': location,
-    };
-  }
-
-  factory IncidentReport.fromMap(Map<String, dynamic> map) {
-    return IncidentReport(
-      incident_type: map['incident_type'],
-      patient_name: map['patient_name'],
-      sex: map['sex'],
-      age: map['age'],
-      description: map['description'],
-      location: map['location'],
-      incident_images: map['incident_images'] != null
-          ? List<XFile>.from(map['incident_images']?.map((x) => XFile(x)))
-          : null,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory IncidentReport.fromJson(String source) =>
-      IncidentReport.fromMap(json.decode(source));
 
   @override
   String toString() {
-    return 'IncidentReport(incident_type: $incident_type, patient_name: $patient_name, sex: $sex, age: $age, description: $description, location: $location, incident_images: $incident_images)';
+    return 'IncidentReport(incident_type: $incident_type, patient_name: $patient_name, sex: $sex, age: $age, description: $description, incident_images: $incident_images, address: $address, landmark: $landmark)';
   }
 
   @override
@@ -86,8 +60,9 @@ class IncidentReport {
         other.sex == sex &&
         other.age == age &&
         other.description == description &&
-        other.location == location &&
-        listEquals(other.incident_images, incident_images);
+        listEquals(other.incident_images, incident_images) &&
+        other.address == address &&
+        other.landmark == landmark;
   }
 
   @override
@@ -97,7 +72,8 @@ class IncidentReport {
         sex.hashCode ^
         age.hashCode ^
         description.hashCode ^
-        location.hashCode ^
-        incident_images.hashCode;
+        incident_images.hashCode ^
+        address.hashCode ^
+        landmark.hashCode;
   }
 }

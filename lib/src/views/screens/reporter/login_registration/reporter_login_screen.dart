@@ -169,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             children: [
               Text(
                 'Welcome!',
-                style: DefaultTextTheme.headline1,
+                style: DefaultTextTheme.headline2,
               ),
               Text(
                 'Sign in to your account',

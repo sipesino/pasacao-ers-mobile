@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
@@ -37,7 +39,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   String? description;
   String? address;
   String? landmark;
-
   List<XFile> incident_images = [];
 
   final nameValidator = MultiValidator([
@@ -68,59 +69,13 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   ]);
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-
-    goTo(int step) {
-      setState(() => currentStep = step);
-    }
-
-    next() {
-      if (currentStep + 1 != 2) {
-        if (!toLocation && form_keys[0].currentState!.validate()) {
-          form_keys[0].currentState!.save();
-
-          //if reporter is the victim then retrieve patient name, sex and age information to his profile.
-          if (!not_victim) {
-            patient_name = '${args.user!.first_name!} ${args.user!.last_name!}';
-            sex = args.user!.sex!;
-            age = '10';
-            //TODO: uncomment calcualte age method below
-            // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
-          }
-          goTo(currentStep + 1);
-        }
-      } else {
-        if (form_keys[1].currentState!.validate()) {
-          form_keys[1].currentState!.save();
-          var report = IncidentReport(
-            incident_type: incident_type,
-            patient_name: patient_name,
-            sex: sex,
-            age: age,
-            description: description,
-            incident_images: incident_images,
-            location: 'location',
-          );
-          Navigator.pushNamed(
-            context,
-            '/reporter/home/report/summary',
-            arguments: ScreenArguments(
-              incident_report: report,
-              user: args.user,
-            ),
-          );
-        }
-      }
-    }
-
-    cancel() {
-      if (currentStep > 0) {
-        goTo(currentStep - 1);
-      } else {
-        Navigator.pop(context);
-      }
-    }
 
     List<Step> steps = [
       Step(
@@ -156,6 +111,74 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         state: currentStep >= 1 ? StepState.editing : StepState.disabled,
       ),
     ];
+
+    goTo(int step) {
+      setState(() => currentStep = step);
+    }
+
+    next() async {
+      if (currentStep == 0) {
+        if (!toLocation && form_keys[0].currentState!.validate()) {
+          form_keys[0].currentState!.save();
+
+          //if reporter is the victim then retrieve patient name, sex and age information to his profile.
+          if (!not_victim) {
+            patient_name = '${args.user!.first_name!} ${args.user!.last_name!}';
+            sex = args.user!.sex!;
+            age = '10';
+            //TODO: uncomment calcualte age method below
+            // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
+          }
+          print('$sex\n$age');
+          goTo(currentStep + 1);
+        }
+      } else {
+        if (form_keys[1].currentState!.validate()) {
+          print(currentStep);
+          form_keys[1].currentState!.save();
+          print('currentStep');
+
+          if (_switchValue) {
+            LocationData location_data = await Location().getLocation();
+            address = '${location_data.longitude}, ${location_data.latitude}';
+          }
+
+          print('currentStep2');
+
+          var report = IncidentReport(
+            incident_type: incident_type,
+            patient_name: patient_name,
+            sex: sex,
+            age: age,
+            description: description,
+            incident_images: incident_images,
+            address: address,
+            landmark: landmark,
+          );
+
+          print(report.toString());
+
+          print('currentStep3');
+
+          Navigator.pushNamed(
+            context,
+            '/reporter/home/report/summary',
+            arguments: ScreenArguments(
+              incident_report: report,
+              user: args.user,
+            ),
+          );
+        }
+      }
+    }
+
+    cancel() {
+      if (currentStep > 0) {
+        goTo(currentStep - 1);
+      } else {
+        Navigator.pop(context);
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -298,7 +321,9 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                   keyboardType: TextInputType.streetAddress,
                   prefixIcon: Icons.pin_drop_outlined,
                   label: 'Address',
-                  onSaved: (val) {},
+                  onSaved: (val) {
+                    address = val;
+                  },
                 ),
         ),
         SizedBox(height: 10),
@@ -307,7 +332,9 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           keyboardType: TextInputType.streetAddress,
           prefixIcon: Icons.business_rounded,
           label: 'Landmark',
-          onSaved: (val) {},
+          onSaved: (val) {
+            landmark = val;
+          },
         ),
       ],
     );
@@ -579,8 +606,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                   borderRadius: BorderRadius.circular(10),
                   child: Image.file(
                     File(incident_images[index].path),
-                    width: 110,
-                    height: 110,
+                    width: 95,
+                    height: 95,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -625,8 +652,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           backgroundColor: Colors.transparent,
         ),
         child: Container(
-          width: 110,
-          height: 110,
+          width: 95,
+          height: 95,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),

@@ -18,7 +18,6 @@ class _MapScreenState extends State<MapScreen> {
   bool show_map = false;
   Set<Marker> _markers = {};
   late LocationData current_location;
-  late CameraPosition initial_camera_position;
   late Location location;
 
   void _onMapCreated(GoogleMapController controller) {

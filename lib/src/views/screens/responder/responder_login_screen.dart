@@ -127,7 +127,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
             children: [
               Text(
                 'Welcome!',
-                style: DefaultTextTheme.headline1,
+                style: DefaultTextTheme.headline2,
               ),
               Text(
                 'Sign in to your account',
