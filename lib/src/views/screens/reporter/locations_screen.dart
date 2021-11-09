@@ -27,17 +27,19 @@ class _LocationsScreenState extends State<LocationsScreen> {
       if (widget.controller!.position.userScrollDirection ==
           ScrollDirection.reverse) {
         if (_isVisible == true) {
-          setState(() {
-            _isVisible = false;
-          });
+          if (mounted)
+            setState(() {
+              _isVisible = false;
+            });
         }
       } else {
         if (widget.controller!.position.userScrollDirection ==
             ScrollDirection.forward) {
           if (_isVisible == false) {
-            setState(() {
-              _isVisible = true;
-            });
+            if (mounted)
+              setState(() {
+                _isVisible = true;
+              });
           }
         }
       }
@@ -49,36 +51,17 @@ class _LocationsScreenState extends State<LocationsScreen> {
     return SafeArea(
       child: LayoutBuilder(
         builder: (context, constraint) {
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                controller: widget.controller,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraint.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: _buildColumn(),
-                    ),
-                  ),
+          return SingleChildScrollView(
+            controller: widget.controller,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraint.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: _buildColumn(),
                 ),
               ),
-              Positioned(
-                bottom: 15,
-                right: 15,
-                child: new Visibility(
-                  visible: _isVisible,
-                  child: new FloatingActionButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/reporter/home/map');
-                    },
-                    tooltip: 'Map',
-                    child: Icon(CustomIcons.map),
-                    backgroundColor: accentColor,
-                  ),
-                ),
-              ),
-            ],
+            ),
           );
         },
       ),
@@ -89,9 +72,45 @@ class _LocationsScreenState extends State<LocationsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'Locations',
-          style: DefaultTextTheme.headline4,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Important Locations',
+                    style: DefaultTextTheme.headline4,
+                  ),
+                  Text(
+                    'List of emergency services locations',
+                    style: DefaultTextTheme.subtitle1,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/reporter/home/map');
+                },
+                child: Icon(
+                  CustomIcons.map,
+                  color: Colors.white,
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(accentColor),
+                  shape: MaterialStateProperty.all(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         SizedBox(
           height: 20,
