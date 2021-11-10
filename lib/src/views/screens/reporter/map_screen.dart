@@ -106,7 +106,7 @@ class _MapScreenState extends State<MapScreen> {
         onPressed: () {
           updatePinOnMap();
         },
-        child: Icon(Icons.ac_unit_rounded),
+        child: Icon(Icons.my_location),
       ),
     );
   }
