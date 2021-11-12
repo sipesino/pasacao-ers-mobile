@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
@@ -10,7 +10,6 @@ import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class IncidentReportScreen extends StatefulWidget {
@@ -37,6 +36,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   String? sex;
   String? age;
   String? description;
+  String? status;
   String? address;
   String? landmark;
   List<XFile> incident_images = [];
@@ -259,33 +259,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         const SizedBox(height: 10),
         _buildIncidentTypeTextFormField(args),
         const SizedBox(height: 10),
-        _buildVictimCheckBox(),
-        const SizedBox(height: 10),
-        AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
-          child: not_victim
-              ? Column(
-                  children: [
-                    _buildVictimNameTextFormField(),
-                    const SizedBox(height: 10),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _buildSexTextFormField(),
-                        ),
-                        SizedBox(width: 10),
-                        SizedBox(
-                          width: 120,
-                          child: _buildAgeTextFormField(),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                )
-              : SizedBox.shrink(),
-        ),
+        _buildVictimStatusTextFormField(),
         _buildDescriptionTextFormField(),
         const SizedBox(height: 20),
         _buildIncidentImages(),
@@ -354,33 +328,15 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
-  Row _buildVictimCheckBox() {
-    return Row(
-      children: [
-        SizedBox(
-          width: 20,
-          height: 20,
-          child: Checkbox(
-            value: not_victim,
-            onChanged: (value) {
-              setState(() {
-                not_victim = value!;
-              });
-            },
-          ),
-        ),
-        TextButton(
-          onPressed: () {
-            setState(() {
-              not_victim = !not_victim;
-            });
-          },
-          child: Text(
-            'I\'m not the victim',
-            style: TextStyle(color: primaryColor),
-          ),
-        ),
-      ],
+  Widget _buildVictimStatusTextFormField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.text,
+      prefixIcon: FontAwesomeIcons.questionCircle,
+      validator: nameValidator,
+      label: 'Victim Status',
+      onSaved: (String? val) {
+        status = val;
+      },
     );
   }
 
@@ -394,44 +350,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         description = val;
       },
       maxLines: 5,
-    );
-  }
-
-  Widget _buildVictimNameTextFormField() {
-    return CustomTextFormField(
-      keyboardType: TextInputType.text,
-      prefixIcon: CustomIcons.description,
-      validator: nameValidator,
-      label: 'Victim Name',
-      onSaved: (String? val) {
-        patient_name = val;
-      },
-    );
-  }
-
-  Widget _buildSexTextFormField() {
-    return CustomDropDownButton(
-      hintText: 'Sex',
-      icon: CustomIcons.sex,
-      items: ['Male', 'Female'],
-      onSaved: (val) {
-        sex = val;
-      },
-      validator: (value) => value == null ? 'Sex is required' : null,
-      isDisabled: false,
-      focusNode: FocusNode(),
-    );
-  }
-
-  Widget _buildAgeTextFormField() {
-    return CustomTextFormField(
-      keyboardType: TextInputType.number,
-      prefixIcon: CustomIcons.age,
-      validator: ageValidator,
-      label: 'Age',
-      onSaved: (String? val) {
-        age = val;
-      },
     );
   }
 

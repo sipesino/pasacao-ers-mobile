@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
+import 'package:pers/src/models/locations.dart';
+import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/location_widget.dart';
+import 'package:pers/src/widgets/location_card.dart';
 
 class LocationsScreen extends StatefulWidget {
   final ScrollController? controller;
@@ -94,7 +97,11 @@ class _LocationsScreenState extends State<LocationsScreen> {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/reporter/home/map');
+                  Navigator.pushNamed(
+                    context,
+                    '/reporter/home/map',
+                    arguments: ScreenArguments(),
+                  );
                 },
                 child: Icon(
                   CustomIcons.map,
@@ -116,12 +123,21 @@ class _LocationsScreenState extends State<LocationsScreen> {
           height: 20,
         ),
         _buildLocationsStats(),
-        LocationCard(),
-        LocationCard(),
-        LocationCard(),
-        LocationCard(),
-        LocationCard(),
-        LocationCard(),
+        Column(
+          children: getLocations()
+              .map(
+                (e) => LocationCard(
+                  location: Location(
+                    location_id: e.location_id,
+                    location_name: e.location_name,
+                    location_type: e.location_type,
+                    address: e.address,
+                    coordinates: e.coordinates,
+                  ),
+                ),
+              )
+              .toList(),
+        ),
       ],
     );
   }

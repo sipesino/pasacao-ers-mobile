@@ -1,4 +1,6 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pers/src/models/emergency_contact.dart';
+import 'package:pers/src/models/locations.dart';
 
 List<EmergencyContact> _emergencyContacts = [
   EmergencyContact(
@@ -53,8 +55,43 @@ List<EmergencyContact> _emergencyContacts = [
   ),
 ];
 
+List<Location> _locations = [
+  Location(
+    location_id: 'PS-01',
+    location_type: 'Police Station',
+    address: 'Pasacao, Camarines Sur',
+    coordinates: LatLng(13.5124, 123.04249),
+    location_name: 'Pasacao Municipal Police Station',
+  ),
+  Location(
+    location_id: 'FS-02',
+    location_type: 'Fire Station',
+    address: 'Pasacao, Camarines Sur',
+    coordinates: LatLng(13.5082966305, 123.041959332),
+    location_name: 'Pasacao Fire Station',
+  ),
+  Location(
+    location_id: 'HC-01',
+    location_type: 'Hospital',
+    address: 'Pasacao, Camarines Sur',
+    coordinates: LatLng(13.504323, 123.040576),
+    location_name: 'Pasacao Rural Health Unit',
+  ),
+  Location(
+    location_id: 'EC-01',
+    location_type: 'Evacuation Center',
+    address: 'Pasacao, Camarines Sur',
+    coordinates: LatLng(13.514365889568493, 123.04275664858702),
+    location_name: 'Evacuation Center (PCS)',
+  ),
+];
+
 List<EmergencyContact> getEmergencyContacts() {
   return _emergencyContacts;
+}
+
+List<Location> getLocations() {
+  return _locations;
 }
 
 void addEmergencyContacts(EmergencyContact contact) {
