@@ -138,19 +138,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 Map<String, dynamic> user_data = {
                   "first_name": first_name,
                   "last_name": last_name,
-                  // "mobile_no": mobile_no,
+                  "phone": mobile_no,
                   "email": email,
                   "password": password,
-                  // "sex": sex,
-                  // "birthdate": birthdate,
-                  // "account_type": 'Reporter',
+                  "sex": sex,
+                  "birthdate": birthdate,
+                  "account_type": 'Reporter',
                 };
 
                 user = User.fromMap(user_data);
 
                 widget.model
                     .postAPICall(
-                  'http://143.198.92.250/api/users',
+                  'http://143.198.92.250/api/accounts',
                   user_data,
                 )
                     .then((value) {

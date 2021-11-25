@@ -91,30 +91,24 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
               ),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            child: BottomNavigationBar(
-              items: _barItems,
-              currentIndex: _selectedIndex,
-              unselectedItemColor: chromeColor,
-              unselectedIconTheme: IconThemeData(color: chromeColor),
-              selectedItemColor: accentColor,
-              selectedIconTheme: IconThemeData(color: accentColor),
-              onTap: (index) {
-                pageController.animateToPage(
-                  index,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.ease,
-                );
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              showUnselectedLabels: true,
-            ),
+          child: BottomNavigationBar(
+            items: _barItems,
+            currentIndex: _selectedIndex,
+            unselectedItemColor: chromeColor,
+            unselectedIconTheme: IconThemeData(color: chromeColor),
+            selectedItemColor: accentColor,
+            selectedIconTheme: IconThemeData(color: accentColor),
+            onTap: (index) {
+              pageController.animateToPage(
+                index,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.ease,
+              );
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            showUnselectedLabels: true,
           ),
         ),
       ),

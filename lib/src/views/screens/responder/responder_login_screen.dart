@@ -143,6 +143,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 onSaved: (val) {
                   email = val;
                 },
+                initialValue: 'admin@email.com',
                 prefixIcon: CustomIcons.mail,
               ),
               const SizedBox(
@@ -152,6 +153,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 validator: passwordValidator,
                 label: 'Password',
                 prefixIcon: CustomIcons.lock,
+                initialValue: 'admin',
                 onChanged: (String value) {},
                 onSaved: (val) {
                   password = val;
