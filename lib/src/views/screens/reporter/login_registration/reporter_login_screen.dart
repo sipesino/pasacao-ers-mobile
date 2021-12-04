@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
 import 'package:pers/src/constants.dart';
@@ -9,6 +12,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
+import 'package:http/http.dart' as http;
 
 // ignore: must_be_immutable
 class LoginScreen extends StatefulWidget {
@@ -42,6 +46,42 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final passwordValidator = MultiValidator([
     RequiredValidator(errorText: 'Password is required'),
   ]);
+
+  signIn() async {
+    String url = "http://143.198.92.250/api/login";
+    Map body = {"email": email, "password": password};
+
+    var jsonResponse;
+    var res = await http.post(Uri.parse(url), body: body);
+
+    if (res.statusCode == 201) {
+      jsonResponse = jsonDecode(res.body);
+
+      if (jsonResponse != null) {
+        setState(() {
+          widget.isLoading = true;
+        });
+
+        SharedPref preferences = SharedPref();
+        // save bearer token in the local storage
+        preferences.save("token", jsonResponse["token"]);
+
+        User user = User.fromMap(jsonResponse["user"]);
+
+        // save user credentials inside local storage
+        preferences.save("user", user);
+
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/reporter/home',
+          (Route<dynamic> route) => false,
+          arguments: ScreenArguments(
+            user: user,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,65 +134,66 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         children: [
           _buildTopContainer(),
           BottomContainer(
-            onPressed: () async {
+            onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
-                setState(() {
-                  widget.isLoading = true;
-                });
-                Map<String, String> credentials = {
-                  "email": email!,
-                  "password": password!,
-                };
-                widget.model
-                    .postAPICall(
-                  'http://192.168.56.1/pers/api/user/authentication.php',
-                  credentials,
-                )
-                    .then((value) {
-                  var status_code = value["statuscode"];
-                  if (status_code == 200) {
-                    Map<String, String> id = {
-                      "id": value["id"],
-                    };
-                    widget.model
-                        .getAPICall(
-                      'http://192.168.56.1/pers/api/user/getUser.php',
-                      id,
-                    )
-                        .then((value) {
-                      var status_code = value["statuscode"];
-                      print(status_code);
-                      print(value["user"]);
-                      user = User.fromMap(value["user"]);
+                signIn();
+                //   setState(() {
+                //     widget.isLoading = true;
+                //   });
+                //   Map<String, String> credentials = {
+                //     "email": email!,
+                //     "password": password!,
+                //   };
+                //   widget.model
+                //       .postAPICall(
+                //     'http://143.198.92.250/api/login',
+                //     credentials,
+                //   )
+                //       .then((value) {
+                //     if (value["success"]) {
+                //       // store  user credentials
+                //       //   Map<String, String> id = {
+                //       //     "id": value["id"],
+                //       //   };
+                //       //   widget.model
+                //       //       .getAPICall(
+                //       //     'http://192.168.56.1/pers/api/user/getUser.php',
+                //       //     id,
+                //       //   )
+                //       //       .then((value) {
+                //       //     var status_code = value["statuscode"];
+                //       //     print(status_code);
+                //       //     print(value["user"]);
+                //       //     user = User.fromMap(value["user"]);
 
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/reporter/home',
-                        (Route<dynamic> route) => false,
-                        arguments: ScreenArguments(
-                          user: user,
-                        ),
-                      );
-                      setState(() {
-                        widget.isLoading = false;
-                      });
-                    });
-                  } else {
-                    setState(() {
-                      widget.isLoading = false;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: new Text(value["msg"]),
-                        backgroundColor: Colors.red,
-                        duration: new Duration(seconds: 5),
-                      ),
-                    );
-                    print(value["msg"]);
-                  }
-                });
+                //       //     Navigator.pushNamedAndRemoveUntil(
+                //       //       context,
+                //       //       '/reporter/home',
+                //       //       (Route<dynamic> route) => false,
+                //       //       arguments: ScreenArguments(
+                //       //         user: user,
+                //       //       ),
+                //       //     );
+                //       //     setState(() {
+                //       //       widget.isLoading = false;
+                //       //     });
+                //       //   });
+                // } else {
+                //   setState(() {
+                //   widget.isLoading = false;
+                // });
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     behavior: SnackBarBehavior.floating,
+                //     content: new Text(value["msg"]),
+                //     backgroundColor: Colors.red,
+                //     duration: new Duration(seconds: 5),
+                //   ),
+                // );
+                // print(response["msg"]);
+                // }
+                //   });
               }
             },
           ),
@@ -203,7 +244,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         label: 'Email',
         prefixIcon: CustomIcons.mail,
         validator: emailValidator,
-        initialValue: 'admin@email.com',
+        initialValue: 'admin@pers.com',
       );
 
   Widget PasswordTextField() => CustomPasswordTextFormField(
@@ -214,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         onSaved: (value) {
           password = value;
         },
-        initialValue: 'admin',
+        initialValue: 'secret',
       );
 
   Widget FormDivider() => Row(

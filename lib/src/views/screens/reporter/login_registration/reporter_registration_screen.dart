@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -5,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/phone_validator.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
 import 'package:pers/src/constants.dart';
@@ -13,6 +16,7 @@ import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
+import 'package:http/http.dart' as http;
 
 class RegistrationScreen extends StatefulWidget {
   final MainModel model;
@@ -28,7 +32,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _load = false;
   String pass = "";
   final _formKey = GlobalKey<FormState>();
-  late User user;
   FocusNode bdayFocusNode = new FocusNode();
   FocusNode mobileFocusNode = new FocusNode();
   TextEditingController bdateController = new TextEditingController();
@@ -37,7 +40,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   String? first_name;
   String? last_name;
   String? sex;
-  String birthdate = 'Birthdate';
+  String birthday = 'birthdate';
   String? mobile_no;
   String? email;
   String? password;
@@ -131,66 +134,99 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
 
-                setState(() {
-                  _load = true;
-                });
-
-                Map<String, dynamic> user_data = {
+                Map<String, dynamic> body = {
                   "first_name": first_name,
                   "last_name": last_name,
-                  "phone": mobile_no,
+                  "mobile_no": mobile_no,
                   "email": email,
                   "password": password,
+                  "password_confirmation": password,
                   "sex": sex,
-                  "birthdate": birthdate,
-                  "account_type": 'Reporter',
+                  "birthday": birthday,
+                  "address": 'Sample Address',
+                  "account_type": 'reporter',
                 };
 
-                user = User.fromMap(user_data);
+                String url = 'http://143.198.92.250/api/register';
+                var jsonResponse;
+                var res = await http.post(
+                  Uri.parse(url),
+                  body: body,
+                );
 
-                widget.model
-                    .postAPICall(
-                  'http://143.198.92.250/api/accounts',
-                  user_data,
-                )
-                    .then((value) {
-                  var status_code = value["success"];
-                  if (status_code) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/reporter/home', (Route<dynamic> route) => false,
-                        arguments: ScreenArguments(
-                          user: user,
-                        ));
+                if (res.statusCode == 201) {
+                  jsonResponse = jsonDecode(res.body);
+
+                  if (jsonResponse != null) {
                     setState(() {
-                      _load = false;
+                      _load = true;
                     });
-                    print(value["message"]);
-                  } else {
-                    setState(() {
-                      _load = false;
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        behavior: SnackBarBehavior.floating,
-                        content: new Text(value["message"]),
-                        backgroundColor: Colors.red,
-                        duration: new Duration(seconds: 5),
+
+                    SharedPref preferences = SharedPref();
+                    // save bearer token in the local storage
+                    preferences.save("token", jsonResponse["token"]);
+
+                    User user = User.fromMap(jsonResponse["user"]);
+
+                    // save user credentials inside local storage
+                    preferences.save("user", user);
+
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/reporter/home',
+                      (Route<dynamic> route) => false,
+                      arguments: ScreenArguments(
+                        user: user,
                       ),
                     );
-                    print(value["message"]);
                   }
-                }, onError: (error) {
-                  setState(() {
-                    _load = false;
-                  });
-                  print("Error == $error");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: new Text('Something went wrong..'),
-                      duration: new Duration(seconds: 5),
-                    ),
-                  );
-                });
+                } else {
+                  print(res.statusCode);
+                }
+
+                // widget.model
+                //     .postAPICall(
+                //   ,
+                //   user_data,
+                // )
+                //     .then((value) {
+                //   var status_code = value.statusCode;
+                //   if (status_code == 201) {
+                //     Navigator.of(context).pushNamedAndRemoveUntil(
+                //         '/reporter/home', (Route<dynamic> route) => false,
+                //         arguments: ScreenArguments(
+                //           user: user,
+                //         ));
+                //     setState(() {
+                //       _load = false;
+                //     });
+                //     print(value["message"]);
+                //   } else {
+                //     setState(() {
+                //       _load = false;
+                //     });
+                //     ScaffoldMessenger.of(context).showSnackBar(
+                //       SnackBar(
+                //         behavior: SnackBarBehavior.floating,
+                //         content: new Text(value["message"]),
+                //         backgroundColor: Colors.red,
+                //         duration: new Duration(seconds: 5),
+                //       ),
+                //     );
+                //     print(value["message"]);
+                //   }
+                // }, onError: (error) {
+                //   setState(() {
+                //     _load = false;
+                //   });
+                //   print("Error == $error");
+                //   ScaffoldMessenger.of(context).showSnackBar(
+                //     SnackBar(
+                //       content: new Text('Something went wrong..'),
+                //       duration: new Duration(seconds: 5),
+                //     ),
+                //   );
+                // });
               }
             },
           ),
@@ -290,15 +326,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         Flexible(
           flex: 3,
           child: CustomTextFormField(
-            key: Key(birthdate),
+            key: Key(birthday),
             controller: bdateController,
             label: 'Birthdate',
             keyboardType: TextInputType.datetime,
             isReadOnly: true,
             prefixIcon: CustomIcons.calendar,
-            initialValue: birthdate,
+            initialValue: birthday,
             onSaved: (newValue) {
-              birthdate = newValue!;
+              birthday = newValue!;
             },
             validator: birthdateValidator,
           ),
@@ -327,8 +363,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ).then((d) {
                     setState(() {
                       DateTime date = d!;
-                      birthdate = formatter.format(date);
-                      bdateController.text = birthdate;
+                      birthday = formatter.format(date);
+                      bdateController.text = birthday;
                     });
                     mobileFocusNode.requestFocus();
                   });

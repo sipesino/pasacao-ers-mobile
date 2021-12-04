@@ -6,13 +6,15 @@ import 'dart:async';
 import 'package:scoped_model/scoped_model.dart';
 
 class APIManager extends Model {
-  Future<dynamic> postAPICall(String url, Map param) async {
+  Future<dynamic> postAPICall(String url, Map body) async {
     print("Calling API: $url");
-    print("Calling parameters: $param");
+    print("Calling parameters: $body");
 
     var responseJson;
     try {
-      final response = await http.post(Uri.parse(url), body: param);
+      final response = await http.post(Uri.parse(url), body: body, headers: {
+        'Accept': '*/*',
+      });
       responseJson = _response(response);
     } on SocketException {
       throw FetchDataException('No Internet connection');
@@ -41,6 +43,7 @@ class APIManager extends Model {
   dynamic _response(http.Response response) {
     switch (response.statusCode) {
       case 200:
+      case 201:
         var responseJson = json.decode(response.body.toString());
         return responseJson;
       case 400:
