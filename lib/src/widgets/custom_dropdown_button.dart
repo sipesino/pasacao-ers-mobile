@@ -6,7 +6,7 @@ class CustomDropDownButton extends StatefulWidget {
   final List<String> items;
   final IconData icon;
   final String hintText;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
   final FormFieldValidator validator;
   final FormFieldSetter<String>? onSaved;
   final bool isDisabled;
@@ -16,9 +16,9 @@ class CustomDropDownButton extends StatefulWidget {
     required this.items,
     required this.icon,
     required this.hintText,
-    required this.focusNode,
     required this.validator,
     required this.onSaved,
+    this.focusNode,
     this.isDisabled = false,
     this.isOptional = false,
   });
@@ -123,7 +123,6 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
                     setState(() {
                       dropdownValue = val;
                       isTapped = !isTapped;
-                      widget.focusNode.requestFocus();
                     });
                   },
             onTap: () {

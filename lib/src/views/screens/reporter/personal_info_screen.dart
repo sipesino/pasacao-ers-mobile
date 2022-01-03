@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/phone_validator.dart';
+import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
@@ -112,15 +114,23 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     );
   }
 
-  Widget buildColumn() => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          buildTopContainer(),
-          buildBottomContainer(),
-        ],
-      );
+  Widget buildColumn() => FutureBuilder(
+      future: SharedPref().read('user'),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          User user = User.fromJson(snapshot.data as String);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              buildTopContainer(user),
+              buildBottomContainer(user),
+            ],
+          );
+        } else
+          return Text('');
+      });
 
-  Widget buildTopContainer() {
+  Widget buildTopContainer(User user) {
     return Container(
       child: Center(
         child: Column(
@@ -168,11 +178,11 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             ),
             SizedBox(height: 15),
             Text(
-              'Juan Dela Cruz',
+              '${user.first_name} ${user.last_name}',
               style: DefaultTextTheme.headline3,
             ),
             Text(
-              'juandelacruz@gmail.com',
+              '${user.email}',
               style: TextStyle(
                 color: Colors.grey,
               ),
@@ -183,19 +193,19 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     );
   }
 
-  Widget buildBottomContainer() {
+  Widget buildBottomContainer(User user) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 30),
-          FirstNameTextField(),
+          FirstNameTextField(user.first_name!),
           const SizedBox(height: 15),
-          LastNameTextField(),
+          LastNameTextField(user.last_name!),
           const SizedBox(height: 15),
-          GenderDropDown(),
+          GenderDropDown(user.sex!),
           const SizedBox(height: 15),
-          BirthDatePicker(),
+          BirthDatePicker(user.birthday!),
           const SizedBox(height: 15),
           ChangePasswordButton(),
         ],
@@ -203,7 +213,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     );
   }
 
-  Widget FirstNameTextField() {
+  Widget FirstNameTextField(String first_name) {
     return CustomTextFormField(
       validator: nameValidator,
       keyboardType: TextInputType.name,
@@ -211,25 +221,27 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       onSaved: (value) {
         if (value != null) first_name = value.trim();
       },
+      initialValue: first_name,
       prefixIcon: CustomIcons.person,
       isReadOnly: readOnly,
     );
   }
 
-  Widget LastNameTextField() {
+  Widget LastNameTextField(String last_name) {
     return CustomTextFormField(
       validator: nameValidator,
       label: 'Last Name',
       onSaved: (value) {
         if (value != null) last_name = value.trim();
       },
+      initialValue: last_name,
       prefixIcon: CustomIcons.person,
       keyboardType: TextInputType.name,
       isReadOnly: readOnly,
     );
   }
 
-  Widget GenderDropDown() {
+  Widget GenderDropDown(String _sex) {
     return CustomDropDownButton(
       hintText: 'Sex',
       icon: CustomIcons.sex,
@@ -243,7 +255,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     );
   }
 
-  Widget BirthDatePicker() {
+  Widget BirthDatePicker(String birthday) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -256,7 +268,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             keyboardType: TextInputType.datetime,
             isReadOnly: true,
             prefixIcon: CustomIcons.calendar,
-            initialValue: birthdate,
+            initialValue: birthday,
             onSaved: (newValue) {
               birthdate = newValue!;
             },

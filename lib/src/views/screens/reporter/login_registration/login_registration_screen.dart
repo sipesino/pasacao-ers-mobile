@@ -3,6 +3,7 @@ import 'package:pers/src/scoped_model/main_scoped_model.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/views/screens/reporter/login_registration/reporter_login_screen.dart';
 import 'package:pers/src/views/screens/reporter/login_registration/reporter_registration_screen.dart';
+import 'package:pers/src/widgets/hotline_card.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class LoginRegistrationScreen extends StatefulWidget {

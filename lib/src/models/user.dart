@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 class User {
+  final int? id;
   final String? address;
   final String? birthday;
   final String? account_type;
@@ -13,6 +14,7 @@ class User {
   final String? password_confirmation;
 
   User({
+    this.id,
     this.address,
     this.birthday,
     this.account_type,
@@ -26,6 +28,7 @@ class User {
   });
 
   User copyWith({
+    int? id,
     String? address,
     String? birthday,
     String? account_type,
@@ -38,6 +41,7 @@ class User {
     String? password_confirmation,
   }) {
     return User(
+      id: id ?? this.id,
       address: address ?? this.address,
       birthday: birthday ?? this.birthday,
       account_type: account_type ?? this.account_type,
@@ -54,6 +58,7 @@ class User {
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'address': address,
       'birthday': birthday,
       'account_type': account_type,
@@ -69,6 +74,7 @@ class User {
 
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
+      id: map['id'] != null ? map['id'] : null,
       address: map['address'] != null ? map['address'] : null,
       birthday: map['birthday'] != null ? map['birthday'] : null,
       account_type: map['account_type'] != null ? map['account_type'] : null,
@@ -90,7 +96,7 @@ class User {
 
   @override
   String toString() {
-    return 'User(address: $address, birthday: $birthday, account_type: $account_type, email: $email, first_name: $first_name, sex: $sex, last_name: $last_name, mobile_no: $mobile_no, password: $password, password_confirmation: $password_confirmation)';
+    return 'User(id: $id, address: $address, birthday: $birthday, account_type: $account_type, email: $email, first_name: $first_name, sex: $sex, last_name: $last_name, mobile_no: $mobile_no, password: $password, password_confirmation: $password_confirmation)';
   }
 
   @override
@@ -98,6 +104,7 @@ class User {
     if (identical(this, other)) return true;
 
     return other is User &&
+        other.id == id &&
         other.address == address &&
         other.birthday == birthday &&
         other.account_type == account_type &&
@@ -113,6 +120,7 @@ class User {
   @override
   int get hashCode {
     return address.hashCode ^
+        id.hashCode ^
         birthday.hashCode ^
         account_type.hashCode ^
         email.hashCode ^

@@ -4,17 +4,16 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/incident_button.dart';
 
 class HomeScreen extends StatelessWidget {
-  final ScreenArguments args;
-  final ScrollController controller;
+  User? user;
 
   HomeScreen({
     Key? key,
-    required this.args,
-    required this.controller,
   }) : super(key: key);
 
   final ButtonStyle elivatedButtonStyle = ElevatedButton.styleFrom(
@@ -148,7 +147,6 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: LayoutBuilder(builder: (context, constraint) {
         return SingleChildScrollView(
-          controller: controller,
           clipBehavior: Clip.none,
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraint.maxHeight),
@@ -160,9 +158,18 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 50),
-                  Text(
-                    'Hey ${args.user!.first_name}!\nwe\'re here for you.',
-                    style: DefaultTextTheme.headline3,
+                  FutureBuilder(
+                    future: SharedPref().read('user'),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        user = User.fromJson(snapshot.data as String);
+                        return Text(
+                          'Hey ${user!.first_name}!\nwe\'re here for you.',
+                          style: DefaultTextTheme.headline3,
+                        );
+                      } else
+                        return Text('');
+                    },
                   ),
                   SizedBox(height: 30),
                   Text(
@@ -252,8 +259,9 @@ class HomeScreen extends StatelessWidget {
       '/reporter/home/report',
       arguments: ScreenArguments(
         incidentType: incidentType,
-        user: args.user,
       ),
     );
   }
+
+  getUserCredentials() {}
 }

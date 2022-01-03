@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -9,7 +10,11 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/widgets/custom_dropdown_button.dart';
+import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class IncidentReportScreen extends StatefulWidget {
@@ -32,7 +37,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   bool toLocation = false;
 
   String? incident_type;
-  String? patient_name;
   String? sex;
   String? age;
   String? description;
@@ -77,6 +81,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
 
+    incident_type = args.incidentType;
     List<Step> steps = [
       Step(
         title: Text(
@@ -120,52 +125,50 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
       if (currentStep == 0) {
         if (!toLocation && form_keys[0].currentState!.validate()) {
           form_keys[0].currentState!.save();
-
-          //if reporter is the victim then retrieve patient name, sex and age information to his profile.
-          if (!not_victim) {
-            patient_name = '${args.user!.first_name!} ${args.user!.last_name!}';
-            sex = args.user!.sex!;
-            age = '10';
-            //TODO: uncomment calcualte age method below
-            // age = calculateAge(new DateFormat("yyyy-MM-dd").parse(args.user!.birthdate!)).toString();
-          }
-          print('$sex\n$age');
+          print(incident_type);
           goTo(currentStep + 1);
         }
       } else {
         if (form_keys[1].currentState!.validate()) {
           print(currentStep);
           form_keys[1].currentState!.save();
-          print('currentStep');
 
           if (_switchValue) {
             LocationData location_data = await Location().getLocation();
             address = '${location_data.longitude}, ${location_data.latitude}';
           }
 
-          print('currentStep2');
+          // get user credentials from shared preferences
+          SharedPref pref = new SharedPref();
+          User user = User.fromJson(await pref.read("user"));
+
+          if (!not_victim) {
+            print(user.toString());
+            sex = user.sex;
+            age = calculateAge(DateTime.parse(user.birthday!)).toString();
+            print(user.birthday!);
+            print(age);
+          }
 
           var report = IncidentReport(
             incident_type: incident_type,
-            patient_name: patient_name,
             sex: sex,
             age: age,
             description: description,
             incident_images: incident_images,
+            status: status,
             address: address,
             landmark: landmark,
+            account_id: user.id.toString(),
           );
 
           print(report.toString());
-
-          print('currentStep3');
 
           Navigator.pushNamed(
             context,
             '/reporter/home/report/summary',
             arguments: ScreenArguments(
               incident_report: report,
-              user: args.user,
             ),
           );
         }
@@ -256,10 +259,35 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(height: 10),
-        _buildIncidentTypeTextFormField(args),
+        CustomLabel(label: 'Incident Type', value: args.incidentType!),
+        ExpansionTile(
+          title: Text('I\'m not the victim'),
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildSexDropdownField()),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: 110,
+                  child: _buildAgeTextFormField(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+          ],
+          tilePadding: EdgeInsets.zero,
+          trailing: Icon(
+            not_victim ? Icons.circle : Icons.circle_outlined,
+            size: 15,
+          ),
+          onExpansionChanged: (bool expanded) {
+            setState(() => not_victim = expanded);
+          },
+        ),
         const SizedBox(height: 10),
         _buildVictimStatusTextFormField(),
+        const SizedBox(height: 10),
         _buildDescriptionTextFormField(),
         const SizedBox(height: 20),
         _buildIncidentImages(),
@@ -314,17 +342,27 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
-  Widget _buildIncidentTypeTextFormField(ScreenArguments args) {
-    return CustomTextFormField(
-      validator: sexValidator,
-      keyboardType: TextInputType.text,
-      prefixIcon: CustomIcons.siren,
-      label: 'Incident Type',
+  Widget _buildSexDropdownField() {
+    return CustomDropDownButton(
+      items: ['Male', 'Female'],
+      icon: CustomIcons.sex,
+      hintText: 'Sex of victim',
+      validator: (value) => value == null ? 'Fill this in too' : null,
       onSaved: (val) {
-        incident_type = val;
+        sex = val;
       },
-      isReadOnly: true,
-      initialValue: args.incidentType,
+    );
+  }
+
+  Widget _buildAgeTextFormField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.number,
+      prefixIcon: CustomIcons.age,
+      label: 'Age',
+      onSaved: (val) {
+        age = val;
+      },
+      validator: ageValidator,
     );
   }
 
@@ -597,7 +635,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   calculateAge(DateTime birthDate) {
     String now = DateFormat("yyyy-MM-dd").format(DateTime.now());
-    print(now);
     DateTime currentDate = DateTime.parse(now);
     int age = currentDate.year - birthDate.year;
     int month1 = currentDate.month;

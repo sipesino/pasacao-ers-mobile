@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';

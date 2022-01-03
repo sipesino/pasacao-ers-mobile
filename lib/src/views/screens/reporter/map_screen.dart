@@ -148,7 +148,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    _setCustomMarker();
+
     PermissionHandler.checkLocationPermission();
     location = new Location();
     location.getLocation().then((cLoc) {
@@ -160,13 +160,15 @@ class _MapScreenState extends State<MapScreen> {
         });
       });
     });
+    _setCustomMarker();
   }
 
   void updatePinOnMap() async {
     location.onLocationChanged.listen((cloc) {
-      setState(() {
-        current_location = cloc;
-      });
+      current_location = cloc;
+      // setState(() {
+      //   current_location = cloc;
+      // });
     });
     CameraPosition cPosition = CameraPosition(
       target: LatLng(

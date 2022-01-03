@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -47,11 +48,16 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     RequiredValidator(errorText: 'Password is required'),
   ]);
 
+  login() {
+    String url = "http://143.198.92.250/api/login";
+    Map body = {"email": email, "password": password};
+  }
+
   signIn() async {
     String url = "http://143.198.92.250/api/login";
     Map body = {"email": email, "password": password};
 
-    var jsonResponse;
+    Map<String, dynamic> jsonResponse;
     var res = await http.post(Uri.parse(url), body: body);
 
     if (res.statusCode == 201) {
@@ -62,24 +68,35 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           widget.isLoading = true;
         });
 
-        SharedPref preferences = SharedPref();
-        // save bearer token in the local storage
-        preferences.save("token", jsonResponse["token"]);
+        if (jsonResponse["success"]) {
+          SharedPref preferences = SharedPref();
+          // save bearer token in the local storage
+          preferences.save("token", jsonResponse["token"]);
 
-        User user = User.fromMap(jsonResponse["user"]);
+          User user = User.fromMap(jsonResponse["user"]);
 
-        // save user credentials inside local storage
-        preferences.save("user", user);
+          // save user credentials inside local storage
+          preferences.save("user", user);
 
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/reporter/home',
-          (Route<dynamic> route) => false,
-          arguments: ScreenArguments(
-            user: user,
-          ),
-        );
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/reporter/home',
+            (Route<dynamic> route) => false,
+          );
+        }
       }
+    } else {
+      setState(() {
+        widget.isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: new Text('Invalid user credentials'),
+          backgroundColor: Colors.red,
+          duration: new Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -134,6 +151,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         children: [
           _buildTopContainer(),
           BottomContainer(
+            displayHotlinesButton: true,
             onPressed: () {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
@@ -244,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         label: 'Email',
         prefixIcon: CustomIcons.mail,
         validator: emailValidator,
-        initialValue: 'admin@pers.com',
+        initialValue: 'jdlc@email.com',
       );
 
   Widget PasswordTextField() => CustomPasswordTextFormField(
@@ -255,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         onSaved: (value) {
           password = value;
         },
-        initialValue: 'secret',
+        initialValue: 'password!',
       );
 
   Widget FormDivider() => Row(
@@ -300,7 +318,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
       );
 
   Widget ForgotPassButton() => TextButton(
-        child: const Text('Forgot password?'),
+        child: const Text(
+          'Forgot password?',
+          style: TextStyle(
+            color: accentColor,
+          ),
+        ),
         onPressed: () {
           Navigator.of(context).pushNamed(
             '/forgot_password/email',

@@ -9,10 +9,8 @@ import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/location_card.dart';
 
 class LocationsScreen extends StatefulWidget {
-  final ScrollController? controller;
   const LocationsScreen({
     Key? key,
-    this.controller,
   }) : super(key: key);
 
   @override
@@ -26,27 +24,6 @@ class _LocationsScreenState extends State<LocationsScreen> {
   void initState() {
     super.initState();
     _isVisible = true;
-    widget.controller!.addListener(() {
-      if (widget.controller!.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_isVisible == true) {
-          if (mounted)
-            setState(() {
-              _isVisible = false;
-            });
-        }
-      } else {
-        if (widget.controller!.position.userScrollDirection ==
-            ScrollDirection.forward) {
-          if (_isVisible == false) {
-            if (mounted)
-              setState(() {
-                _isVisible = true;
-              });
-          }
-        }
-      }
-    });
   }
 
   @override
@@ -55,7 +32,6 @@ class _LocationsScreenState extends State<LocationsScreen> {
       child: LayoutBuilder(
         builder: (context, constraint) {
           return SingleChildScrollView(
-            controller: widget.controller,
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: constraint.maxHeight),
               child: IntrinsicHeight(

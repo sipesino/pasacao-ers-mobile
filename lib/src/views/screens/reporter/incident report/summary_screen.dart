@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_label.dart';
+import 'package:http/http.dart' as http;
 
 class SummaryScreen extends StatefulWidget {
   const SummaryScreen({
@@ -72,11 +75,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
             ),
             Wrap(
               children: [
-                CustomLabel(
-                  label: 'Patient Name',
-                  value: args.incident_report!.patient_name!,
-                ),
-                SizedBox(width: 30),
                 SizedBox(
                   width: 90,
                   child: CustomLabel(
@@ -92,6 +90,10 @@ class _SummaryScreenState extends State<SummaryScreen> {
                   ),
                 ),
               ],
+            ),
+            CustomLabel(
+              label: 'Victim Status',
+              value: args.incident_report!.status!,
             ),
             CustomLabel(
               label: 'Description',
@@ -155,7 +157,9 @@ class _SummaryScreenState extends State<SummaryScreen> {
             SizedBox(
               height: 50,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _submitReport(args.incident_report!);
+                },
                 child: Text('Submit Report'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(accentColor),
@@ -171,4 +175,50 @@ class _SummaryScreenState extends State<SummaryScreen> {
           ],
         ),
       );
+
+  _submitReport(IncidentReport report) async {
+    Map<String, dynamic> body = {
+      "incident_type": report.incident_type,
+      "sex": report.sex,
+      "age": report.age,
+      "victim_status": report.status,
+      "description": report.description,
+      "account_id": report.account_id,
+      // incident_images: incident_images,
+      "location": report.address,
+      // landmark: landmark,
+    };
+
+    print(body);
+
+    // get bearer token from shared preferences
+    SharedPref pref = new SharedPref();
+    String token = await pref.read("token");
+    print(token);
+
+    String url = 'http://143.198.92.250/api/incidents';
+    var jsonResponse;
+    var res = await http.post(Uri.parse(url), body: body, headers: {
+      'Authorization': 'Bearer $token',
+    });
+
+    if (res.statusCode == 200) {
+      jsonResponse = jsonDecode(res.body);
+
+      if (jsonResponse != null) {
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: new Text("Incident report submitted successfuly"),
+            backgroundColor: Colors.green,
+            duration: new Duration(seconds: 5),
+          ),
+        );
+      }
+    } else {
+      print(res.statusCode);
+    }
+  }
 }
