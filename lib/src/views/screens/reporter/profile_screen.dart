@@ -34,6 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    SharedPref().reload();
   }
 
   @override

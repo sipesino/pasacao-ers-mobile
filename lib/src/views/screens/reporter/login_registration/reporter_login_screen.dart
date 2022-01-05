@@ -48,11 +48,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     RequiredValidator(errorText: 'Password is required'),
   ]);
 
-  login() {
-    String url = "http://143.198.92.250/api/login";
-    Map body = {"email": email, "password": password};
-  }
-
   signIn() async {
     String url = "http://143.198.92.250/api/login";
     Map body = {"email": email, "password": password};

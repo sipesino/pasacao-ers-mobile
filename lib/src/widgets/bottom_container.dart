@@ -21,6 +21,7 @@ class BottomContainer extends StatelessWidget {
       children: [
         Container(
           height: buttonHeight * 1.5,
+          width: MediaQuery.of(context).size.width,
           color: chromeColor,
           child: displayHotlinesButton
               ? Center(
@@ -41,16 +42,15 @@ class BottomContainer extends StatelessWidget {
                         context: context,
                         builder: (context) {
                           return Dialog(
+                            insetPadding: EdgeInsets.symmetric(
+                              vertical: 0,
+                              horizontal: 20,
+                            ),
                             backgroundColor: Colors.transparent,
                             child: Container(
-                              clipBehavior: Clip.antiAlias,
-                              height: MediaQuery.of(context).size.height * 0.7,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
                               child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Card(
                                     child: Container(
@@ -69,57 +69,23 @@ class BottomContainer extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: ListView(
-                                      clipBehavior: Clip.antiAlias,
-                                      shrinkWrap: true,
-                                      children: [
-                                        HotlineCard(
-                                          agency_name: 'Pasacao PNP',
-                                          hotline_number: '09123456789',
-                                          hotline_type: 'Police',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao BFP',
-                                          hotline_number: '+(63) 987-654-3210',
-                                          hotline_type: 'Medic',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao MDRRMO',
-                                          hotline_number: '09669777143',
-                                          hotline_type: 'Mobile Number',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao PNP',
-                                          hotline_number: '09123456789',
-                                          hotline_type: 'Police',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao BFP',
-                                          hotline_number: '+(63) 987-654-3210',
-                                          hotline_type: 'Police',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao MDRRMO',
-                                          hotline_number: '09669777143',
-                                          hotline_type: 'Medic',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao PNP',
-                                          hotline_number: '09123456789',
-                                          hotline_type: 'Mobile Number',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao BFP',
-                                          hotline_number: '+(63) 987-654-3210',
-                                          hotline_type: 'Mobile Number',
-                                        ),
-                                        HotlineCard(
-                                          agency_name: 'Pasacao MDRRMO',
-                                          hotline_number: '09669777143',
-                                          hotline_type: 'Mobile Number',
-                                        ),
-                                      ],
+                                  Flexible(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: [
+                                          HotlineCard(
+                                            agency_name: 'Pasacao PNP',
+                                            hotline_number: '09123456789',
+                                            hotline_type: 'Police',
+                                          ),
+                                          HotlineCard(
+                                            agency_name: 'Pasacao BFP',
+                                            hotline_number:
+                                                '+(63) 987-654-3210',
+                                            hotline_type: 'Medic',
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -131,7 +97,7 @@ class BottomContainer extends StatelessWidget {
                     },
                   ),
                 )
-              : SizedBox(),
+              : Text(''),
         ),
         Transform.translate(
           offset: Offset(MediaQuery.of(context).size.width - (buttonWidth + 20),

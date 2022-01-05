@@ -1,6 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +11,10 @@ import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
+import 'package:pers/src/widgets/custom_gender_picker.dart';
+import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
+import 'package:http/http.dart' as http;
 
 class PersonalInformationScreen extends StatefulWidget {
   PersonalInformationScreen({Key? key}) : super(key: key);
@@ -22,21 +25,23 @@ class PersonalInformationScreen extends StatefulWidget {
 }
 
 class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   FocusNode bdayFocusNode = new FocusNode();
   FocusNode mobileFocusNode = new FocusNode();
   TextEditingController bdateController = new TextEditingController();
+  bool isLoading = false;
+
+  User? user;
 
   String? first_name;
   String? last_name;
-  String? sex;
-  String birthdate = 'Birthdate';
+  String sex = 'Male';
+  String? birthdate;
   String? mobile_no;
 
   bool readOnly = true;
 
   XFile? _imageFile;
-
-  String sampleName = 'Richard';
 
   final nameValidator = MultiValidator([
     RequiredValidator(errorText: 'Name is required'),
@@ -69,6 +74,41 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     DateValidator('yyyy-MM-dd', errorText: 'Birthdate is required.'),
   ]);
 
+  _saveEdits(String field, String value) async {
+    // get bearer token from shared preferences
+    SharedPref pref = new SharedPref();
+    String token = await pref.read("token");
+
+    String url = "http://143.198.92.250/api/accounts/${user!.id}";
+    Map body = {"$field": value};
+
+    Map<String, dynamic> jsonResponse;
+
+    var res = await http.put(Uri.parse(url), body: body, headers: {
+      'Authorization': 'Bearer $token',
+    });
+
+    if (res.statusCode == 200) {
+      jsonResponse = jsonDecode(res.body);
+      if (jsonResponse != null) {
+        SharedPref preferences = SharedPref();
+
+        User user = User.fromMap(jsonResponse);
+
+        // save user credentials inside local storage
+        preferences.save("user", user);
+        setState(() {
+          preferences.reload();
+        });
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } else {
+      print(res.body);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,31 +121,89 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             fontWeight: FontWeight.w500,
           ),
         ),
-        centerTitle: true,
         actions: [
-          IconButton(
+          TextButton(
             onPressed: () {
-              setState(() {
-                readOnly = !readOnly;
-              });
+              if (!readOnly) {
+                setState(() {
+                  isLoading = true;
+                });
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+
+                  if (user!.first_name != first_name) {
+                    _saveEdits('first_name', first_name!);
+                  }
+                  if (user!.last_name != last_name) {
+                    _saveEdits('last_name', last_name!);
+                  }
+                  if (user!.sex != sex) {
+                    _saveEdits('sex', sex);
+                  }
+                  if (user!.birthday != birthdate) {
+                    _saveEdits('birthday', birthdate!);
+                  }
+                  setState(() {
+                    readOnly = true;
+                  });
+                  setState(() {
+                    isLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: new Text('Profile successfuly updated'),
+                      backgroundColor: Colors.green,
+                      duration: new Duration(seconds: 3),
+                    ),
+                  );
+                }
+              } else {
+                setState(() {
+                  readOnly = false;
+                });
+              }
             },
-            icon: Icon(
-              readOnly ? FontAwesomeIcons.edit : Icons.check,
-              size: 20,
-              color: accentColor,
+            child: Text(
+              readOnly ? 'Edit' : 'Save',
+              style: TextStyle(
+                color: accentColor,
+              ),
             ),
           )
         ],
       ),
       body: LayoutBuilder(builder: (context, constraints) {
+        Widget loadingIndicator = isLoading
+            ? new Container(
+                width: 70.0,
+                height: 70.0,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(5),
+                  ),
+                ),
+                child: new Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: new Center(
+                    child: new CircularProgressIndicator(),
+                  ),
+                ),
+              )
+            : new Container();
         return SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 20.0),
-                child: buildColumn(),
+              child: Stack(
+                children: [
+                  buildColumn(),
+                  new Align(
+                    child: loadingIndicator,
+                    alignment: FractionalOffset.center,
+                  ),
+                ],
               ),
             ),
           ),
@@ -118,12 +216,21 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       future: SharedPref().read('user'),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          User user = User.fromJson(snapshot.data as String);
+          user = User.fromJson(snapshot.data as String);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              buildTopContainer(user),
-              buildBottomContainer(user),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Column(
+                    children: [
+                      buildTopContainer(user!),
+                      buildBottomContainer(user!),
+                    ],
+                  ),
+                ),
+              ),
             ],
           );
         } else
@@ -195,18 +302,49 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   Widget buildBottomContainer(User user) {
     return Expanded(
+      child: readOnly ? _displayPersonalInfo(user) : _editPersonalInfo(user),
+    );
+  }
+
+  Widget _displayPersonalInfo(User user) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 30),
+        CustomLabel(
+          label: 'First Name',
+          value: user.first_name!,
+        ),
+        const SizedBox(height: 5),
+        CustomLabel(label: 'Last Name', value: user.last_name!),
+        const SizedBox(height: 5),
+        CustomLabel(label: 'Sex', value: user.sex!),
+        const SizedBox(height: 5),
+        CustomLabel(label: 'Birthday', value: user.birthday!),
+        const SizedBox(height: 5),
+        ChangePasswordButton(),
+      ],
+    );
+  }
+
+  Widget _editPersonalInfo(User user) {
+    return Form(
+      key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 30),
           FirstNameTextField(user.first_name!),
-          const SizedBox(height: 15),
+          const SizedBox(height: 5),
           LastNameTextField(user.last_name!),
-          const SizedBox(height: 15),
-          GenderDropDown(user.sex!),
-          const SizedBox(height: 15),
+          const SizedBox(height: 5),
+          CustomGenderPicker(
+            initialValue: user.sex == 'Male' ? 0 : 1,
+            onChanged: (val) {
+              sex = val;
+            },
+          ),
+          const SizedBox(height: 5),
           BirthDatePicker(user.birthday!),
-          const SizedBox(height: 15),
+          const SizedBox(height: 5),
           ChangePasswordButton(),
         ],
       ),
@@ -219,7 +357,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       keyboardType: TextInputType.name,
       label: 'First Name',
       onSaved: (value) {
-        if (value != null) first_name = value.trim();
+        this.first_name = value!.trim();
       },
       initialValue: first_name,
       prefixIcon: CustomIcons.person,
@@ -232,7 +370,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       validator: nameValidator,
       label: 'Last Name',
       onSaved: (value) {
-        if (value != null) last_name = value.trim();
+        this.last_name = value!.trim();
       },
       initialValue: last_name,
       prefixIcon: CustomIcons.person,
@@ -248,7 +386,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       focusNode: bdayFocusNode,
       items: ['Male', 'Female'],
       onSaved: (val) {
-        sex = val;
+        this.sex = val!.trim();
       },
       validator: (value) => value == null ? 'Sex is required' : null,
       isDisabled: readOnly,
@@ -262,7 +400,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         Flexible(
           flex: 3,
           child: CustomTextFormField(
-            key: Key(birthdate),
             controller: bdateController,
             label: 'Birthdate',
             keyboardType: TextInputType.datetime,
@@ -270,7 +407,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             prefixIcon: CustomIcons.calendar,
             initialValue: birthday,
             onSaved: (newValue) {
-              birthdate = newValue!;
+              this.birthdate = newValue!.trim();
             },
             validator: birthdateValidator,
           ),
@@ -290,13 +427,17 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                           onPressed: readOnly ? null : _showDatePicker,
                           child: Text('Set'),
                           style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                              EdgeInsets.all(20),
-                            ),
-                            backgroundColor: MaterialStateProperty.all(
-                              Colors.white,
-                            ),
-                          ),
+                              padding: MaterialStateProperty.all(
+                                EdgeInsets.all(22),
+                              ),
+                              backgroundColor: MaterialStateProperty.all(
+                                Colors.white,
+                              ),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              )),
                         ),
                       ),
                     ],
@@ -355,7 +496,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       setState(() {
         DateTime date = d!;
         birthdate = formatter.format(date);
-        bdateController.text = birthdate;
+        bdateController.text = birthdate!;
       });
       mobileFocusNode.requestFocus();
     });

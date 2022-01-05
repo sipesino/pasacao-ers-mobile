@@ -22,4 +22,9 @@ class SharedPref {
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
   }
+
+  reload() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.reload();
+  }
 }

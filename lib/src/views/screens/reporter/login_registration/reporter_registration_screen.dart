@@ -13,6 +13,7 @@ import 'package:pers/src/scoped_model/main_scoped_model.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
+import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
@@ -39,8 +40,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   //user details
   String? first_name;
   String? last_name;
-  String? sex;
-  String birthday = 'birthdate';
+  String? sex = 'Male';
+  String birthday = 'Birthdate';
   String? mobile_no;
   String? email;
   String? password;
@@ -259,7 +260,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             const SizedBox(height: 10),
             LastNameTextField(),
             const SizedBox(height: 10),
-            GenderDropDown(),
+            CustomGenderPicker(
+              onChanged: (val) {
+                sex = val;
+              },
+            ),
             const SizedBox(height: 10),
             BirthDatePicker(),
             const SizedBox(height: 10),

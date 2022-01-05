@@ -91,7 +91,7 @@ class _ResponderProfileScreenState extends State<ResponderProfileScreen> {
         children: [
           TextButton.icon(
             onPressed: () {
-              Navigator.of(context).pushNamed('/reporter/home/profile');
+              // Navigator.of(context).pushNamed('/reporter/home/profile');
             },
             label: Text(
               'Personal Information',
@@ -101,20 +101,6 @@ class _ResponderProfileScreenState extends State<ResponderProfileScreen> {
             ),
             icon: Icon(
               CustomIcons.person,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'Incidents Reported',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.siren,
               color: accentColor,
               size: 20,
             ),

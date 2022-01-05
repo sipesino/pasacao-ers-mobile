@@ -14,6 +14,7 @@ import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_dropdown_button.dart';
+import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
@@ -266,7 +267,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: _buildSexDropdownField()),
+                Expanded(child: _buildSexPicker()),
                 const SizedBox(width: 10),
                 SizedBox(
                   width: 110,
@@ -342,13 +343,9 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
-  Widget _buildSexDropdownField() {
-    return CustomDropDownButton(
-      items: ['Male', 'Female'],
-      icon: CustomIcons.sex,
-      hintText: 'Sex of victim',
-      validator: (value) => value == null ? 'Fill this in too' : null,
-      onSaved: (val) {
+  Widget _buildSexPicker() {
+    return CustomGenderPicker(
+      onChanged: (val) {
         sex = val;
       },
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/incident_card.dart';
+import 'package:pers/src/widgets/operation_card.dart';
 
 class ResponderHomeScreen extends StatelessWidget {
   const ResponderHomeScreen({Key? key}) : super(key: key);
@@ -20,23 +21,8 @@ class ResponderHomeScreen extends StatelessWidget {
               style: DefaultTextTheme.headline4,
             ),
             SizedBox(height: 20),
-            Container(
-              height: 300,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                color: accentColor.withOpacity(0.1),
-              ),
-              child: Center(
-                child: Text(
-                  'No operation assigned',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ),
+            OperationCard(),
+            displayNoOperationAssigned(),
             SizedBox(height: 20),
             Text(
               'Proceeding Incidents',
@@ -52,6 +38,36 @@ class ResponderHomeScreen extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget displayNoOperationAssigned() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(
+          color: primaryColor,
+        ),
+      ),
+      child: Container(
+        height: 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.grey[200],
+          boxShadow: boxShadow,
+        ),
+        child: Center(
+          child: Text(
+            'No operation assigned',
+            style: TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+            ),
+          ),
         ),
       ),
     );

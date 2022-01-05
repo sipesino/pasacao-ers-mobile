@@ -87,7 +87,7 @@ class EmergencyContactCard2 extends StatelessWidget {
       child: Material(
         child: Container(
           width: double.infinity,
-          height: 120,
+          height: 80,
           padding: const EdgeInsets.all(10.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -100,8 +100,8 @@ class EmergencyContactCard2 extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(10.0),
                 child: Container(
-                  height: 100.0,
-                  width: 100.0,
+                  height: 60.0,
+                  width: 60.0,
                   color: chromeColor.withOpacity(0.5),
                   child: Image(
                     image: AssetImage(contact_image),

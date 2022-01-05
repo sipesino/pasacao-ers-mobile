@@ -194,7 +194,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
     // get bearer token from shared preferences
     SharedPref pref = new SharedPref();
     String token = await pref.read("token");
-    print(token);
 
     String url = 'http://143.198.92.250/api/incidents';
     var jsonResponse;
