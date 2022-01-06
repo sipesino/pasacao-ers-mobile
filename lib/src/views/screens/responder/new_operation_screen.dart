@@ -8,10 +8,12 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/directions.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/theme.dart';
 
 class NewOperation extends StatefulWidget {
   NewOperation({Key? key}) : super(key: key);
@@ -25,6 +27,8 @@ class _NewOperationState extends State<NewOperation> {
   bool show_map = false;
   Set<Marker> _markers = {};
   Directions? _info;
+
+  bool _isExpanded = false;
 
   var args;
   BitmapDescriptor? incidentLocationMarker;
@@ -54,11 +58,13 @@ class _NewOperationState extends State<NewOperation> {
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
 
+    AppBar appBar = AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: appBar,
       extendBodyBehindAppBar: true,
       body: !show_map
           ? Center(
@@ -74,7 +80,7 @@ class _NewOperationState extends State<NewOperation> {
                       current_location.latitude!,
                       current_location.longitude!,
                     ),
-                    zoom: 18,
+                    zoom: 5,
                   ),
                   polylines: {if (_info != null) setPolylines()},
                   myLocationEnabled: true,
@@ -83,30 +89,245 @@ class _NewOperationState extends State<NewOperation> {
                   buildingsEnabled: true,
                   tiltGesturesEnabled: false,
                 ),
-                if (_info != null)
-                  Positioned(
-                    bottom: 20,
-                    left: 20,
-                    child: Container(
-                      padding: EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[800],
-                        boxShadow: boxShadow,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${_info!.totalDistance}, ${_info!.totalDuration}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
+                SafeArea(
+                  child: Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(bottom: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: boxShadow,
+                            ),
+                            height: 100,
+                            padding: EdgeInsets.all(20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Medical Incident',
+                                        style: DefaultTextTheme.headline3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        'Danao Pasacao Rd, Pasacao, Camarines Sur',
+                                        style: DefaultTextTheme.subtitle1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                ClipOval(
+                                  child: SizedBox(
+                                    width: 60,
+                                    height: 60,
+                                    child: ElevatedButton(
+                                      onPressed: () => updatePinOnMap(),
+                                      style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all(
+                                          accentColor,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        CustomIcons.siren_filled,
+                                        color: Colors.white,
+                                        size: 30,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Stack(
+                                children: [
+                                  AnimatedContainer(
+                                    duration: Duration(milliseconds: 150),
+                                    curve: Curves.easeInCirc,
+                                    height: _isExpanded
+                                        ? MediaQuery.of(context).size.height -
+                                            (appBar.preferredSize.height + 290)
+                                        : 130,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.7),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: boxShadow,
+                                    ),
+                                    child: ListView(
+                                      padding: EdgeInsets.all(20),
+                                      children: [
+                                        setDetail(
+                                          field_name: 'Sex',
+                                          value: 'Female',
+                                        ),
+                                        setDetail(
+                                          field_name: 'Age',
+                                          value: '27',
+                                        ),
+                                        setDetail(
+                                          field_name: 'Status',
+                                          value: 'Conscious and Responsive',
+                                        ),
+                                        SizedBox(height: 10),
+                                        Column(
+                                          children: [
+                                            Text(
+                                              'Description',
+                                              style: DefaultTextTheme.bodyText1,
+                                            ),
+                                            Divider(
+                                              color: primaryColor,
+                                            ),
+                                            Text(
+                                              'Na heat stroke si ate gurl. namastal na kaya',
+                                              style: DefaultTextTheme.headline4,
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 10),
+                                        setDetail(
+                                          field_name: 'Landmark',
+                                          value:
+                                              'Front of Caranan National High School',
+                                        ),
+                                        setDetail(
+                                          field_name: 'Dist. & ETA',
+                                          value: 'Female',
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Transform.translate(
+                                    offset: Offset(
+                                        MediaQuery.of(context).size.width - 100,
+                                        -20),
+                                    child: ClipOval(
+                                      child: SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child: ElevatedButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              _isExpanded = !_isExpanded;
+                                            });
+                                          },
+                                          child: Icon(
+                                            _isExpanded
+                                                ? Icons
+                                                    .keyboard_arrow_down_rounded
+                                                : Icons
+                                                    .keyboard_arrow_up_rounded,
+                                            color: accentColor,
+                                          ),
+                                          style: ButtonStyle(
+                                            elevation:
+                                                MaterialStateProperty.all(8),
+                                            padding: MaterialStateProperty.all(
+                                              EdgeInsets.zero,
+                                            ),
+                                            backgroundColor:
+                                                MaterialStateProperty.all(
+                                              Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Divider(),
+                              SizedBox(
+                                height: 50,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                        MaterialStateProperty.all(accentColor),
+                                    shape: MaterialStateProperty.all(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  ),
+                                  onPressed: () {},
+                                  child: Text('Respond'),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
                   ),
+                ),
+                //displayDistanceAndETA(),
               ],
             ),
     );
+  }
+
+  Widget setDetail({required String field_name, required String value}) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 85,
+          child: Text(
+            field_name,
+            style: DefaultTextTheme.bodyText1,
+          ),
+        ),
+        VerticalDivider(
+          color: primaryColor,
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: DefaultTextTheme.headline4,
+          ),
+        ),
+      ],
+    );
+  }
+
+  displayDistanceAndETA() {
+    if (_info != null)
+      return Positioned(
+        bottom: 20,
+        left: 20,
+        child: Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: Colors.amber[800],
+            boxShadow: boxShadow,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Text(
+            '${_info!.totalDistance}, ${_info!.totalDuration}',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      );
   }
 
   setPolylines() {
@@ -133,7 +354,6 @@ class _NewOperationState extends State<NewOperation> {
         current_location.latitude!,
         current_location.longitude!,
       ),
-      zoom: 20,
     );
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
