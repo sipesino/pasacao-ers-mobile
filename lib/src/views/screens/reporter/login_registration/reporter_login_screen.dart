@@ -1,9 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
@@ -151,62 +148,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
                 signIn();
-                //   setState(() {
-                //     widget.isLoading = true;
-                //   });
-                //   Map<String, String> credentials = {
-                //     "email": email!,
-                //     "password": password!,
-                //   };
-                //   widget.model
-                //       .postAPICall(
-                //     'http://143.198.92.250/api/login',
-                //     credentials,
-                //   )
-                //       .then((value) {
-                //     if (value["success"]) {
-                //       // store  user credentials
-                //       //   Map<String, String> id = {
-                //       //     "id": value["id"],
-                //       //   };
-                //       //   widget.model
-                //       //       .getAPICall(
-                //       //     'http://192.168.56.1/pers/api/user/getUser.php',
-                //       //     id,
-                //       //   )
-                //       //       .then((value) {
-                //       //     var status_code = value["statuscode"];
-                //       //     print(status_code);
-                //       //     print(value["user"]);
-                //       //     user = User.fromMap(value["user"]);
-
-                //       //     Navigator.pushNamedAndRemoveUntil(
-                //       //       context,
-                //       //       '/reporter/home',
-                //       //       (Route<dynamic> route) => false,
-                //       //       arguments: ScreenArguments(
-                //       //         user: user,
-                //       //       ),
-                //       //     );
-                //       //     setState(() {
-                //       //       widget.isLoading = false;
-                //       //     });
-                //       //   });
-                // } else {
-                //   setState(() {
-                //   widget.isLoading = false;
-                // });
-                // ScaffoldMessenger.of(context).showSnackBar(
-                //   SnackBar(
-                //     behavior: SnackBarBehavior.floating,
-                //     content: new Text(value["msg"]),
-                //     backgroundColor: Colors.red,
-                //     duration: new Duration(seconds: 5),
-                //   ),
-                // );
-                // print(response["msg"]);
-                // }
-                //   });
               }
             },
           ),

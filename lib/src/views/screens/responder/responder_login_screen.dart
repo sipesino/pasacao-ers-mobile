@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
+import 'package:http/http.dart' as http;
 
 class ResponderLoginScreen extends StatefulWidget {
   const ResponderLoginScreen({Key? key}) : super(key: key);
@@ -18,7 +23,10 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     with WidgetsBindingObserver {
   String? email;
   String? password;
+
   final _formKey = GlobalKey<FormState>();
+
+  bool isLoading = false;
 
   final emailValidator = MultiValidator([
     EmailValidator(errorText: 'Invalid email address'),
@@ -31,6 +39,25 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    Widget loadingIndicator = isLoading
+        ? new Container(
+            width: 70.0,
+            height: 70.0,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.all(
+                Radius.circular(5),
+              ),
+            ),
+            child: new Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: new Center(
+                child: new CircularProgressIndicator(),
+              ),
+            ),
+          )
+        : new Container();
+
     return DefaultTabController(
       initialIndex: 0,
       length: 1,
@@ -86,9 +113,17 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraint.maxHeight),
                 child: IntrinsicHeight(
-                  child: Form(
-                    key: _formKey,
-                    child: _buildColumn(),
+                  child: Stack(
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: _buildColumn(),
+                      ),
+                      new Align(
+                        child: loadingIndicator,
+                        alignment: FractionalOffset.center,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -106,11 +141,8 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
           BottomContainer(
             onPressed: () async {
               if (_formKey.currentState!.validate()) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/responder/home',
-                  (Route<dynamic> route) => false,
-                );
+                _formKey.currentState?.save();
+                signIn();
               }
             },
           ),
@@ -143,7 +175,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 onSaved: (val) {
                   email = val;
                 },
-                initialValue: 'admin@email.com',
+                initialValue: 'coolestdude@email.com',
                 prefixIcon: CustomIcons.mail,
               ),
               const SizedBox(
@@ -153,7 +185,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 validator: passwordValidator,
                 label: 'Password',
                 prefixIcon: CustomIcons.lock,
-                initialValue: 'admin',
+                initialValue: 'password!',
                 onChanged: (String value) {},
                 onSaved: (val) {
                   password = val;
@@ -172,4 +204,57 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
           ),
         ),
       );
+
+  signIn() async {
+    String url = "http://143.198.92.250/api/login";
+    Map body = {"email": email, "password": password};
+
+    Map<String, dynamic> jsonResponse;
+    var res = await http.post(Uri.parse(url), body: body);
+
+    if (res.statusCode == 201) {
+      jsonResponse = jsonDecode(res.body);
+
+      if (jsonResponse != null) {
+        setState(() {
+          isLoading = true;
+        });
+
+        if (jsonResponse["success"] &&
+            jsonResponse["user"]["account_type"] == 'responder') {
+          SharedPref preferences = SharedPref();
+          // save bearer token in the local storage
+          preferences.save("token", jsonResponse["token"]);
+
+          User user = User.fromMap(jsonResponse["user"]);
+
+          // save user credentials inside local storage
+          preferences.save("user", user);
+
+          setState(() {
+            isLoading = false;
+          });
+
+          Navigator.pushNamedAndRemoveUntil(
+            context,
+            '/responder/home',
+            (Route<dynamic> route) => false,
+          );
+
+          return;
+        }
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: new Text('Invalid user credentials'),
+        backgroundColor: Colors.red,
+        duration: new Duration(seconds: 3),
+      ),
+    );
+  }
 }

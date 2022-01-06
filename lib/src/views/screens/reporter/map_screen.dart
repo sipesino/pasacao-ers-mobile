@@ -12,7 +12,6 @@ import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/directions.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
-import 'package:pers/src/theme.dart';
 
 class MapScreen extends StatefulWidget {
   MapScreen({
@@ -185,6 +184,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(

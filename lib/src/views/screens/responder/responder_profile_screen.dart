@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/data/data.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/emergency_contact_card.dart';
 
 class ResponderProfileScreen extends StatefulWidget {
   const ResponderProfileScreen({Key? key}) : super(key: key);
@@ -135,6 +134,7 @@ class _ResponderProfileScreenState extends State<ResponderProfileScreen> {
           ),
           TextButton.icon(
             onPressed: () {
+              new SharedPref().clear();
               Navigator.of(context).popAndPushNamed('/');
             },
             label: Text(

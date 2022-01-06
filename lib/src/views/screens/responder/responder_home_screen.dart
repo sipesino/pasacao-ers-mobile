@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/incident_card.dart';
 import 'package:pers/src/widgets/operation_card.dart';
@@ -21,7 +23,15 @@ class ResponderHomeScreen extends StatelessWidget {
               style: DefaultTextTheme.headline4,
             ),
             SizedBox(height: 20),
-            OperationCard(),
+            OperationCard(
+              location: Location(
+                location_id: 'HC-01',
+                location_type: 'Hospital',
+                address: 'Pasacao, Camarines Sur',
+                coordinates: LatLng(13.504323, 123.040576),
+                location_name: 'Pasacao Rural Health Unit',
+              ),
+            ),
             displayNoOperationAssigned(),
             SizedBox(height: 20),
             Text(

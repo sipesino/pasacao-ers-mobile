@@ -18,12 +18,9 @@ class LocationsScreen extends StatefulWidget {
 }
 
 class _LocationsScreenState extends State<LocationsScreen> {
-  var _isVisible;
-
   @override
   void initState() {
     super.initState();
-    _isVisible = true;
   }
 
   @override
