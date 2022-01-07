@@ -9,7 +9,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/directions.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -32,6 +31,8 @@ class _NewOperationState extends State<NewOperation> {
 
   bool _isExpanded = false;
   bool _isInitialized = false;
+
+  double _opacity = 1;
 
   var args;
   BitmapDescriptor? incidentLocationMarker;
@@ -73,6 +74,17 @@ class _NewOperationState extends State<NewOperation> {
     AppBar appBar = AppBar(
       elevation: 0,
       backgroundColor: Colors.transparent,
+      actions: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _opacity = _opacity == 1 ? 0 : 1;
+            });
+          },
+          icon: Icon(_opacity == 1 ? Icons.visibility_off : Icons.visibility),
+        ),
+        SizedBox(width: 20)
+      ],
     );
 
     return Scaffold(
@@ -113,82 +125,85 @@ class _NewOperationState extends State<NewOperation> {
                   },
                 ),
                 buildOperationInfo(context, appBar),
-                //displayDistanceAndETA(),
               ],
             ),
     );
   }
 
   Widget buildOperationInfo(BuildContext context, AppBar appBar) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            buildTopBanner(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Stack(
-                  children: [
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 150),
-                      curve: Curves.easeInCirc,
-                      height: _isExpanded
-                          ? MediaQuery.of(context).size.height -
-                              (appBar.preferredSize.height + 290)
-                          : 130,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: boxShadow,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: ListView(
-                          padding: EdgeInsets.all(20),
-                          children: [
-                            Text(
-                              'Operation Info',
-                              style: DefaultTextTheme.headline4,
-                            ),
-                            SizedBox(height: 15),
-                            buildOperationDetail(
-                              field: 'Sex',
-                              value: 'Female',
-                            ),
-                            buildOperationDetail(
-                              field: 'Age',
-                              value: '27',
-                            ),
-                            buildOperationDetail(
-                              field: 'Status',
-                              value: 'Conscious and Responsive',
-                            ),
-                            buildOperationDetail(
-                              field: 'Description',
-                              value:
-                                  'Na heat stroke si ate gurl. namastal na kaya. The quick brownfox jumps over the lazy dog. Lorem ipsum sit dolor amet.',
-                            ),
-                            buildOperationDetail(
-                              field: 'Landmark',
-                              value: 'Front of Caranan National High School',
-                            ),
-                          ],
+    return AnimatedOpacity(
+      duration: Duration(milliseconds: 150),
+      opacity: _opacity,
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              buildTopBanner(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Stack(
+                    children: [
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: 150),
+                        curve: Curves.easeInCirc,
+                        height: _isExpanded
+                            ? MediaQuery.of(context).size.height -
+                                (appBar.preferredSize.height + 290)
+                            : 130,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: boxShadow,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: ListView(
+                            padding: EdgeInsets.all(20),
+                            children: [
+                              Text(
+                                'Operation Info',
+                                style: DefaultTextTheme.headline4,
+                              ),
+                              SizedBox(height: 15),
+                              buildOperationDetail(
+                                field: 'Sex',
+                                value: 'Female',
+                              ),
+                              buildOperationDetail(
+                                field: 'Age',
+                                value: '27',
+                              ),
+                              buildOperationDetail(
+                                field: 'Status',
+                                value: 'Conscious and Responsive',
+                              ),
+                              buildOperationDetail(
+                                field: 'Description',
+                                value:
+                                    'Na heat stroke si ate gurl. namastal na kaya. The quick brownfox jumps over the lazy dog. Lorem ipsum sit dolor amet.',
+                              ),
+                              buildOperationDetail(
+                                field: 'Landmark',
+                                value: 'Front of Caranan National High School',
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    buildExpandButton(context),
-                  ],
-                ),
-                Divider(),
-                buildRespondButton(),
-              ],
-            )
-          ],
+                      buildExpandButton(context),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  buildRespondButton(),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
