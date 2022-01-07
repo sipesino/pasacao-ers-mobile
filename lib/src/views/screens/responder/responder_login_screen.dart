@@ -100,6 +100,9 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                   style: OutlinedButton.styleFrom(
                     primary: Colors.black,
                     side: const BorderSide(width: 1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
                   child: const Text('I\'m a reporter'),
                 ),

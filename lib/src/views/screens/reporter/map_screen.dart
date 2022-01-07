@@ -215,7 +215,7 @@ class _MapScreenState extends State<MapScreen> {
                         endCap: Cap.roundCap,
                         startCap: Cap.roundCap,
                         width: 5,
-                        points: _info!.polylinePoints
+                        points: _info!.polylinePoints!
                             .map((e) => LatLng(e.latitude, e.longitude))
                             .toList(),
                       ),

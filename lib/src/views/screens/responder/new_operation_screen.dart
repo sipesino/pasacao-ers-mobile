@@ -90,190 +90,79 @@ class _NewOperationState extends State<NewOperation> {
                   tiltGesturesEnabled: false,
                 ),
                 SafeArea(
-                  child: Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(bottom: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.7),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: boxShadow,
-                            ),
-                            height: 100,
-                            padding: EdgeInsets.all(20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        buildTopBanner(),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Stack(
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Medical Incident',
-                                        style: DefaultTextTheme.headline3,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        'Danao Pasacao Rd, Pasacao, Camarines Sur',
-                                        style: DefaultTextTheme.subtitle1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 150),
+                                  curve: Curves.easeInCirc,
+                                  height: _isExpanded
+                                      ? MediaQuery.of(context).size.height -
+                                          (appBar.preferredSize.height + 290)
+                                      : 130,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.7),
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: boxShadow,
                                   ),
-                                ),
-                                SizedBox(width: 10),
-                                ClipOval(
-                                  child: SizedBox(
-                                    width: 60,
-                                    height: 60,
-                                    child: ElevatedButton(
-                                      onPressed: () => updatePinOnMap(),
-                                      style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all(
-                                          accentColor,
-                                        ),
-                                      ),
-                                      child: Icon(
-                                        CustomIcons.siren_filled,
-                                        color: Colors.white,
-                                        size: 30,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Stack(
-                                children: [
-                                  AnimatedContainer(
-                                    duration: Duration(milliseconds: 150),
-                                    curve: Curves.easeInCirc,
-                                    height: _isExpanded
-                                        ? MediaQuery.of(context).size.height -
-                                            (appBar.preferredSize.height + 290)
-                                        : 130,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.7),
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: boxShadow,
-                                    ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
                                     child: ListView(
                                       padding: EdgeInsets.all(20),
                                       children: [
-                                        setDetail(
-                                          field_name: 'Sex',
+                                        Text(
+                                          'Operation Info',
+                                          style: DefaultTextTheme.headline4,
+                                        ),
+                                        SizedBox(height: 15),
+                                        buildOperationDetail(
+                                          field: 'Sex',
                                           value: 'Female',
                                         ),
-                                        setDetail(
-                                          field_name: 'Age',
+                                        buildOperationDetail(
+                                          field: 'Age',
                                           value: '27',
                                         ),
-                                        setDetail(
-                                          field_name: 'Status',
+                                        buildOperationDetail(
+                                          field: 'Status',
                                           value: 'Conscious and Responsive',
                                         ),
-                                        SizedBox(height: 10),
-                                        Column(
-                                          children: [
-                                            Text(
-                                              'Description',
-                                              style: DefaultTextTheme.bodyText1,
-                                            ),
-                                            Divider(
-                                              color: primaryColor,
-                                            ),
-                                            Text(
+                                        buildOperationDetail(
+                                          field: 'Description',
+                                          value:
                                               'Na heat stroke si ate gurl. namastal na kaya',
-                                              style: DefaultTextTheme.headline4,
-                                            ),
-                                          ],
                                         ),
-                                        SizedBox(height: 10),
-                                        setDetail(
-                                          field_name: 'Landmark',
+                                        buildOperationDetail(
+                                          field: 'Landmark',
                                           value:
                                               'Front of Caranan National High School',
                                         ),
-                                        setDetail(
-                                          field_name: 'Dist. & ETA',
-                                          value: 'Female',
+                                        buildOperationDetail(
+                                          field: 'Dist. & ETA',
+                                          value: '3.5km, 5 mins',
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Transform.translate(
-                                    offset: Offset(
-                                        MediaQuery.of(context).size.width - 100,
-                                        -20),
-                                    child: ClipOval(
-                                      child: SizedBox(
-                                        width: 40,
-                                        height: 40,
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _isExpanded = !_isExpanded;
-                                            });
-                                          },
-                                          child: Icon(
-                                            _isExpanded
-                                                ? Icons
-                                                    .keyboard_arrow_down_rounded
-                                                : Icons
-                                                    .keyboard_arrow_up_rounded,
-                                            color: accentColor,
-                                          ),
-                                          style: ButtonStyle(
-                                            elevation:
-                                                MaterialStateProperty.all(8),
-                                            padding: MaterialStateProperty.all(
-                                              EdgeInsets.zero,
-                                            ),
-                                            backgroundColor:
-                                                MaterialStateProperty.all(
-                                              Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Divider(),
-                              SizedBox(
-                                height: 50,
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                    backgroundColor:
-                                        MaterialStateProperty.all(accentColor),
-                                    shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  ),
-                                  onPressed: () {},
-                                  child: Text('Respond'),
                                 ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
+                                buildExpandButton(context),
+                              ],
+                            ),
+                            Divider(),
+                            buildRespondButton(),
+                          ],
+                        )
+                      ],
                     ),
                   ),
                 ),
@@ -283,11 +172,155 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
+  Widget buildOperationDetail({required String field, required String value}) {
+    return Column(
+      children: [
+        Row(
+          children: <Widget>[
+            SizedBox(
+              width: 80,
+              child: Text(
+                field,
+              ),
+            ),
+            SizedBox(width: 15),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  value,
+                  style: DefaultTextTheme.headline5,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+  SizedBox buildRespondButton() {
+    return SizedBox(
+      height: 50,
+      child: ElevatedButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(accentColor),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+        onPressed: () {},
+        child: Text('Respond'),
+      ),
+    );
+  }
+
+  Transform buildExpandButton(BuildContext context) {
+    return Transform.translate(
+      offset: Offset(MediaQuery.of(context).size.width - 100, -20),
+      child: ClipOval(
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Icon(
+              _isExpanded
+                  ? Icons.keyboard_arrow_down_rounded
+                  : Icons.keyboard_arrow_up_rounded,
+              color: accentColor,
+            ),
+            style: ButtonStyle(
+              padding: MaterialStateProperty.all(
+                EdgeInsets.zero,
+              ),
+              backgroundColor: MaterialStateProperty.all(
+                Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container buildTopBanner() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: boxShadow,
+      ),
+      height: 120,
+      padding: EdgeInsets.all(20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Medical Incident',
+                  style: DefaultTextTheme.headline3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Danao Pasacao Rd, Pasacao, Camarines Sur',
+                  style: DefaultTextTheme.subtitle1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '5km, 7mins',
+                  style: DefaultTextTheme.subtitle2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10),
+          ClipOval(
+            child: SizedBox(
+              width: 60,
+              height: 60,
+              child: ElevatedButton(
+                onPressed: () => updatePinOnMap(),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                    accentColor,
+                  ),
+                ),
+                child: Icon(
+                  CustomIcons.siren_filled,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget setDetail({required String field_name, required String value}) {
     return Row(
       children: [
         SizedBox(
-          width: 85,
+          width: 80,
           child: Text(
             field_name,
             style: DefaultTextTheme.bodyText1,
@@ -331,18 +364,21 @@ class _NewOperationState extends State<NewOperation> {
   }
 
   setPolylines() {
-    Polyline polyline = Polyline(
-      polylineId: const PolylineId('overview_polyline'),
-      color: Colors.blue,
-      endCap: Cap.roundCap,
-      startCap: Cap.roundCap,
-      width: 5,
-      points: _info!.polylinePoints
-          .map((e) => LatLng(e.latitude, e.longitude))
-          .toList(),
-    );
-    _setMapFitToTour({polyline});
-    return polyline;
+    if (_info!.polylinePoints != null) {
+      Polyline polyline = Polyline(
+        polylineId: const PolylineId('overview_polyline'),
+        color: Colors.blue,
+        endCap: Cap.roundCap,
+        startCap: Cap.roundCap,
+        width: 5,
+        points: _info!.polylinePoints!
+            .map((e) => LatLng(e.latitude, e.longitude))
+            .toList(),
+      );
+      _setMapFitToTour({polyline});
+      return polyline;
+    } else
+      return Polyline(polylineId: PolylineId(''));
   }
 
   void updatePinOnMap() async {
