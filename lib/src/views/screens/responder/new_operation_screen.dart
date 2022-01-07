@@ -23,12 +23,15 @@ class NewOperation extends StatefulWidget {
 }
 
 class _NewOperationState extends State<NewOperation> {
-  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController? _controller;
   bool show_map = false;
   Set<Marker> _markers = {};
   Directions? _info;
 
+  Set<Polyline> polylines = {};
+
   bool _isExpanded = false;
+  bool _isInitialized = false;
 
   var args;
   BitmapDescriptor? incidentLocationMarker;
@@ -37,14 +40,23 @@ class _NewOperationState extends State<NewOperation> {
   late Location location;
 
   @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 
     PermissionHandler.checkLocationPermission();
     location = new Location();
+
     location.getLocation().then((cLoc) {
       current_location = cLoc;
       setInitialLocation();
+
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           show_map = true;
@@ -72,103 +84,113 @@ class _NewOperationState extends State<NewOperation> {
             )
           : Stack(
               children: [
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  markers: _markers,
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(
-                      current_location.latitude!,
-                      current_location.longitude!,
-                    ),
-                    zoom: 5,
-                  ),
-                  polylines: {if (_info != null) setPolylines()},
-                  myLocationEnabled: true,
-                  zoomControlsEnabled: false,
-                  myLocationButtonEnabled: false,
-                  buildingsEnabled: true,
-                  tiltGesturesEnabled: false,
+                StreamBuilder<LocationData>(
+                  stream: location.onLocationChanged,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      LocationData curLoc = snapshot.data!;
+                      getDirections(curLoc);
+                    }
+
+                    return GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      markers: _markers,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          current_location.latitude!,
+                          current_location.longitude!,
+                        ),
+                        zoom: 5,
+                      ),
+                      polylines: polylines,
+                      myLocationEnabled: true,
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      buildingsEnabled: true,
+                      tiltGesturesEnabled: false,
+                      trafficEnabled: true,
+                    );
+                  },
                 ),
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        buildTopBanner(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Stack(
-                              children: [
-                                AnimatedContainer(
-                                  duration: Duration(milliseconds: 150),
-                                  curve: Curves.easeInCirc,
-                                  height: _isExpanded
-                                      ? MediaQuery.of(context).size.height -
-                                          (appBar.preferredSize.height + 290)
-                                      : 130,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(10),
-                                    boxShadow: boxShadow,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: ListView(
-                                      padding: EdgeInsets.all(20),
-                                      children: [
-                                        Text(
-                                          'Operation Info',
-                                          style: DefaultTextTheme.headline4,
-                                        ),
-                                        SizedBox(height: 15),
-                                        buildOperationDetail(
-                                          field: 'Sex',
-                                          value: 'Female',
-                                        ),
-                                        buildOperationDetail(
-                                          field: 'Age',
-                                          value: '27',
-                                        ),
-                                        buildOperationDetail(
-                                          field: 'Status',
-                                          value: 'Conscious and Responsive',
-                                        ),
-                                        buildOperationDetail(
-                                          field: 'Description',
-                                          value:
-                                              'Na heat stroke si ate gurl. namastal na kaya',
-                                        ),
-                                        buildOperationDetail(
-                                          field: 'Landmark',
-                                          value:
-                                              'Front of Caranan National High School',
-                                        ),
-                                        buildOperationDetail(
-                                          field: 'Dist. & ETA',
-                                          value: '3.5km, 5 mins',
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                buildExpandButton(context),
-                              ],
-                            ),
-                            Divider(),
-                            buildRespondButton(),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                buildOperationInfo(context, appBar),
                 //displayDistanceAndETA(),
               ],
             ),
+    );
+  }
+
+  Widget buildOperationInfo(BuildContext context, AppBar appBar) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            buildTopBanner(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Stack(
+                  children: [
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 150),
+                      curve: Curves.easeInCirc,
+                      height: _isExpanded
+                          ? MediaQuery.of(context).size.height -
+                              (appBar.preferredSize.height + 290)
+                          : 130,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: boxShadow,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: ListView(
+                          padding: EdgeInsets.all(20),
+                          children: [
+                            Text(
+                              'Operation Info',
+                              style: DefaultTextTheme.headline4,
+                            ),
+                            SizedBox(height: 15),
+                            buildOperationDetail(
+                              field: 'Sex',
+                              value: 'Female',
+                            ),
+                            buildOperationDetail(
+                              field: 'Age',
+                              value: '27',
+                            ),
+                            buildOperationDetail(
+                              field: 'Status',
+                              value: 'Conscious and Responsive',
+                            ),
+                            buildOperationDetail(
+                              field: 'Description',
+                              value:
+                                  'Na heat stroke si ate gurl. namastal na kaya. The quick brownfox jumps over the lazy dog. Lorem ipsum sit dolor amet.',
+                            ),
+                            buildOperationDetail(
+                              field: 'Landmark',
+                              value: 'Front of Caranan National High School',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    buildExpandButton(context),
+                  ],
+                ),
+                Divider(),
+                buildRespondButton(),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -204,7 +226,7 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  SizedBox buildRespondButton() {
+  Widget buildRespondButton() {
     return SizedBox(
       height: 50,
       child: ElevatedButton(
@@ -222,7 +244,7 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  Transform buildExpandButton(BuildContext context) {
+  Widget buildExpandButton(BuildContext context) {
     return Transform.translate(
       offset: Offset(MediaQuery.of(context).size.width - 100, -20),
       child: ClipOval(
@@ -255,7 +277,7 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  Container buildTopBanner() {
+  Widget buildTopBanner() {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -284,7 +306,9 @@ class _NewOperationState extends State<NewOperation> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '5km, 7mins',
+                  _info != null
+                      ? '${_info!.totalDistance}, ${_info!.totalDuration}'
+                      : '',
                   style: DefaultTextTheme.subtitle2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -363,8 +387,10 @@ class _NewOperationState extends State<NewOperation> {
       );
   }
 
+  //set the lines of the direction to destination
   setPolylines() {
     if (_info!.polylinePoints != null) {
+      polylines.clear();
       Polyline polyline = Polyline(
         polylineId: const PolylineId('overview_polyline'),
         color: Colors.blue,
@@ -375,25 +401,23 @@ class _NewOperationState extends State<NewOperation> {
             .map((e) => LatLng(e.latitude, e.longitude))
             .toList(),
       );
-      _setMapFitToTour({polyline});
-      return polyline;
-    } else
-      return Polyline(polylineId: PolylineId(''));
+      if (!_isInitialized) _setMapFitToTour({polyline});
+      _isInitialized = true;
+      polylines.add(polyline);
+    }
   }
 
   void updatePinOnMap() async {
-    location.onLocationChanged.listen((cloc) {
-      current_location = cloc;
-    });
+    current_location = await location.getLocation();
     CameraPosition cPosition = CameraPosition(
       target: LatLng(
         current_location.latitude!,
         current_location.longitude!,
       ),
+      zoom: 18,
     );
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-    if (args.destination != null) getDirections();
+    _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    if (args.destination != null) getDirections(current_location);
   }
 
   //set camera to center of 2 markers
@@ -411,8 +435,7 @@ class _NewOperationState extends State<NewOperation> {
       });
     });
 
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(
+    _controller!.animateCamera(
       CameraUpdate.newLatLngBounds(
         LatLngBounds(
           southwest: LatLng(minLat, minLong),
@@ -440,13 +463,13 @@ class _NewOperationState extends State<NewOperation> {
     });
   }
 
-  void getDirections() async {
+  void getDirections(LocationData curLoc) async {
     Dio dio = new Dio();
     String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
     final response = await dio.get(
       baseUrl,
       queryParameters: {
-        'origin': '${current_location.latitude},${current_location.longitude}',
+        'origin': '${curLoc.latitude},${curLoc.longitude}',
         'destination': '13.524416, 123.015583',
         'key': googleAPIKey,
       },
@@ -455,6 +478,7 @@ class _NewOperationState extends State<NewOperation> {
     if (response.statusCode == 200) {
       setState(() {
         _info = Directions.fromMap(response.data);
+        setPolylines();
       });
     }
   }
@@ -467,8 +491,7 @@ class _NewOperationState extends State<NewOperation> {
       ),
       zoom: 18,
     );
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -492,8 +515,10 @@ class _NewOperationState extends State<NewOperation> {
       _markers = _mrkrs;
     });
 
-    if (args.destination != null) getDirections();
+    if (args.destination != null) {
+      getDirections(current_location);
+    }
 
-    _controller.complete(controller);
+    _controller = controller;
   }
 }
