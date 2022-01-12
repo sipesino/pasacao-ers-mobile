@@ -36,7 +36,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   bool toLocation = false;
 
   String? incident_type;
-  String? sex;
+  String sex = 'Male';
   String? age;
   String? description;
   String? status;
@@ -129,7 +129,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         }
       } else {
         if (form_keys[1].currentState!.validate()) {
-          print(currentStep);
           form_keys[1].currentState!.save();
 
           if (_switchValue) {
@@ -143,7 +142,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           if (!not_victim) {
             print(user.toString());
-            sex = user.sex;
+            sex = user.sex!;
             age = calculateAge(DateTime.parse(user.birthday!)).toString();
             print(user.birthday!);
             print(age);

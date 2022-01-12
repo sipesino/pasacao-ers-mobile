@@ -5,7 +5,7 @@ import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
 
 class LocationCard extends StatelessWidget {
-  final Location location;
+  final LocationInfo location;
   const LocationCard({
     Key? key,
     required this.location,

@@ -156,7 +156,7 @@ class _NewOperationState extends State<NewOperation> {
                                 (appBar.preferredSize.height + 290)
                             : 130,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: boxShadow,
                         ),
@@ -227,6 +227,7 @@ class _NewOperationState extends State<NewOperation> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
+                  boxShadow: boxShadow,
                 ),
                 child: Text(
                   value,
@@ -296,7 +297,7 @@ class _NewOperationState extends State<NewOperation> {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(10),
         boxShadow: boxShadow,
       ),
@@ -479,22 +480,26 @@ class _NewOperationState extends State<NewOperation> {
   }
 
   void getDirections(LocationData curLoc) async {
-    Dio dio = new Dio();
-    String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
-    final response = await dio.get(
-      baseUrl,
-      queryParameters: {
-        'origin': '${curLoc.latitude},${curLoc.longitude}',
-        'destination': '13.524416, 123.015583',
-        'key': googleAPIKey,
-      },
-    );
+    try {
+      Dio dio = new Dio();
+      String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
+      final response = await dio.get(
+        baseUrl,
+        queryParameters: {
+          'origin': '${curLoc.latitude},${curLoc.longitude}',
+          'destination': '13.524416, 123.015583',
+          'key': googleAPIKey,
+        },
+      );
 
-    if (response.statusCode == 200) {
-      setState(() {
-        _info = Directions.fromMap(response.data);
-        setPolylines();
-      });
+      if (response.statusCode == 200) {
+        setState(() {
+          _info = Directions.fromMap(response.data);
+          setPolylines();
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 

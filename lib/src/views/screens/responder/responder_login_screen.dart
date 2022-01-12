@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/custom_icons.dart';
@@ -213,48 +214,62 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     Map body = {"email": email, "password": password};
 
     Map<String, dynamic> jsonResponse;
-    var res = await http.post(Uri.parse(url), body: body);
+    var res;
 
-    if (res.statusCode == 201) {
-      jsonResponse = jsonDecode(res.body);
+    //check if there is internet connection
+    if (await DataConnectionChecker().hasConnection) {
+      res = await http.post(Uri.parse(url), body: body);
 
-      if (jsonResponse != null) {
-        setState(() {
-          isLoading = true;
-        });
+      //check if request is successfull
+      if (res.statusCode == 201) {
+        jsonResponse = jsonDecode(res.body);
 
-        if (jsonResponse["success"] &&
-            jsonResponse["user"]["account_type"] == 'responder') {
-          SharedPref preferences = SharedPref();
-          // save bearer token in the local storage
-          preferences.save("token", jsonResponse["token"]);
-
-          User user = User.fromMap(jsonResponse["user"]);
-
-          // save user credentials inside local storage
-          preferences.save("user", user);
-
+        if (jsonResponse != null) {
           setState(() {
-            isLoading = false;
+            isLoading = true;
           });
 
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/responder/home',
-            (Route<dynamic> route) => false,
-          );
+          if (jsonResponse["success"] &&
+              jsonResponse["user"]["account_type"] == 'responder') {
+            SharedPref preferences = SharedPref();
+            // save bearer token in the local storage
+            preferences.save("token", jsonResponse["token"]);
 
-          return;
+            User user = User.fromMap(jsonResponse["user"]);
+
+            // save user credentials inside local storage
+            preferences.save("user", user);
+
+            setState(() {
+              isLoading = false;
+            });
+
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/responder/home',
+              (Route<dynamic> route) => false,
+            );
+            return;
+          }
         }
       }
     }
+    String message = "";
+    if (!await DataConnectionChecker().hasConnection)
+      message = "No internet. Check your internet connection";
+    else if (res.statusCode == 401)
+      message = "Invalid user credentials";
+    else
+      message = "Something went wrong.";
+
     setState(() {
       isLoading = false;
     });
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: new Text('Invalid user credentials'),
+        content: new Text(message),
         backgroundColor: Colors.red,
         duration: new Duration(seconds: 3),
       ),

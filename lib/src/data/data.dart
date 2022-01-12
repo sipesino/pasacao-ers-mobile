@@ -55,29 +55,29 @@ List<EmergencyContact> _emergencyContacts = [
   ),
 ];
 
-List<Location> _locations = [
-  Location(
+List<LocationInfo> _locations = [
+  LocationInfo(
     location_id: 'PS-01',
     location_type: 'Police Station',
     address: 'Pasacao, Camarines Sur',
     coordinates: LatLng(13.5124, 123.04249),
     location_name: 'Pasacao Municipal Police Station',
   ),
-  Location(
+  LocationInfo(
     location_id: 'FS-02',
     location_type: 'Fire Station',
     address: 'Pasacao, Camarines Sur',
     coordinates: LatLng(13.5082966305, 123.041959332),
     location_name: 'Pasacao Fire Station',
   ),
-  Location(
+  LocationInfo(
     location_id: 'HC-01',
     location_type: 'Hospital',
     address: 'Pasacao, Camarines Sur',
     coordinates: LatLng(13.504323, 123.040576),
     location_name: 'Pasacao Rural Health Unit',
   ),
-  Location(
+  LocationInfo(
     location_id: 'EC-01',
     location_type: 'Evacuation Center',
     address: 'Pasacao, Camarines Sur',
@@ -90,7 +90,7 @@ List<EmergencyContact> getEmergencyContacts() {
   return _emergencyContacts;
 }
 
-List<Location> getLocations() {
+List<LocationInfo> getLocations() {
   return _locations;
 }
 

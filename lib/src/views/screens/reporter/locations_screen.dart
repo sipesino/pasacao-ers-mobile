@@ -100,7 +100,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
           children: getLocations()
               .map(
                 (e) => LocationCard(
-                  location: Location(
+                  location: LocationInfo(
                     location_id: e.location_id,
                     location_name: e.location_name,
                     location_type: e.location_type,

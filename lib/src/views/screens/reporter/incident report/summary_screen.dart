@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
@@ -27,25 +28,54 @@ class _SummaryScreenState extends State<SummaryScreen> {
     MinLengthValidator(2, errorText: 'At least 2 characters is required'),
   ]);
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
+    Widget loadingIndicator = isLoading
+        ? new Container(
+            width: 70.0,
+            height: 70.0,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.all(
+                Radius.circular(5),
+              ),
+            ),
+            child: new Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: new Center(
+                child: new CircularProgressIndicator(),
+              ),
+            ),
+          )
+        : new Container();
 
     return Scaffold(
       appBar: AppBar(),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraint) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraint.maxHeight),
-                child: IntrinsicHeight(
-                  child: Form(
-                    key: _formKey,
-                    child: _buildTopContainer(args),
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints:
+                        BoxConstraints(minHeight: constraint.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Form(
+                        key: _formKey,
+                        child: _buildTopContainer(args),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                new Align(
+                  child: loadingIndicator,
+                  alignment: FractionalOffset.center,
+                ),
+              ],
             );
           },
         ),
@@ -195,29 +225,59 @@ class _SummaryScreenState extends State<SummaryScreen> {
     SharedPref pref = new SharedPref();
     String token = await pref.read("token");
 
+    print(token);
+
     String url = 'http://143.198.92.250/api/incidents';
     var jsonResponse;
-    var res = await http.post(Uri.parse(url), body: body, headers: {
-      'Authorization': 'Bearer $token',
+    var res;
+
+    setState(() {
+      isLoading = true;
+    });
+    if (await DataConnectionChecker().hasConnection) {
+      res = await http.post(Uri.parse(url), body: body, headers: {
+        'Authorization': 'Bearer $token',
+      });
+
+      if (res.statusCode == 200) {
+        jsonResponse = jsonDecode(res.body);
+
+        if (jsonResponse != null) {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: new Text("Incident report submitted successfuly"),
+              backgroundColor: Colors.green,
+              duration: new Duration(seconds: 5),
+            ),
+          );
+          return;
+        }
+      }
+    }
+    String message = "";
+    if (!await DataConnectionChecker().hasConnection)
+      message = "No internet. Check your internet connection";
+    else if (res.statusCode == 401)
+      message = "Invalid user credentials";
+    else
+      message = "Something went wrong.";
+
+    setState(() {
+      isLoading = false;
     });
 
-    if (res.statusCode == 200) {
-      jsonResponse = jsonDecode(res.body);
-
-      if (jsonResponse != null) {
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            behavior: SnackBarBehavior.floating,
-            content: new Text("Incident report submitted successfuly"),
-            backgroundColor: Colors.green,
-            duration: new Duration(seconds: 5),
-          ),
-        );
-      }
-    } else {
-      print(res.statusCode);
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: new Text(message),
+        backgroundColor: Colors.red,
+        duration: new Duration(seconds: 3),
+      ),
+    );
+    print(res.statusCode);
+    print(res.body);
   }
 }

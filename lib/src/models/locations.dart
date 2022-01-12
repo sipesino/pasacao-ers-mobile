@@ -1,6 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class Location {
+class LocationInfo {
   final String location_id;
   final String location_name;
   final String location_type;
@@ -8,7 +8,7 @@ class Location {
   final LatLng coordinates;
   final String? incident_id;
 
-  Location({
+  LocationInfo({
     required this.location_id,
     required this.location_name,
     required this.location_type,

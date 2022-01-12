@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -50,46 +51,63 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     Map body = {"email": email, "password": password};
 
     Map<String, dynamic> jsonResponse;
-    var res = await http.post(Uri.parse(url), body: body);
+    var res;
 
-    if (res.statusCode == 201) {
-      jsonResponse = jsonDecode(res.body);
+    //check if there is internet connection
+    if (await DataConnectionChecker().hasConnection) {
+      res = await http.post(Uri.parse(url), body: body);
 
-      if (jsonResponse != null) {
-        setState(() {
-          widget.isLoading = true;
-        });
+      //check if request is successfull
+      if (res.statusCode == 201) {
+        jsonResponse = jsonDecode(res.body);
 
-        if (jsonResponse["success"]) {
-          SharedPref preferences = SharedPref();
-          // save bearer token in the local storage
-          preferences.save("token", jsonResponse["token"]);
+        //check if response body has data
+        if (jsonResponse != null) {
+          setState(() {
+            widget.isLoading = true;
+          });
 
-          User user = User.fromMap(jsonResponse["user"]);
+          if (jsonResponse["success"]) {
+            SharedPref preferences = SharedPref();
+            // save bearer token in the local storage
+            preferences.save("token", jsonResponse["token"]);
 
-          // save user credentials inside local storage
-          preferences.save("user", user);
+            User user = User.fromMap(jsonResponse["user"]);
 
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/reporter/home',
-            (Route<dynamic> route) => false,
-          );
+            // save user credentials inside local storage
+            preferences.save("user", user);
+
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/reporter/home',
+              (Route<dynamic> route) => false,
+            );
+          }
         }
+        return;
       }
-    } else {
-      setState(() {
-        widget.isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: new Text('Invalid user credentials'),
-          backgroundColor: Colors.red,
-          duration: new Duration(seconds: 3),
-        ),
-      );
     }
+
+    String message = "";
+    if (!await DataConnectionChecker().hasConnection)
+      message = "No internet. Check your internet connection";
+    else if (res.statusCode == 401)
+      message = "Invalid user credentials";
+    else
+      message = "Something went wrong.";
+
+    setState(() {
+      widget.isLoading = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: new Text(message),
+        backgroundColor: Colors.red,
+        duration: new Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
