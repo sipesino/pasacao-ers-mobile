@@ -367,9 +367,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     lastDate: DateTime.now(),
                   ).then((d) {
                     setState(() {
-                      DateTime date = d!;
-                      birthday = formatter.format(date);
-                      bdateController.text = birthday;
+                      if (d != null) {
+                        DateTime date = d;
+                        birthday = formatter.format(date);
+                        bdateController.text = birthday;
+                      }
                     });
                     mobileFocusNode.requestFocus();
                   });

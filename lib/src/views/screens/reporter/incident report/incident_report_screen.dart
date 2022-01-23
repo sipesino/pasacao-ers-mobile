@@ -35,12 +35,15 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   bool _switchValue = true;
   bool toLocation = false;
 
+  String? first_name;
+  String? last_name;
   String? incident_type;
   String sex = 'Male';
   String? age;
   String? description;
   String? status;
-  String? address;
+  String? longitude;
+  String? latitude;
   String? landmark;
   List<XFile> incident_images = [];
 
@@ -133,7 +136,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           if (_switchValue) {
             LocationData location_data = await Location().getLocation();
-            address = '${location_data.longitude}, ${location_data.latitude}';
+            longitude = '${location_data.longitude}';
+            latitude = '${location_data.latitude}';
           }
 
           // get user credentials from shared preferences
@@ -142,6 +146,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           if (!not_victim) {
             print(user.toString());
+            first_name = user.first_name;
+            last_name = user.last_name;
             sex = user.sex!;
             age = calculateAge(DateTime.parse(user.birthday!)).toString();
             print(user.birthday!);
@@ -150,17 +156,18 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           var report = IncidentReport(
             incident_type: incident_type,
+            first_name: first_name,
+            last_name: last_name,
             sex: sex,
             age: age,
             description: description,
             incident_images: incident_images,
             status: status,
-            address: address,
+            latitude: latitude,
+            longitude: longitude,
             landmark: landmark,
             account_id: user.id.toString(),
           );
-
-          print(report.toString());
 
           Navigator.pushNamed(
             context,
@@ -199,8 +206,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         onStepContinue: next,
         onStepCancel: cancel,
         onStepTapped: (step) => goTo(step),
-        controlsBuilder: (BuildContext context,
-            {VoidCallback? onStepContinue, VoidCallback? onStepCancel}) {
+        controlsBuilder: (BuildContext context, ControlsDetails controls) {
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 15.0),
             child: Row(
@@ -213,7 +219,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                       height: 50,
                       width: 100,
                       child: ElevatedButton(
-                        onPressed: onStepContinue,
+                        onPressed: controls.onStepContinue,
                         child: Text('Continue'),
                         style: ElevatedButton.styleFrom(
                           primary: accentColor,
@@ -233,7 +239,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                               height: 50,
                               width: 100,
                               child: TextButton(
-                                onPressed: onStepCancel,
+                                onPressed: controls.onStepCancel,
                                 child: Text(
                                   'Cancel',
                                   style: TextStyle(color: accentColor),
@@ -261,6 +267,10 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         ExpansionTile(
           title: Text('I\'m not the victim'),
           children: [
+            FirstNameTextField(),
+            const SizedBox(height: 10),
+            LastNameTextField(),
+            const SizedBox(height: 10),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -312,26 +322,12 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             ),
           ],
         ),
-        AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
-          child: _switchValue
-              ? SizedBox.shrink()
-              : CustomTextFormField(
-                  validator: addressValidator,
-                  keyboardType: TextInputType.streetAddress,
-                  prefixIcon: Icons.pin_drop_outlined,
-                  label: 'Address',
-                  onSaved: (val) {
-                    address = val;
-                  },
-                ),
-        ),
         SizedBox(height: 10),
         CustomTextFormField(
-          validator: landmarkValidator,
           keyboardType: TextInputType.streetAddress,
           prefixIcon: Icons.business_rounded,
           label: 'Landmark',
+          isOptional: true,
           onSaved: (val) {
             landmark = val;
           },
@@ -455,6 +451,30 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                 ),
               ),
       ],
+    );
+  }
+
+  Widget FirstNameTextField() {
+    return CustomTextFormField(
+      keyboardType: TextInputType.name,
+      label: 'First Name',
+      onSaved: (value) {
+        if (value != null) first_name = value.trim();
+      },
+      isOptional: true,
+      prefixIcon: CustomIcons.person,
+    );
+  }
+
+  Widget LastNameTextField() {
+    return CustomTextFormField(
+      label: 'Last Name',
+      onSaved: (value) {
+        if (value != null) last_name = value.trim();
+      },
+      isOptional: true,
+      prefixIcon: CustomIcons.person,
+      keyboardType: TextInputType.name,
     );
   }
 

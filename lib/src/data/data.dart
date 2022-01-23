@@ -57,31 +57,35 @@ List<EmergencyContact> _emergencyContacts = [
 
 List<LocationInfo> _locations = [
   LocationInfo(
-    location_id: 'PS-01',
+    location_id: 1,
     location_type: 'Police Station',
     address: 'Pasacao, Camarines Sur',
-    coordinates: LatLng(13.5124, 123.04249),
+    latitude: '13.5124',
+    longitude: '123.04249',
     location_name: 'Pasacao Municipal Police Station',
   ),
   LocationInfo(
-    location_id: 'FS-02',
+    location_id: 2,
     location_type: 'Fire Station',
     address: 'Pasacao, Camarines Sur',
-    coordinates: LatLng(13.5082966305, 123.041959332),
+    latitude: '13.5082966305',
+    longitude: '123.041959332',
     location_name: 'Pasacao Fire Station',
   ),
   LocationInfo(
-    location_id: 'HC-01',
+    location_id: 3,
     location_type: 'Hospital',
     address: 'Pasacao, Camarines Sur',
-    coordinates: LatLng(13.504323, 123.040576),
+    latitude: '13.504323',
+    longitude: '123.040576',
     location_name: 'Pasacao Rural Health Unit',
   ),
   LocationInfo(
-    location_id: 'EC-01',
+    location_id: 4,
     location_type: 'Evacuation Center',
     address: 'Pasacao, Camarines Sur',
-    coordinates: LatLng(13.514365889568493, 123.04275664858702),
+    latitude: '13.514365889568493',
+    longitude: '123.04275664858702',
     location_name: 'Evacuation Center (PCS)',
   ),
 ];

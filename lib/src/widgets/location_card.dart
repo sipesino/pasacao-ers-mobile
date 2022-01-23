@@ -72,7 +72,8 @@ class LocationCard extends StatelessWidget {
                       context,
                       '/reporter/home/map',
                       arguments: ScreenArguments(
-                        destination: location.coordinates,
+                        latitude: location.latitude,
+                        longitude: location.longitude,
                       ),
                     );
                   },

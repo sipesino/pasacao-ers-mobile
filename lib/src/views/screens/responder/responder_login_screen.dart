@@ -39,6 +39,11 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
   ]);
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Widget loadingIndicator = isLoading
         ? new Container(
@@ -179,7 +184,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 onSaved: (val) {
                   email = val;
                 },
-                initialValue: 'coolestdude@email.com',
+                initialValue: 'mrresponder@email.com',
                 prefixIcon: CustomIcons.mail,
               ),
               const SizedBox(
@@ -215,6 +220,8 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
 
     Map<String, dynamic> jsonResponse;
     var res;
+
+    print(body);
 
     //check if there is internet connection
     if (await DataConnectionChecker().hasConnection) {
@@ -265,6 +272,8 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     setState(() {
       isLoading = false;
     });
+
+    print(res.body);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

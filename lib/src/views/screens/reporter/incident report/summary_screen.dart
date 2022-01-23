@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/models/incident_report.dart';
+import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
@@ -99,44 +100,36 @@ class _SummaryScreenState extends State<SummaryScreen> {
               style: DefaultTextTheme.subtitle1,
             ),
             SizedBox(height: 20),
-            CustomLabel(
-              label: 'Incident Type',
+            buildOperationDetail(
+              field: 'Name',
+              value:
+                  '${args.incident_report!.first_name!} ${args.incident_report!.last_name!}',
+            ),
+            buildOperationDetail(
+              field: 'Incident Type',
               value: args.incident_report!.incident_type!,
             ),
-            Wrap(
-              children: [
-                SizedBox(
-                  width: 90,
-                  child: CustomLabel(
-                    label: 'Sex',
-                    value: args.incident_report!.sex!,
-                  ),
-                ),
-                SizedBox(width: 30),
-                SizedBox(
-                  child: CustomLabel(
-                    label: 'Age',
-                    value: args.incident_report!.age!,
-                  ),
-                ),
-              ],
+            buildOperationDetail(
+              field: 'Sex',
+              value: args.incident_report!.sex!,
             ),
-            CustomLabel(
-              label: 'Victim Status',
+            buildOperationDetail(
+              field: 'Age',
+              value: args.incident_report!.age!,
+            ),
+            buildOperationDetail(
+              field: 'Victim Status',
               value: args.incident_report!.status!,
             ),
-            CustomLabel(
-              label: 'Description',
+            buildOperationDetail(
+              field: 'Description',
               value: args.incident_report!.description!,
             ),
-            CustomLabel(
-              label: 'Address',
-              value: args.incident_report!.address!,
-            ),
-            CustomLabel(
-              label: 'Landmark',
-              value: args.incident_report!.landmark!,
-            ),
+            if (args.incident_report!.landmark! != null)
+              buildOperationDetail(
+                field: 'Landmark',
+                value: args.incident_report!.landmark!,
+              ),
             SizedBox(height: 10),
             args.incident_report!.incident_images != null &&
                     args.incident_report!.incident_images!.isNotEmpty
@@ -206,57 +199,114 @@ class _SummaryScreenState extends State<SummaryScreen> {
         ),
       );
 
+  Widget buildOperationDetail({required String field, required String value}) {
+    return Column(
+      children: [
+        Row(
+          children: <Widget>[
+            SizedBox(
+              width: 95,
+              child: Text(
+                field,
+              ),
+            ),
+            SizedBox(width: 15),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: boxShadow,
+                ),
+                child: Text(
+                  value,
+                  style: DefaultTextTheme.headline5,
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
   _submitReport(IncidentReport report) async {
-    Map<String, dynamic> body = {
-      "incident_type": report.incident_type,
-      "sex": report.sex,
-      "age": report.age,
-      "victim_status": report.status,
-      "description": report.description,
-      "account_id": report.account_id,
-      // incident_images: incident_images,
-      "location": report.address,
-      // landmark: landmark,
+    Map<String, dynamic> location_body = {
+      "location_type": "incident location",
+      "longitude": report.longitude,
+      "latitude": report.latitude,
+      "landmark": report.landmark,
     };
 
-    print(body);
-
-    // get bearer token from shared preferences
     SharedPref pref = new SharedPref();
     String token = await pref.read("token");
 
     print(token);
+    print(location_body);
 
-    String url = 'http://143.198.92.250/api/incidents';
+    String url = 'http://143.198.92.250/api/locations';
     var jsonResponse;
     var res;
 
-    setState(() {
-      isLoading = true;
-    });
     if (await DataConnectionChecker().hasConnection) {
-      res = await http.post(Uri.parse(url), body: body, headers: {
+      res = await http.post(Uri.parse(url), body: location_body, headers: {
         'Authorization': 'Bearer $token',
       });
 
       if (res.statusCode == 200) {
+        print(res.body);
         jsonResponse = jsonDecode(res.body);
 
-        if (jsonResponse != null) {
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: new Text("Incident report submitted successfuly"),
-              backgroundColor: Colors.green,
-              duration: new Duration(seconds: 5),
-            ),
-          );
-          return;
+        LocationInfo location_info = LocationInfo.fromMap(jsonResponse["data"]);
+
+        Map<String, dynamic> body = {
+          "incident_type": report.incident_type,
+          if (report.first_name != null) "first_name": report.first_name,
+          if (report.last_name != null) "last_name": report.last_name,
+          "sex": report.sex,
+          "age": report.age,
+          "status": report.status,
+          "description": report.description,
+          "account_id": report.account_id,
+          // "incident_images": incident_images,
+          "location": location_info.location_id.toString(),
+          "landmark": report.landmark,
+        };
+
+        print(body);
+
+        url = 'http://143.198.92.250/api/incidents';
+
+        setState(() {
+          isLoading = true;
+        });
+
+        res = await http.post(Uri.parse(url), body: body, headers: {
+          'Authorization': 'Bearer $token',
+        });
+
+        if (res.statusCode == 200) {
+          jsonResponse = jsonDecode(res.body);
+
+          if (jsonResponse != null) {
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: new Text("Incident report submitted successfuly"),
+                backgroundColor: Colors.green,
+                duration: new Duration(seconds: 5),
+              ),
+            );
+            return;
+          }
         }
       }
     }
+
     String message = "";
     if (!await DataConnectionChecker().hasConnection)
       message = "No internet. Check your internet connection";

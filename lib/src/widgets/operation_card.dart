@@ -48,12 +48,12 @@ class OperationCard extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                print(location.coordinates);
                 Navigator.pushNamed(
                   context,
                   '/responder/home/new_operation',
                   arguments: ScreenArguments(
-                    destination: location.coordinates,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
                   ),
                 );
               },

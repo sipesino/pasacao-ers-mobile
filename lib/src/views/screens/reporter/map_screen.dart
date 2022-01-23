@@ -181,8 +181,8 @@ class _MapScreenState extends State<MapScreen> {
       currentlySelectedPin = PinInformation(
         locationIcon: getLocationIcon(e.location_type),
         location: LatLng(
-          e.coordinates.latitude,
-          e.coordinates.longitude,
+          double.parse(e.latitude),
+          double.parse(e.longitude),
         ),
         locationName: e.location_name,
         address: e.address,
@@ -193,8 +193,8 @@ class _MapScreenState extends State<MapScreen> {
     if (await DataConnectionChecker().hasConnection)
       getDistanceAndReach(
         LatLng(
-          e.coordinates.latitude,
-          e.coordinates.longitude,
+          double.parse(e.latitude),
+          double.parse(e.longitude),
         ),
       );
   }
@@ -290,10 +290,10 @@ class _MapScreenState extends State<MapScreen> {
     Set<Marker> _mrkrs = getLocations()
         .map(
           (e) => Marker(
-            markerId: MarkerId(e.location_id),
+            markerId: MarkerId(e.location_id.toString()),
             position: LatLng(
-              e.coordinates.latitude,
-              e.coordinates.longitude,
+              double.parse(e.latitude),
+              double.parse(e.longitude),
             ),
             icon: setMarkerIcon(e.location_type),
             onTap: () {

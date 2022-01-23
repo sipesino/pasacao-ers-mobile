@@ -25,10 +25,11 @@ class ResponderHomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             OperationCard(
               location: LocationInfo(
-                location_id: 'HC-01',
+                location_id: 6,
                 location_type: 'Hospital',
                 address: 'Pasacao, Camarines Sur',
-                coordinates: LatLng(13.504323, 123.040576),
+                longitude: '13.504323',
+                latitude: '123.040576',
                 location_name: 'Pasacao Rural Health Unit',
               ),
             ),
