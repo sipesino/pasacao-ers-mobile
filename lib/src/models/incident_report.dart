@@ -12,8 +12,7 @@ class IncidentReport {
   final String? landmark;
   final String? status;
   final String? account_id;
-  final String? first_name;
-  final String? last_name;
+  final String? name;
 
   IncidentReport({
     this.incident_type,
@@ -26,8 +25,7 @@ class IncidentReport {
     this.account_id,
     this.longitude,
     this.latitude,
-    this.first_name,
-    this.last_name,
+    this.name,
   });
 
   IncidentReport copyWith({
@@ -42,8 +40,7 @@ class IncidentReport {
     String? longitude,
     String? latitude,
     String? landmark,
-    String? first_name,
-    String? last_name,
+    String? name,
   }) {
     return IncidentReport(
       incident_type: incident_type ?? this.incident_type,
@@ -56,14 +53,13 @@ class IncidentReport {
       longitude: longitude ?? this.longitude,
       latitude: latitude ?? this.latitude,
       landmark: landmark ?? this.landmark,
-      first_name: landmark ?? this.first_name,
-      last_name: landmark ?? this.last_name,
+      name: landmark ?? this.name,
     );
   }
 
   @override
   String toString() {
-    return 'IncidentReport(incident_type: $incident_type, first_name: $first_name, last_name: $last_name, sex: $sex, age: $age, status: $status, description: $description, incident_images: $incident_images, latitude: $latitude, longitude: $longitude, landmark: $landmark, account_id: $account_id)';
+    return 'IncidentReport(incident_type: $incident_type, name: $name, sex: $sex, age: $age, status: $status, description: $description, incident_images: $incident_images, latitude: $latitude, longitude: $longitude, landmark: $landmark, account_id: $account_id)';
   }
 
   @override
@@ -72,8 +68,7 @@ class IncidentReport {
 
     return other is IncidentReport &&
         other.incident_type == incident_type &&
-        other.first_name == first_name &&
-        other.last_name == last_name &&
+        other.name == name &&
         other.sex == sex &&
         other.age == age &&
         other.status == status &&
@@ -88,8 +83,7 @@ class IncidentReport {
   @override
   int get hashCode {
     return incident_type.hashCode ^
-        first_name.hashCode ^
-        last_name.hashCode ^
+        name.hashCode ^
         sex.hashCode ^
         age.hashCode ^
         status.hashCode ^

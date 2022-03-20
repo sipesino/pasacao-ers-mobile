@@ -35,8 +35,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   bool _switchValue = true;
   bool toLocation = false;
 
-  String? first_name;
-  String? last_name;
+  String? name;
   String? incident_type;
   String sex = 'Male';
   String? age;
@@ -146,8 +145,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           if (!not_victim) {
             print(user.toString());
-            first_name = user.first_name;
-            last_name = user.last_name;
+            name = "${user.first_name} ${user.last_name}";
             sex = user.sex!;
             age = calculateAge(DateTime.parse(user.birthday!)).toString();
             print(user.birthday!);
@@ -156,8 +154,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
           var report = IncidentReport(
             incident_type: incident_type,
-            first_name: first_name,
-            last_name: last_name,
+            name: name,
             sex: sex,
             age: age,
             description: description,
@@ -267,9 +264,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         ExpansionTile(
           title: Text('I\'m not the victim'),
           children: [
-            FirstNameTextField(),
-            const SizedBox(height: 10),
-            LastNameTextField(),
+            NameTextField(),
             const SizedBox(height: 10),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,20 +303,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 10),
-        Row(
-          children: [
-            Text('Get my location automatically'),
-            Switch(
-              value: _switchValue,
-              onChanged: (value) {
-                setState(() {
-                  _switchValue = value;
-                });
-              },
-            ),
-          ],
-        ),
         SizedBox(height: 10),
         CustomTextFormField(
           keyboardType: TextInputType.streetAddress,
@@ -454,27 +435,15 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
-  Widget FirstNameTextField() {
+  Widget NameTextField() {
     return CustomTextFormField(
       keyboardType: TextInputType.name,
-      label: 'First Name',
+      label: 'Victim Name',
       onSaved: (value) {
-        if (value != null) first_name = value.trim();
+        if (value != null) name = value.trim();
       },
       isOptional: true,
       prefixIcon: CustomIcons.person,
-    );
-  }
-
-  Widget LastNameTextField() {
-    return CustomTextFormField(
-      label: 'Last Name',
-      onSaved: (value) {
-        if (value != null) last_name = value.trim();
-      },
-      isOptional: true,
-      prefixIcon: CustomIcons.person,
-      keyboardType: TextInputType.name,
     );
   }
 

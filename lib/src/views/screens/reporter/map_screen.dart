@@ -80,7 +80,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void getDirections(LocationData curLoc) async {
-    if (args.destination != null)
+    if (args.latitude != null)
       try {
         Dio dio = new Dio();
         String baseUrl =
@@ -89,8 +89,7 @@ class _MapScreenState extends State<MapScreen> {
           baseUrl,
           queryParameters: {
             'origin': '${curLoc.latitude},${curLoc.longitude}',
-            'destination':
-                '${args.destination.latitude}, ${args.destination.longitude}',
+            'destination': '${args.latitude}, ${args.longitude}',
             'key': googleAPIKey,
           },
         );
@@ -98,6 +97,7 @@ class _MapScreenState extends State<MapScreen> {
         if (response.statusCode == 200) {
           setState(() {
             _info = Directions.fromMap(response.data);
+
             setPolylines();
           });
         }
@@ -125,6 +125,10 @@ class _MapScreenState extends State<MapScreen> {
           _info = Directions.fromMap(response.data);
           setPolylines();
         });
+      } else {
+        print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+        print(response.data);
+        print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
       }
     } catch (e) {
       print(e);
@@ -207,7 +211,8 @@ class _MapScreenState extends State<MapScreen> {
       ),
       zoom: 18,
     );
-    _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    if (_controller != null)
+      _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
   }
 
   void updatePinOnMap() async {
@@ -220,7 +225,7 @@ class _MapScreenState extends State<MapScreen> {
       zoom: 18,
     );
     _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-    if (args.destination != null) getDirections(current_location);
+    if (args.latitude != null) getDirections(current_location);
   }
 
   getLocationIcon(String location_type) {
@@ -252,16 +257,16 @@ class _MapScreenState extends State<MapScreen> {
         if (point.longitude > maxLong) maxLong = point.longitude;
       });
     });
-
-    _controller!.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(minLat, minLong),
-          northeast: LatLng(maxLat, maxLong),
+    if (_controller != null)
+      _controller!.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(minLat, minLong),
+            northeast: LatLng(maxLat, maxLong),
+          ),
+          50,
         ),
-        50,
-      ),
-    );
+      );
   }
 
   void _setCustomMarker() {
@@ -307,8 +312,7 @@ class _MapScreenState extends State<MapScreen> {
       _markers = _mrkrs;
     });
 
-    if (args.destination != null && _info != null)
-      getDirections(current_location);
+    if (args.latitude != null && _info != null) getDirections(current_location);
 
     _controller = controller;
   }
@@ -419,27 +423,27 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
-                // if (_info != null)
-                //   Positioned(
-                //     bottom: 20,
-                //     left: 20,
-                //     child: Container(
-                //       padding: EdgeInsets.all(15),
-                //       decoration: BoxDecoration(
-                //         color: Colors.amber[800],
-                //         boxShadow: boxShadow,
-                //         borderRadius: BorderRadius.circular(10),
-                //       ),
-                //       child: Text(
-                //         '${_info!.totalDistance}, ${_info!.totalDuration}',
-                //         style: TextStyle(
-                //           fontWeight: FontWeight.w700,
-                //           fontSize: 14,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
+                if (_info != null)
+                  Positioned(
+                    bottom: 20,
+                    left: 20,
+                    child: Container(
+                      padding: EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: Colors.amber[800],
+                        boxShadow: boxShadow,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${_info!.totalDistance}, ${_info!.totalDuration}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
       floatingActionButton: FloatingActionButton(

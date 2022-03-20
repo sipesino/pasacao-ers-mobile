@@ -4,6 +4,7 @@ import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -30,6 +31,13 @@ class _SummaryScreenState extends State<SummaryScreen> {
   ]);
 
   bool isLoading = false;
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,8 +110,9 @@ class _SummaryScreenState extends State<SummaryScreen> {
             SizedBox(height: 20),
             buildOperationDetail(
               field: 'Name',
-              value:
-                  '${args.incident_report!.first_name!} ${args.incident_report!.last_name!}',
+              value: (args.incident_report!.name!.isEmpty)
+                  ? "Unknown"
+                  : args.incident_report!.name!,
             ),
             buildOperationDetail(
               field: 'Incident Type',
@@ -125,7 +134,62 @@ class _SummaryScreenState extends State<SummaryScreen> {
               field: 'Description',
               value: args.incident_report!.description!,
             ),
-            if (args.incident_report!.landmark! != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: buildOperationDetail(
+                    field: 'Location',
+                    value:
+                        "${args.incident_report!.latitude!}, ${args.incident_report!.longitude!}",
+                  ),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        boxShadow: boxShadow,
+                      ),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.white),
+                          overlayColor:
+                              MaterialStateProperty.all(Colors.grey[200]),
+                          elevation: MaterialStateProperty.all(0),
+                          padding:
+                              MaterialStateProperty.all(EdgeInsets.all(12)),
+                          minimumSize: MaterialStateProperty.all(Size.zero),
+                          shape: MaterialStateProperty.all(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/reporter/home/map',
+                            arguments: ScreenArguments(
+                              latitude: args.incident_report!.latitude!,
+                              longitude: args.incident_report!.longitude!,
+                            ),
+                          );
+                        },
+                        child: Icon(
+                          CustomIcons.map,
+                          color: accentColor,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                  ],
+                ),
+              ],
+            ),
+            if (args.incident_report!.landmark!.isNotEmpty)
               buildOperationDetail(
                 field: 'Landmark',
                 value: args.incident_report!.landmark!,
@@ -257,19 +321,21 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
       if (res.statusCode == 200) {
         print(res.body);
+
         jsonResponse = jsonDecode(res.body);
 
         LocationInfo location_info = LocationInfo.fromMap(jsonResponse["data"]);
 
         Map<String, dynamic> body = {
           "incident_type": report.incident_type,
-          if (report.first_name != null) "first_name": report.first_name,
-          if (report.last_name != null) "last_name": report.last_name,
+          if (report.name != null) "name": report.name,
           "sex": report.sex,
           "age": report.age,
-          "status": report.status,
+          "incident_status": "available",
+          "victim_status": report.status,
           "description": report.description,
           "account_id": report.account_id,
+
           // "incident_images": incident_images,
           "location": location_info.location_id.toString(),
           "landmark": report.landmark,
@@ -285,6 +351,8 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
         res = await http.post(Uri.parse(url), body: body, headers: {
           'Authorization': 'Bearer $token',
+          "Connection": "Keep-Alive",
+          "Keep-Alive": "timeout=5, max=1000",
         });
 
         if (res.statusCode == 200) {

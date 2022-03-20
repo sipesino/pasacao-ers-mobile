@@ -32,9 +32,11 @@ class IncidentCard extends StatelessWidget {
                         style: DefaultTextTheme.headline5,
                       ),
                       SizedBox(width: 20),
-                      Text(
-                        '11-16-21, 5:17pm',
-                        style: DefaultTextTheme.subtitle2,
+                      Flexible(
+                        child: Text(
+                          '11-16-21, 5:17pm',
+                          style: DefaultTextTheme.subtitle2,
+                        ),
                       )
                     ],
                   ),

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1079593252014",
+    "project_id": "pasacao-ers",
+    "storage_bucket": "pasacao-ers.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079593252014:android:b54a1608e64d773b62e93f",
+        "android_client_info": {
+          "package_name": "com.captainstone.pers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079593252014-143kv7nf19tqgecruu22d4o7pr8h0cro.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWrHIPUo0-6zykEWxiWeS79VhzJ1Cb18c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1079593252014-143kv7nf19tqgecruu22d4o7pr8h0cro.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

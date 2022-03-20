@@ -16,16 +16,6 @@ class HomeScreen extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  final ButtonStyle elivatedButtonStyle = ElevatedButton.styleFrom(
-    onPrimary: Colors.black87,
-    primary: Colors.grey[300],
-    minimumSize: Size(88, 36),
-    padding: EdgeInsets.symmetric(horizontal: 16),
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(2)),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
     List<IncidentButton> incident_buttons = [
@@ -247,6 +237,16 @@ class HomeScreen extends StatelessWidget {
       }),
     );
   }
+
+  final ButtonStyle elivatedButtonStyle = ElevatedButton.styleFrom(
+    onPrimary: Colors.black87,
+    primary: Colors.grey[300],
+    minimumSize: Size(88, 36),
+    padding: EdgeInsets.symmetric(horizontal: 16),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(2)),
+    ),
+  );
 
   navigateToIncidentReportScreen(
     BuildContext context,

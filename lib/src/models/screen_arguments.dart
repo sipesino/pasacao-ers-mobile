@@ -10,6 +10,7 @@ class ScreenArguments {
   final IncidentReport? incident_report;
   final String? longitude;
   final String? latitude;
+  final String? payload;
 
   ScreenArguments({
     this.incident_report,
@@ -19,5 +20,6 @@ class ScreenArguments {
     this.incidentType,
     this.longitude,
     this.latitude,
+    this.payload,
   });
 }

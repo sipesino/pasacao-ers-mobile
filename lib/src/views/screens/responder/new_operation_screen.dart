@@ -417,9 +417,13 @@ class _NewOperationState extends State<NewOperation> {
             .map((e) => LatLng(e.latitude, e.longitude))
             .toList(),
       );
-      if (!_isInitialized) _setMapFitToTour({polyline});
+      if (!_isInitialized) {
+        _setMapFitToTour({polyline});
+      }
       _isInitialized = true;
       polylines.add(polyline);
+    } else {
+      print('may mali');
     }
   }
 
@@ -433,11 +437,12 @@ class _NewOperationState extends State<NewOperation> {
       zoom: 18,
     );
     _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-    if (args.destination != null) getDirections(current_location);
+    if (args.latitude != null) getDirections(current_location);
   }
 
   //set camera to center of 2 markers
   void _setMapFitToTour(Set<Polyline> p) async {
+    print(_isInitialized);
     double minLat = p.first.points.first.latitude;
     double minLong = p.first.points.first.longitude;
     double maxLat = p.first.points.first.latitude;
@@ -450,16 +455,19 @@ class _NewOperationState extends State<NewOperation> {
         if (point.longitude > maxLong) maxLong = point.longitude;
       });
     });
-
-    _controller!.animateCamera(
-      CameraUpdate.newLatLngBounds(
-        LatLngBounds(
-          southwest: LatLng(minLat, minLong),
-          northeast: LatLng(maxLat, maxLong),
+    if (_controller != null)
+      _controller!.animateCamera(
+        CameraUpdate.newLatLngBounds(
+          LatLngBounds(
+            southwest: LatLng(minLat, minLong),
+            northeast: LatLng(maxLat, maxLong),
+          ),
+          50,
         ),
-        50,
-      ),
-    );
+      );
+    else {
+      print('_controller is null');
+    }
   }
 
   static Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -480,27 +488,30 @@ class _NewOperationState extends State<NewOperation> {
   }
 
   void getDirections(LocationData curLoc) async {
-    try {
-      Dio dio = new Dio();
-      String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
-      final response = await dio.get(
-        baseUrl,
-        queryParameters: {
-          'origin': '${curLoc.latitude},${curLoc.longitude}',
-          'destination': '13.524416, 123.015583',
-          'key': googleAPIKey,
-        },
-      );
+    if (args.latitude != null)
+      try {
+        Dio dio = new Dio();
+        String baseUrl =
+            'https://maps.googleapis.com/maps/api/directions/json?';
 
-      if (response.statusCode == 200) {
-        setState(() {
-          _info = Directions.fromMap(response.data);
-          setPolylines();
-        });
+        final response = await dio.get(
+          baseUrl,
+          queryParameters: {
+            'origin': '${curLoc.latitude},${curLoc.longitude}',
+            'destination': '${args.latitude}, ${args.longitude}',
+            'key': googleAPIKey,
+          },
+        );
+
+        if (response.statusCode == 200) {
+          setState(() {
+            _info = Directions.fromMap(response.data);
+            setPolylines();
+          });
+        }
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {
-      print(e);
-    }
   }
 
   void setInitialLocation() async {
@@ -511,7 +522,8 @@ class _NewOperationState extends State<NewOperation> {
       ),
       zoom: 18,
     );
-    _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    if (_controller != null)
+      _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -522,7 +534,8 @@ class _NewOperationState extends State<NewOperation> {
     Set<Marker> _mrkrs = {
       Marker(
         markerId: MarkerId('incident_location'),
-        position: LatLng(13.524416, 123.015583),
+        position:
+            LatLng(double.parse(args.latitude), double.parse(args.longitude)),
         infoWindow: InfoWindow(
           title: 'Vehicle Accident',
           snippet: 'Danao Pasacao Rd, Pasacao, Camarines Sur',
@@ -535,10 +548,10 @@ class _NewOperationState extends State<NewOperation> {
       _markers = _mrkrs;
     });
 
-    if (args.destination != null) {
+    _controller = controller;
+
+    if (args.latitude != null) {
       getDirections(current_location);
     }
-
-    _controller = controller;
   }
 }

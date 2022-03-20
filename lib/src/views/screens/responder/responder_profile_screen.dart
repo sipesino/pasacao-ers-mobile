@@ -135,7 +135,8 @@ class _ResponderProfileScreenState extends State<ResponderProfileScreen> {
           TextButton.icon(
             onPressed: () {
               new SharedPref().clear();
-              Navigator.of(context).popAndPushNamed('/');
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (route) => false);
             },
             label: Text(
               'Logout',

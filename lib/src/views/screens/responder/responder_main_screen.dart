@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/models/notification_api.dart';
+import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/views/screens/responder/responder_home_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_operations_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_profile_screen.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:http/http.dart' as http;
 
 class ResponderMainScreen extends StatefulWidget {
   ResponderMainScreen({Key? key}) : super(key: key);
@@ -29,6 +35,48 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       label: 'Profile',
     ),
   ];
+
+  final String taskName = 'awaitOperationTask';
+
+  @override
+  void initState() {
+    // setupBackgroundTask();
+
+    super.initState();
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    if (mounted) super.setState(fn);
+  }
+
+  void listenToNotifications() =>
+      NotificationAPI.onNotifications.stream.listen(onClickNotification);
+
+  void onClickNotification(String? payload) {
+    Navigator.pushNamed(
+      context,
+      '/responder/home/new_operation',
+      arguments: ScreenArguments(
+        payload: payload,
+      ),
+    );
+  }
+
+  setupBackgroundTask() async {
+    NotificationAPI.init();
+    listenToNotifications();
+    await Workmanager().initialize(callbackDispatcher);
+    await Workmanager().registerPeriodicTask(
+      "1",
+      taskName,
+      existingWorkPolicy: ExistingWorkPolicy.replace,
+      constraints: Constraints(
+        networkType: NetworkType.connected,
+      ),
+    );
+  }
 
   void onTap(int index) {
     setState(() {
@@ -70,4 +118,25 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       ),
     );
   }
+}
+
+void callbackDispatcher() {
+  Workmanager().executeTask((taskName, inputData) async {
+    var res = await http.get(
+      Uri.parse('http://192.168.1.2/test/api/message/getMessages.php?id=1'),
+    );
+    var jsonResponse;
+
+    if (res.statusCode == 200) {
+      jsonResponse = jsonDecode(res.body);
+      NotificationAPI.showNotification(
+        title: 'Notification Title',
+        body: 'Notification body',
+        payload: 'Notification payload',
+      );
+    } else {
+      print(res.body);
+    }
+    return Future.value(true);
+  });
 }

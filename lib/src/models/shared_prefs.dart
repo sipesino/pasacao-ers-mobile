@@ -5,7 +5,11 @@ class SharedPref {
   Future<String> read(String key) async {
     final prefs = await SharedPreferences.getInstance();
     // print(json.decode(prefs.getString(key)!));
-    return json.decode(prefs.getString(key)!);
+    var data = prefs.getString(key);
+    if (data != null)
+      return json.decode(prefs.getString(key)!);
+    else
+      return 'null';
   }
 
   save(String key, value) async {
