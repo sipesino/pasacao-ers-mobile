@@ -19,7 +19,7 @@ import 'package:pers/src/views/screens/reporter/login_registration/login_registr
 import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/personal_info_screen.dart';
 import 'package:pers/src/views/screens/reporter/reporter_main_screen.dart';
-import 'package:pers/src/views/screens/responder/new_operation_screen.dart';
+import 'package:pers/src/views/screens/responder/operation/new_operation_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_login_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_main_screen.dart';
 import 'package:scoped_model/scoped_model.dart';

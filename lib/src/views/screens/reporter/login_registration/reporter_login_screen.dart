@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -36,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   late User user;
   String? email;
   String? password;
+  String? fbToken;
 
   final emailValidator = MultiValidator([
     EmailValidator(errorText: 'Invalid email address'),
@@ -45,6 +47,11 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final passwordValidator = MultiValidator([
     RequiredValidator(errorText: 'Password is required'),
   ]);
+
+  getToken() async {
+    fbToken = await FirebaseMessaging.instance.getToken();
+    print('Firebase Token: $fbToken');
+  }
 
   signIn() async {
     String url = "http://143.198.92.250/api/login";
@@ -77,11 +84,22 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             // save user credentials inside local storage
             preferences.save("user", user);
 
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/reporter/home',
-              (Route<dynamic> route) => false,
-            );
+            url = 'http://143.198.92.250/api/register_token';
+            body = {"account_id": user.id.toString(), "token": fbToken};
+
+            res = await http.post(Uri.parse(url), body: body);
+
+            if (res.statusCode == 201) {
+              print('Token inserted');
+              print(res.body);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/reporter/home',
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              print(res.statusCode);
+            }
           }
         }
         return;
@@ -108,6 +126,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         duration: new Duration(seconds: 3),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getToken();
   }
 
   @override

@@ -319,7 +319,10 @@ class _SummaryScreenState extends State<SummaryScreen> {
         'Authorization': 'Bearer $token',
       });
 
+      print(res.body);
+
       if (res.statusCode == 200) {
+        print('Location inserted');
         print(res.body);
 
         jsonResponse = jsonDecode(res.body);
@@ -331,7 +334,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
           if (report.name != null) "name": report.name,
           "sex": report.sex,
           "age": report.age,
-          "incident_status": "available",
+          "incident_status": "pending",
           "victim_status": report.status,
           "description": report.description,
           "account_id": report.account_id,
@@ -340,8 +343,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
           "location": location_info.location_id.toString(),
           "landmark": report.landmark,
         };
-
-        print(body);
 
         url = 'http://143.198.92.250/api/incidents';
 
@@ -364,14 +365,20 @@ class _SummaryScreenState extends State<SummaryScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: new Text("Incident report submitted successfuly"),
+                content: new Text("Incident reported successfuly"),
                 backgroundColor: Colors.green,
                 duration: new Duration(seconds: 5),
               ),
             );
             return;
           }
+        } else {
+          print(res.statusCode);
+          print(res.body);
         }
+      } else {
+        // print(res.statusCode);
+        // print(res.body);
       }
     }
 
@@ -395,7 +402,5 @@ class _SummaryScreenState extends State<SummaryScreen> {
         duration: new Duration(seconds: 3),
       ),
     );
-    print(res.statusCode);
-    print(res.body);
   }
 }
