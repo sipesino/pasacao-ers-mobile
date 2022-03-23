@@ -98,6 +98,7 @@ InputDecoration textFormDecoration({
   required String label,
 }) {
   return InputDecoration(
+    contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
     fillColor: Colors.white,
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(10),
@@ -132,7 +133,7 @@ InputDecoration textFormDecoration({
     prefixIcon: Icon(
       prefixIcon,
       color: contentColorLightTheme,
-      size: 20,
+      size: 17,
     ),
     hintText: label,
     hintStyle: TextStyle(

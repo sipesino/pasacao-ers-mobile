@@ -64,6 +64,7 @@ class CustomPasswordTextFormFieldState
     required String label,
   }) {
     return InputDecoration(
+      contentPadding: EdgeInsets.symmetric(horizontal: 0, vertical: 0),
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
@@ -105,7 +106,7 @@ class CustomPasswordTextFormFieldState
       prefixIcon: Icon(
         prefixIcon,
         color: contentColorLightTheme,
-        size: 20,
+        size: 17,
       ),
       suffixIcon: IconButton(
         onPressed: () {

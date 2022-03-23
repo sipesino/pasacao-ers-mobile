@@ -184,50 +184,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 } else {
                   print(res.statusCode);
                 }
-
-                // widget.model
-                //     .postAPICall(
-                //   ,
-                //   user_data,
-                // )
-                //     .then((value) {
-                //   var status_code = value.statusCode;
-                //   if (status_code == 201) {
-                //     Navigator.of(context).pushNamedAndRemoveUntil(
-                //         '/reporter/home', (Route<dynamic> route) => false,
-                //         arguments: ScreenArguments(
-                //           user: user,
-                //         ));
-                //     setState(() {
-                //       _load = false;
-                //     });
-                //     print(value["message"]);
-                //   } else {
-                //     setState(() {
-                //       _load = false;
-                //     });
-                //     ScaffoldMessenger.of(context).showSnackBar(
-                //       SnackBar(
-                //         behavior: SnackBarBehavior.floating,
-                //         content: new Text(value["message"]),
-                //         backgroundColor: Colors.red,
-                //         duration: new Duration(seconds: 5),
-                //       ),
-                //     );
-                //     print(value["message"]);
-                //   }
-                // }, onError: (error) {
-                //   setState(() {
-                //     _load = false;
-                //   });
-                //   print("Error == $error");
-                //   ScaffoldMessenger.of(context).showSnackBar(
-                //     SnackBar(
-                //       content: new Text('Something went wrong..'),
-                //       duration: new Duration(seconds: 5),
-                //     ),
-                //   );
-                // });
               }
             },
           ),
@@ -252,10 +208,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               style: DefaultTextTheme.subtitle1,
             ),
             const SizedBox(height: 20),
-            GoogleSignInButton(),
-            const SizedBox(height: 10),
-            FormDivider(),
-            const SizedBox(height: 10),
+            // GoogleSignInButton(),
+            // const SizedBox(height: 10),
+            // FormDivider(),
+            // const SizedBox(height: 10),
             FirstNameTextField(),
             const SizedBox(height: 10),
             LastNameTextField(),
@@ -473,6 +429,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       child: OutlinedButton.icon(
         onPressed: () {},
         style: OutlinedButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
           primary: Colors.black,
           side: const BorderSide(width: 1),
           shape: RoundedRectangleBorder(

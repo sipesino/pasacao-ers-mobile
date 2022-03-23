@@ -19,7 +19,7 @@ class IncidentButton extends StatelessWidget {
     return Material(
       child: Container(
         margin: EdgeInsets.only(bottom: 15),
-        height: 100.0,
+        height: 75.0,
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.all(

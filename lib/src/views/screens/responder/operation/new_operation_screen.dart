@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:expandable_page_view/expandable_page_view.dart';
+import 'package:intl/intl.dart';
 import 'package:pers/.env.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:pers/src/models/directions.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class NewOperation extends StatefulWidget {
   NewOperation({Key? key}) : super(key: key);
@@ -22,25 +25,24 @@ class NewOperation extends StatefulWidget {
 }
 
 class _NewOperationState extends State<NewOperation> {
+  //google maps variables
   GoogleMapController? _controller;
   bool show_map = false;
   Set<Marker> _markers = {};
   Directions? _info;
-
   Set<Polyline> polylines = {};
-
-  bool _isExpanded = false;
   bool _isInitialized = false;
-  bool _isResponding = false;
-  PageController pageController = new PageController();
-
-  double _opacity = 1;
-
-  var args;
-  BitmapDescriptor? incidentLocationMarker;
-
   late LocationData current_location;
   late Location location;
+  BitmapDescriptor? incidentLocationMarker;
+
+  //operation info variables
+  bool _isExpanded = false;
+  bool _isResponding = false;
+  double _opacity = 1;
+  var args;
+  String time = '00:00 AM';
+  PageController pageController = new PageController();
 
   @override
   void setState(fn) {
@@ -67,6 +69,9 @@ class _NewOperationState extends State<NewOperation> {
       });
     });
     _setCustomMarker();
+
+    time = _formatDateTime(DateTime.now());
+    Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
   }
 
   @override
@@ -94,51 +99,73 @@ class _NewOperationState extends State<NewOperation> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          !show_map
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : StreamBuilder<LocationData>(
-                  stream: location.onLocationChanged,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      LocationData curLoc = snapshot.data!;
-                      getDirections(curLoc);
-                    }
+          // !show_map
+          //     ? Center(
+          //         child: CircularProgressIndicator(),
+          //       )
+          //     : StreamBuilder<LocationData>(
+          //         stream: location.onLocationChanged,
+          //         builder: (context, snapshot) {
+          //           if (snapshot.hasData) {
+          //             LocationData curLoc = snapshot.data!;
+          //             getDirections(curLoc);
+          //           }
 
-                    return GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      markers: _markers,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          current_location.latitude!,
-                          current_location.longitude!,
-                        ),
-                        zoom: 5,
-                      ),
-                      polylines: polylines,
-                      myLocationEnabled: true,
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
-                      buildingsEnabled: true,
-                      tiltGesturesEnabled: false,
-                      trafficEnabled: true,
-                    );
-                  },
-                ),
+          //           return GoogleMap(
+          //             onMapCreated: _onMapCreated,
+          //             markers: _markers,
+          //             initialCameraPosition: CameraPosition(
+          //               target: LatLng(
+          //                 current_location.latitude!,
+          //                 current_location.longitude!,
+          //               ),
+          //               zoom: 5,
+          //             ),
+          //             polylines: polylines,
+          //             myLocationEnabled: true,
+          //             zoomControlsEnabled: false,
+          //             myLocationButtonEnabled: false,
+          //             buildingsEnabled: true,
+          //             tiltGesturesEnabled: false,
+          //             trafficEnabled: true,
+          //           );
+          //         },
+          //       ),
           !_isResponding
               ? buildOperationInfo(context, appBar)
-              : PageView(
-                  controller: pageController,
-                  children: [
-                    BuildBaseDepartPhase(),
-                    BuildBaseDepartPhase(),
-                    BuildBaseDepartPhase(),
-                  ],
+              : AnimatedOpacity(
+                  duration: Duration(milliseconds: 150),
+                  opacity: _opacity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ExpandablePageView(
+                        physics: NeverScrollableScrollPhysics(),
+                        controller: pageController,
+                        children: [
+                          BuildBaseDepartPhase(),
+                          BuildSceneArrivalPhase(),
+                          BuildSceneDepartPhase(),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
         ],
       ),
     );
+  }
+
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    setState(() {
+      time = formattedDateTime;
+    });
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('hh:mm aa').format(dateTime);
   }
 
   Widget BuildBaseDepartPhase() {
@@ -157,9 +184,18 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Proceeding Screen'),
+                Text('Depart from base'),
+                Text(
+                  time,
+                  style: DefaultTextTheme.headline1,
+                ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(accentColor),
                     shape: MaterialStateProperty.all(
@@ -168,7 +204,107 @@ class _NewOperationState extends State<NewOperation> {
                       ),
                     ),
                   ),
-                  child: Text('Click Me'),
+                  child: Text('Confirm'),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget BuildSceneArrivalPhase() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: boxShadow,
+            ),
+            child: Column(
+              children: [
+                Text('Arrived at the scene'),
+                Text(
+                  time,
+                  style: DefaultTextTheme.headline1,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(accentColor),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: Text('Confirm'),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget BuildSceneDepartPhase() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: boxShadow,
+            ),
+            child: Column(
+              children: [
+                Text('Depart from scene'),
+                Text(
+                  time,
+                  style: DefaultTextTheme.headline1,
+                ),
+                SizedBox(height: 10),
+                CustomTextFormField(
+                  keyboardType: TextInputType.text,
+                  prefixIcon: CustomIcons.cross,
+                  label: 'Receiving Facility',
+                  onSaved: (val) {},
+                ),
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(accentColor),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: Text('Confirm'),
                 )
               ],
             ),

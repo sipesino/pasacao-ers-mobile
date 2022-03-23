@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/custom_icons.dart';
@@ -24,6 +25,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     with WidgetsBindingObserver {
   String? email;
   String? password;
+  String? fbToken;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -41,6 +43,13 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
   @override
   void setState(VoidCallback fn) {
     if (mounted) super.setState(fn);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getToken();
   }
 
   @override
@@ -141,6 +150,11 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
         ),
       ),
     );
+  }
+
+  getToken() async {
+    fbToken = await FirebaseMessaging.instance.getToken();
+    print('Firebase Token: $fbToken');
   }
 
   Widget _buildColumn() => Column(
@@ -247,20 +261,32 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
             // save user credentials inside local storage
             preferences.save("user", user);
 
-            setState(() {
-              isLoading = false;
-            });
+            url = 'http://143.198.92.250/api/register_token';
+            body = {"account_id": user.id.toString(), "token": fbToken};
 
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/responder/home',
-              (Route<dynamic> route) => false,
-            );
+            res = await http.post(Uri.parse(url), body: body);
+
+            if (res.statusCode == 201) {
+              setState(() {
+                isLoading = false;
+              });
+
+              print('Token inserted');
+              print(res.body);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/responder/home',
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              print(res.statusCode);
+            }
             return;
           }
         }
       }
     }
+
     String message = "";
     if (!await DataConnectionChecker().hasConnection)
       message = "No internet. Check your internet connection";

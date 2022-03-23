@@ -37,7 +37,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   late User user;
   String? email;
   String? password;
-  String? fbToken;
 
   final emailValidator = MultiValidator([
     EmailValidator(errorText: 'Invalid email address'),
@@ -47,11 +46,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final passwordValidator = MultiValidator([
     RequiredValidator(errorText: 'Password is required'),
   ]);
-
-  getToken() async {
-    fbToken = await FirebaseMessaging.instance.getToken();
-    print('Firebase Token: $fbToken');
-  }
 
   signIn() async {
     String url = "http://143.198.92.250/api/login";
@@ -84,22 +78,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
             // save user credentials inside local storage
             preferences.save("user", user);
 
-            url = 'http://143.198.92.250/api/register_token';
-            body = {"account_id": user.id.toString(), "token": fbToken};
+            setState(() {
+              widget.isLoading = false;
+            });
 
-            res = await http.post(Uri.parse(url), body: body);
-
-            if (res.statusCode == 201) {
-              print('Token inserted');
-              print(res.body);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/reporter/home',
-                (Route<dynamic> route) => false,
-              );
-            } else {
-              print(res.statusCode);
-            }
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/reporter/home',
+              (Route<dynamic> route) => false,
+            );
           }
         }
         return;
@@ -126,13 +113,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         duration: new Duration(seconds: 3),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getToken();
   }
 
   @override
@@ -217,10 +197,10 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               EmailTextField(),
               const SizedBox(height: 20),
               PasswordTextField(),
-              const SizedBox(height: 10),
-              FormDivider(),
-              const SizedBox(height: 10),
-              SignInWithGoogle(),
+              // const SizedBox(height: 10),
+              // FormDivider(),
+              // const SizedBox(height: 10),
+              // SignInWithGoogle(),
               Flexible(
                 flex: 1,
                 child: SizedBox(
@@ -282,6 +262,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         child: OutlinedButton.icon(
           onPressed: () {},
           style: OutlinedButton.styleFrom(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
             primary: Colors.black,
             side: const BorderSide(width: 1),
             shape: RoundedRectangleBorder(
