@@ -48,6 +48,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   ]);
 
   signIn() async {
+    setState(() {
+      widget.isLoading = true;
+    });
     String url = "http://143.198.92.250/api/login";
     Map body = {"email": email, "password": password};
 
@@ -64,10 +67,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
         //check if response body has data
         if (jsonResponse != null) {
-          setState(() {
-            widget.isLoading = true;
-          });
-
           if (jsonResponse["success"]) {
             SharedPref preferences = SharedPref();
             // save bearer token in the local storage

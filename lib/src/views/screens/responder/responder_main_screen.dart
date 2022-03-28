@@ -51,33 +51,6 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
     if (mounted) super.setState(fn);
   }
 
-  void listenToNotifications() =>
-      NotificationAPI.onNotifications.stream.listen(onClickNotification);
-
-  void onClickNotification(String? payload) {
-    Navigator.pushNamed(
-      context,
-      '/responder/home/new_operation',
-      arguments: ScreenArguments(
-        payload: payload,
-      ),
-    );
-  }
-
-  setupBackgroundTask() async {
-    NotificationAPI.init();
-    listenToNotifications();
-    await Workmanager().initialize(callbackDispatcher);
-    await Workmanager().registerPeriodicTask(
-      "1",
-      taskName,
-      existingWorkPolicy: ExistingWorkPolicy.replace,
-      constraints: Constraints(
-        networkType: NetworkType.connected,
-      ),
-    );
-  }
-
   void onTap(int index) {
     setState(() {
       _selectedIndex = index;

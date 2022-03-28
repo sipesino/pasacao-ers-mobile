@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/models/incident_report.dart';
+import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/user.dart';
 
 class ScreenArguments {
@@ -10,7 +11,7 @@ class ScreenArguments {
   final IncidentReport? incident_report;
   final String? longitude;
   final String? latitude;
-  final String? payload;
+  final Operation? operation;
 
   ScreenArguments({
     this.incident_report,
@@ -20,6 +21,6 @@ class ScreenArguments {
     this.incidentType,
     this.longitude,
     this.latitude,
-    this.payload,
+    this.operation,
   });
 }

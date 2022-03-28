@@ -1,4 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
+import 'package:pers/src/models/screen_arguments.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +38,8 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'High Importance Notifications', // title
   description:
       'This channel is used for important notifications.', // description
-  importance: Importance.high,
+  importance: Importance.max,
+  sound: RawResourceAndroidNotificationSound('alert_sound'),
   playSound: true,
 );
 
@@ -44,10 +52,31 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
 
   print("Handling a background message: ${message.messageId}");
+
+  flutterLocalNotificationsPlugin.show(
+    message.hashCode,
+    message.data['title'],
+    message.data['body'],
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        channel.id,
+        channel.name,
+        channelDescription: 'channel description',
+        color: Colors.blue,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('alert_sound'),
+        icon: '@mipmap/ic_launcher',
+      ),
+    ),
+    payload: message.data.toString(),
+  );
+  print("Data: ${message.data}");
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
 
   SharedPref prefs = SharedPref();
   String data = await prefs.read('user');
@@ -75,29 +104,46 @@ void main() async {
 
   print('User granted permission: ${settings.authorizationStatus}');
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    RemoteNotification notification = message.notification!;
-    AndroidNotification? android = message.notification?.android;
+  _connectionStatus = await _connectivity.checkConnectivity();
 
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: 'channel description',
-            color: Colors.blue,
-            playSound: true,
-            icon: '@mipmap/ic_launcher',
+  print(_connectionStatus);
+  if (_connectionStatus != ConnectivityResult.none) {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+      }
+
+      print('1');
+      FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler);
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        flutterLocalNotificationsPlugin.show(
+          message.hashCode,
+          message.data['title'],
+          message.data['body'],
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channelDescription: 'channel description',
+              color: Colors.blue,
+              playSound: true,
+              sound: RawResourceAndroidNotificationSound('alert_sound'),
+              icon: '@mipmap/ic_launcher',
+            ),
           ),
-        ),
-        payload: message.data.toString(),
-      );
+          payload: message.data.toString(),
+        );
+        // print("Data: ${message.data}");
+      });
+    } on SocketException catch (_) {
+      print('not connected');
     }
-  });
+  } else {
+    print("No internet connection");
+  }
 
   runApp(MERS(initialRoute: user != null ? '/${user.account_type}/home' : '/'));
 }
@@ -115,6 +161,19 @@ class _MERSState extends State<MERS> {
   void initState() {
     super.initState();
     PermissionHandler.checkPermissions();
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    // Navigator.pushNamed(
+    //   context,
+    //   '/responder/home/new_operation',
+    //   arguments: ScreenArguments(
+    //     latitude: location.latitude,
+    //     longitude: location.longitude,
+    //   ),
+    // );
+    print('\n\n>>> i click bacasdasd\n\n');
   }
 
   @override

@@ -264,6 +264,8 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
             url = 'http://143.198.92.250/api/register_token';
             body = {"account_id": user.id.toString(), "token": fbToken};
 
+            print(body);
+
             res = await http.post(Uri.parse(url), body: body);
 
             if (res.statusCode == 201) {
@@ -278,10 +280,10 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 '/responder/home',
                 (Route<dynamic> route) => false,
               );
+              return;
             } else {
-              print(res.statusCode);
+              print(res.body);
             }
-            return;
           }
         }
       }
