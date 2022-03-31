@@ -40,7 +40,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   String sex = 'Male';
   String? age;
   String? description;
-  String? status;
+  String? victim_status;
   String? longitude;
   String? latitude;
   String? landmark;
@@ -159,7 +159,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             age: age,
             description: description,
             incident_images: incident_images,
-            status: status,
+            victim_status: victim_status,
             latitude: latitude,
             longitude: longitude,
             landmark: landmark,
@@ -289,7 +289,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           },
         ),
         const SizedBox(height: 10),
-        _buildVictimStatusTextFormField(),
+        _buildVictimvictim_statusTextFormField(),
         const SizedBox(height: 10),
         _buildDescriptionTextFormField(),
         const SizedBox(height: 20),
@@ -337,14 +337,14 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
-  Widget _buildVictimStatusTextFormField() {
+  Widget _buildVictimvictim_statusTextFormField() {
     return CustomTextFormField(
       keyboardType: TextInputType.text,
       prefixIcon: FontAwesomeIcons.questionCircle,
       validator: nameValidator,
       label: 'Victim Status',
       onSaved: (String? val) {
-        status = val;
+        victim_status = val;
       },
     );
   }

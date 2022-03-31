@@ -128,7 +128,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
             ),
             buildOperationDetail(
               field: 'Victim Status',
-              value: args.incident_report!.status!,
+              value: args.incident_report!.victim_status!,
             ),
             buildOperationDetail(
               field: 'Description',
@@ -335,7 +335,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
           "sex": report.sex,
           "age": report.age,
           "incident_status": "pending",
-          "victim_status": report.status,
+          "victim_status": report.victim_status,
           "description": report.description,
           "account_id": report.account_id,
 

@@ -5,6 +5,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
+import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -33,117 +34,24 @@ import 'package:pers/src/views/screens/responder/responder_login_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_main_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', // id
-  'High Importance Notifications', // title
-  description:
-      'This channel is used for important notifications.', // description
-  importance: Importance.max,
-  sound: RawResourceAndroidNotificationSound('alert_sound'),
-  playSound: true,
-);
-
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
-
-  print("Handling a background message: ${message.messageId}");
-
-  flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    message.data['title'],
-    message.data['body'],
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        channel.id,
-        channel.name,
-        channelDescription: 'channel description',
-        color: Colors.blue,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('alert_sound'),
-        icon: '@mipmap/ic_launcher',
-      ),
-    ),
-    payload: message.data.toString(),
-  );
-  print("Data: ${message.data}");
-}
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  final Connectivity _connectivity = Connectivity();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   SharedPref prefs = SharedPref();
   String data = await prefs.read('user');
   User? user;
   if (data != 'null') user = User.fromJson(await data);
   Paint.enableDithering = true;
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   var token = await FirebaseMessaging.instance.getToken();
   print('token: $token');
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  NotificationSettings settings = await messaging.requestPermission(
-    alert: true,
-    announcement: false,
-    badge: true,
-    carPlay: false,
-    criticalAlert: false,
-    provisional: false,
-    sound: true,
-  );
-
-  print('User granted permission: ${settings.authorizationStatus}');
-
-  _connectionStatus = await _connectivity.checkConnectivity();
-
-  print(_connectionStatus);
-  if (_connectionStatus != ConnectivityResult.none) {
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
-      }
-
-      print('1');
-      FirebaseMessaging.onBackgroundMessage(
-          _firebaseMessagingBackgroundHandler);
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        flutterLocalNotificationsPlugin.show(
-          message.hashCode,
-          message.data['title'],
-          message.data['body'],
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: 'channel description',
-              color: Colors.blue,
-              playSound: true,
-              sound: RawResourceAndroidNotificationSound('alert_sound'),
-              icon: '@mipmap/ic_launcher',
-            ),
-          ),
-          payload: message.data.toString(),
-        );
-        // print("Data: ${message.data}");
-      });
-    } on SocketException catch (_) {
-      print('not connected');
-    }
-  } else {
-    print("No internet connection");
-  }
 
   runApp(MERS(initialRoute: user != null ? '/${user.account_type}/home' : '/'));
 }
@@ -157,23 +65,34 @@ class MERS extends StatefulWidget {
 }
 
 class _MERSState extends State<MERS> {
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+
   @override
   void initState() {
-    super.initState();
-    PermissionHandler.checkPermissions();
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
-  }
+    _connectivity.checkConnectivity().then((status) {
+      _connectionStatus = status;
 
-  void _handleMessage(RemoteMessage message) {
-    // Navigator.pushNamed(
-    //   context,
-    //   '/responder/home/new_operation',
-    //   arguments: ScreenArguments(
-    //     latitude: location.latitude,
-    //     longitude: location.longitude,
-    //   ),
-    // );
-    print('\n\n>>> i click bacasdasd\n\n');
+      print(_connectionStatus);
+      if (_connectionStatus != ConnectivityResult.none) {
+        try {
+          InternetAddress.lookup('example.com').then((value) {
+            final result = value;
+
+            if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+              print('connected');
+
+              setupFcm();
+            }
+          });
+        } on SocketException catch (_) {
+          print('not connected');
+        }
+      } else {
+        print("No internet connection");
+      }
+    });
+    super.initState();
   }
 
   @override
@@ -182,6 +101,7 @@ class _MERSState extends State<MERS> {
     return ScopedModel(
       model: _model,
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'PERS',
         debugShowCheckedModeBanner: false,
         initialRoute: widget.initialRoute,

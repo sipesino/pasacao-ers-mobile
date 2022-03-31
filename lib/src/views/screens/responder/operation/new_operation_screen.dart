@@ -132,7 +132,7 @@ class _NewOperationState extends State<NewOperation> {
           //         },
           //       ),
           !_isResponding
-              ? buildOperationInfo(context, appBar)
+              ? buildOperationInfo(context, appBar, args)
               : AnimatedOpacity(
                   duration: Duration(milliseconds: 150),
                   opacity: _opacity,
@@ -314,7 +314,8 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  Widget buildOperationInfo(BuildContext context, AppBar appBar) {
+  Widget buildOperationInfo(
+      BuildContext context, AppBar appBar, ScreenArguments args) {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 150),
       opacity: _opacity,
@@ -325,7 +326,7 @@ class _NewOperationState extends State<NewOperation> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              buildTopBanner(),
+              buildTopBanner(args),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -356,24 +357,26 @@ class _NewOperationState extends State<NewOperation> {
                               SizedBox(height: 15),
                               buildOperationDetail(
                                 field: 'Sex',
-                                value: 'Female',
+                                value: args.incident_report?.sex ?? 'Undefined',
                               ),
                               buildOperationDetail(
                                 field: 'Age',
-                                value: '27',
+                                value: args.incident_report?.age ?? 'Undefined',
                               ),
                               buildOperationDetail(
-                                field: 'Status',
-                                value: 'Conscious and Responsive',
+                                field: 'Victim Status',
+                                value: args.incident_report?.victim_status ??
+                                    'Undefined',
                               ),
                               buildOperationDetail(
                                 field: 'Description',
-                                value:
-                                    'Na heat stroke si ate gurl. namastal na kaya. The quick brownfox jumps over the lazy dog. Lorem ipsum sit dolor amet.',
+                                value: args.incident_report?.description ??
+                                    'Undefined',
                               ),
                               buildOperationDetail(
                                 field: 'Landmark',
-                                value: 'Front of Caranan National High School',
+                                value: args.incident_report?.landmark ??
+                                    'Undefined',
                               ),
                             ],
                           ),
@@ -488,7 +491,7 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  Widget buildTopBanner() {
+  Widget buildTopBanner(ScreenArguments args) {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -507,7 +510,7 @@ class _NewOperationState extends State<NewOperation> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Medical Incident',
+                  args.incident_report?.incident_type ?? 'Undefined',
                   style: DefaultTextTheme.headline3,
                   overflow: TextOverflow.ellipsis,
                 ),

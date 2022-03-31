@@ -38,20 +38,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
               ),
             ),
             displayNoOperationAssigned(),
-            SizedBox(height: 20),
-            Text(
-              'Proceeding Incidents',
-              style: DefaultTextTheme.headline5,
-            ),
-            SizedBox(height: 10),
-            Column(
-              children: [
-                IncidentCard(),
-                IncidentCard(),
-                IncidentCard(),
-                IncidentCard(),
-              ],
-            ),
           ],
         ),
       ),

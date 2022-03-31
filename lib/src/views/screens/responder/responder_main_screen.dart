@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/notification_api.dart';
-import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/views/screens/responder/responder_home_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_operations_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_profile_screen.dart';
@@ -35,15 +34,6 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       label: 'Profile',
     ),
   ];
-
-  final String taskName = 'awaitOperationTask';
-
-  @override
-  void initState() {
-    // setupBackgroundTask();
-
-    super.initState();
-  }
 
   @override
   void setState(VoidCallback fn) {
