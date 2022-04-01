@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 
-class CustomGenderPicker extends StatefulWidget {
+class CustomStatusPicker extends StatefulWidget {
   int initialValue;
   FormFieldValidator<String>? validator;
 
   final Function(String) onChanged;
-  CustomGenderPicker({
+  CustomStatusPicker({
     Key? key,
     required this.onChanged,
     this.initialValue = 0,
   }) : super(key: key);
 
   @override
-  _CustomGenderPickerState createState() => _CustomGenderPickerState();
+  _CustomStatusPickerState createState() => _CustomStatusPickerState();
 }
 
-class _CustomGenderPickerState extends State<CustomGenderPicker> {
+class _CustomStatusPickerState extends State<CustomStatusPicker> {
   int selected = 0;
 
   @override
@@ -32,13 +32,13 @@ class _CustomGenderPickerState extends State<CustomGenderPicker> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Sex'),
+        Text('Victim Status'),
         SizedBox(height: 5),
         Row(
           children: [
-            CustomRadioButton('Male', 0),
+            CustomRadioButton('Conscious', 0),
             SizedBox(width: 10),
-            CustomRadioButton('Female', 1),
+            CustomRadioButton('Unconscious', 1),
           ],
         ),
       ],
@@ -49,7 +49,7 @@ class _CustomGenderPickerState extends State<CustomGenderPicker> {
         onPressed: () {
           setState(() {
             selected = index;
-            widget.onChanged(selected == 0 ? 'Male' : 'Female');
+            widget.onChanged(selected == 0 ? 'Conscious' : 'Unconscious');
           });
         },
         child: Text(

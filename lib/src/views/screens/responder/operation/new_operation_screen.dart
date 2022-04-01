@@ -17,6 +17,22 @@ import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
+extension StringExtension on String {
+  String get totTitleCase => this
+      .split(" ")
+      .map((str) => '${str[0].toUpperCase()}${str.substring(1).toLowerCase()}')
+      .join(" ");
+  String totTitle() {
+    final List<String> splitStr = this.split(' ');
+    for (int i = 0; i < splitStr.length; i++) {
+      splitStr[i] =
+          '${splitStr[i][0].toUpperCase()}${splitStr[i].substring(1)}';
+    }
+    final output = splitStr.join(' ');
+    return output;
+  }
+}
+
 class NewOperation extends StatefulWidget {
   NewOperation({Key? key}) : super(key: key);
 
@@ -357,7 +373,9 @@ class _NewOperationState extends State<NewOperation> {
                               SizedBox(height: 15),
                               buildOperationDetail(
                                 field: 'Sex',
-                                value: args.incident_report?.sex ?? 'Undefined',
+                                value:
+                                    args.incident_report?.sex?.totTitleCase ??
+                                        'Undefined',
                               ),
                               buildOperationDetail(
                                 field: 'Age',
@@ -365,7 +383,8 @@ class _NewOperationState extends State<NewOperation> {
                               ),
                               buildOperationDetail(
                                 field: 'Victim Status',
-                                value: args.incident_report?.victim_status ??
+                                value: args.incident_report?.victim_status
+                                        ?.totTitleCase ??
                                     'Undefined',
                               ),
                               buildOperationDetail(
@@ -510,7 +529,8 @@ class _NewOperationState extends State<NewOperation> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  args.incident_report?.incident_type ?? 'Undefined',
+                  args.incident_report?.incident_type?.totTitleCase ??
+                      'Undefined',
                   style: DefaultTextTheme.headline3,
                   overflow: TextOverflow.ellipsis,
                 ),

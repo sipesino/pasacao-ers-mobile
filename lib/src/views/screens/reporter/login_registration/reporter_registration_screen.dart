@@ -311,7 +311,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             ),
             SizedBox(
               width: 80,
-              height: 65,
+              height: 50,
               child: OutlinedButton(
                 focusNode: bdayFocusNode,
                 onPressed: () {

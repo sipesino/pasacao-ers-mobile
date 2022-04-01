@@ -10,6 +10,28 @@ import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('>>> onBackgroundMessage() fired');
+  flutterLocalNotificationsPlugin.show(
+    message.hashCode,
+    message.data['title'],
+    message.data['body'],
+    NotificationDetails(
+      android: AndroidNotificationDetails(
+        channel.id,
+        channel.name,
+        channelDescription: 'channel description',
+        color: Colors.blue,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('alert_sound'),
+        icon: '@mipmap/ic_launcher',
+      ),
+    ),
+  );
+
+  await Firebase.initializeApp();
+}
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -22,28 +44,6 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   sound: RawResourceAndroidNotificationSound('alert_sound'),
   playSound: true,
 );
-
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    message.notification?.title,
-    message.notification?.body,
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        channel.id,
-        channel.name,
-        channelDescription: 'channel description',
-        color: Colors.blue,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('alert_sound'),
-        icon: '@mipmap/ic_launcher',
-      ),
-    ),
-    payload: message.data.toString(),
-  );
-  print('\n\n>>> Data: ${message.data}\n\n');
-  await Firebase.initializeApp();
-}
 
 void setupFcm() {
   var initializationSettingsAndroid =
@@ -58,7 +58,10 @@ void setupFcm() {
   flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String? payload) {
     if (payload != null) {
+      print('>>> Payload: $payload');
+      print('>>> Converting to map');
       Map<String, dynamic> data = json.decode(payload);
+      print('>>> Successfully converted');
       goToNextScreen(data);
     }
   });
@@ -67,12 +70,13 @@ void setupFcm() {
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     //Its compulsory to check if RemoteMessage instance is null or not.
     print('>>> getInitialMessage() fired');
+
     if (message != null) {
       if (message.data != null)
         flutterLocalNotificationsPlugin.show(
           message.hashCode,
-          message.notification?.title,
-          message.notification?.body,
+          message.data['title'],
+          message.data['body'],
           NotificationDetails(
             android: AndroidNotificationDetails(
               channel.id,
@@ -84,7 +88,7 @@ void setupFcm() {
               icon: '@mipmap/ic_launcher',
             ),
           ),
-          payload: message.data.toString(),
+          payload: message.data['"operation"'],
         );
 
       // goToNextScreen(message.data);
@@ -93,27 +97,24 @@ void setupFcm() {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     print('>>> onMessage() fired');
-    RemoteNotification? notification = message.notification;
-    AndroidNotification? android = message.notification?.android;
-    if (notification != null && android != null) {
-      flutterLocalNotificationsPlugin.show(
-        message.hashCode,
-        message.notification?.title,
-        message.notification?.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channelDescription: 'channel description',
-            color: Colors.blue,
-            playSound: true,
-            sound: RawResourceAndroidNotificationSound('alert_sound'),
-            icon: '@mipmap/ic_launcher',
-          ),
+    print('>>> Operation: ${message.data['"operation"']}');
+    flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      message.data['title'],
+      message.data['body'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: 'channel description',
+          color: Colors.blue,
+          playSound: true,
+          sound: RawResourceAndroidNotificationSound('alert_sound'),
+          icon: '@mipmap/ic_launcher',
         ),
-        payload: message.data.toString(),
-      );
-    }
+      ),
+      payload: message.data['"operation"'],
+    );
   });
 
   //When the app is in the background, but not terminated.
@@ -121,7 +122,7 @@ void setupFcm() {
     (message) {
       if (message != null) {
         print('>>> onMessagedOpened() fired\n\n');
-        goToNextScreen(message.data);
+        goToNextScreen(message.data['"operation"']);
       }
     },
     cancelOnError: false,
@@ -140,8 +141,8 @@ Future<String> getFcmToken() async {
 
 void goToNextScreen(Map<String, dynamic> data) {
   if (data != null) {
-    IncidentReport report = IncidentReport.fromMap(data['operation']);
-    Operation operation = Operation.fromMap(data['operation']);
+    IncidentReport report = IncidentReport.fromMap(data);
+    Operation operation = Operation.fromMap(data);
 
     print('>>> Report: $report');
     print('>>> Operation: $operation');

@@ -81,7 +81,6 @@ class _MERSState extends State<MERS> {
 
             if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
               print('connected');
-
               setupFcm();
             }
           });

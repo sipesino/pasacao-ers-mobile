@@ -160,64 +160,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          TextButton.icon(
-            onPressed: () {
-              Navigator.of(context).pushNamed('/reporter/home/profile');
-            },
-            label: Text(
-              'Personal Information',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.person,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'Incidents Reported',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.siren,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'Settings',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.settings,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            label: Text(
-              'About',
-              style: TextStyle(
-                color: primaryColor,
-              ),
-            ),
-            icon: Icon(
-              CustomIcons.about,
-              color: accentColor,
-              size: 20,
-            ),
-          ),
+          // buildPersonalInfoButton(context: context),
+          // buildIncidentsReportedButton(),
+          // buildSettingsButton(),
+          // buildAboutButton(),
           TextButton.icon(
             onPressed: () {
               new SharedPref().clear();
@@ -237,6 +183,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class buildPersonalInfoButton extends StatelessWidget {
+  const buildPersonalInfoButton({
+    Key? key,
+    required this.context,
+  }) : super(key: key);
+
+  final BuildContext context;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () {
+        Navigator.of(context).pushNamed('/reporter/home/profile');
+      },
+      label: Text(
+        'Personal Information',
+        style: TextStyle(
+          color: primaryColor,
+        ),
+      ),
+      icon: Icon(
+        CustomIcons.person,
+        color: accentColor,
+        size: 20,
+      ),
+    );
+  }
+}
+
+class buildAboutButton extends StatelessWidget {
+  const buildAboutButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () {},
+      label: Text(
+        'About',
+        style: TextStyle(
+          color: primaryColor,
+        ),
+      ),
+      icon: Icon(
+        CustomIcons.about,
+        color: accentColor,
+        size: 20,
+      ),
+    );
+  }
+}
+
+class buildSettingsButton extends StatelessWidget {
+  const buildSettingsButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () {},
+      label: Text(
+        'Settings',
+        style: TextStyle(
+          color: primaryColor,
+        ),
+      ),
+      icon: Icon(
+        CustomIcons.settings,
+        color: accentColor,
+        size: 20,
+      ),
+    );
+  }
+}
+
+class buildIncidentsReportedButton extends StatelessWidget {
+  const buildIncidentsReportedButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: () {},
+      label: Text(
+        'Incidents Reported',
+        style: TextStyle(
+          color: primaryColor,
+        ),
+      ),
+      icon: Icon(
+        CustomIcons.siren,
+        color: accentColor,
+        size: 20,
       ),
     );
   }

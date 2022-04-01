@@ -14,6 +14,7 @@ import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_label.dart';
+import 'package:pers/src/widgets/custom_status_picker%20copy.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 class IncidentReportScreen extends StatefulWidget {
@@ -148,6 +149,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             name = "${user.first_name} ${user.last_name}";
             sex = user.sex!;
             age = calculateAge(DateTime.parse(user.birthday!)).toString();
+            victim_status = 'Conscious';
             print(user.birthday!);
             print(age);
           }
@@ -277,6 +279,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            _buildVictimvictim_statusPicker(),
             const SizedBox(height: 15),
           ],
           tilePadding: EdgeInsets.zero,
@@ -289,7 +293,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           },
         ),
         const SizedBox(height: 10),
-        _buildVictimvictim_statusTextFormField(),
         const SizedBox(height: 10),
         _buildDescriptionTextFormField(),
         const SizedBox(height: 20),
@@ -325,6 +328,14 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
     );
   }
 
+  Widget _buildVictimvictim_statusPicker() {
+    return CustomStatusPicker(
+      onChanged: (val) {
+        victim_status = val;
+      },
+    );
+  }
+
   Widget _buildAgeTextFormField() {
     return CustomTextFormField(
       keyboardType: TextInputType.number,
@@ -334,18 +345,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         age = val;
       },
       validator: ageValidator,
-    );
-  }
-
-  Widget _buildVictimvictim_statusTextFormField() {
-    return CustomTextFormField(
-      keyboardType: TextInputType.text,
-      prefixIcon: FontAwesomeIcons.questionCircle,
-      validator: nameValidator,
-      label: 'Victim Status',
-      onSaved: (String? val) {
-        victim_status = val;
-      },
     );
   }
 
