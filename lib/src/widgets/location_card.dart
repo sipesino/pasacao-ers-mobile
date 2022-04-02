@@ -30,12 +30,12 @@ class LocationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    location.location_name,
+                    location.location_name!,
                     style: DefaultTextTheme.headline5,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    location.address,
+                    location.address!,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(

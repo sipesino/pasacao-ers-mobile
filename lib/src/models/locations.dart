@@ -3,20 +3,20 @@ import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LocationInfo {
-  final int location_id;
-  final String location_name;
-  final String location_type;
-  final String address;
-  final String longitude;
-  final String latitude;
+  final int? location_id;
+  final String? location_name;
+  final String? location_type;
+  final String? address;
+  final String? longitude;
+  final String? latitude;
 
   LocationInfo({
-    required this.location_id,
-    required this.location_name,
-    required this.location_type,
-    required this.address,
-    required this.longitude,
-    required this.latitude,
+    this.location_id,
+    this.location_name,
+    this.location_type,
+    this.address,
+    this.longitude,
+    this.latitude,
   });
 
   LocationInfo copyWith({
@@ -35,6 +35,16 @@ class LocationInfo {
       latitude: latitude ?? this.latitude,
       longitude: latitude ?? this.longitude,
     );
+  }
+
+  ///this method will prevent the override of toString
+  String locationAsString() {
+    return '#${this.location_name}';
+  }
+
+  ///custom comparing function to check if two users are equal
+  bool isEqual(LocationInfo model) {
+    return this.location_name == model.location_name;
   }
 
   Map<String, dynamic> toMap() {
@@ -66,7 +76,7 @@ class LocationInfo {
 
   @override
   String toString() {
-    return 'LocationInfo(location_id: $location_id, location_name: $location_name, location_type: $location_type, address: $address, longitude: $longitude, latitude: $latitude)';
+    return location_name!;
   }
 
   @override

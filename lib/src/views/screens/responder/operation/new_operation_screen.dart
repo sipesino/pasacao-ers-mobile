@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
+import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/.env.dart';
 import 'package:dio/dio.dart';
@@ -12,10 +14,10 @@ import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/directions.dart';
+import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 extension StringExtension on String {
   String get totTitleCase => this
@@ -43,6 +45,7 @@ class NewOperation extends StatefulWidget {
 class _NewOperationState extends State<NewOperation> {
   //google maps variables
   GoogleMapController? _controller;
+  final _formKey = GlobalKey<FormState>();
   bool show_map = false;
   Set<Marker> _markers = {};
   Directions? _info;
@@ -51,20 +54,44 @@ class _NewOperationState extends State<NewOperation> {
   late LocationData current_location;
   late Location location;
   BitmapDescriptor? incidentLocationMarker;
+  BitmapDescriptor? receivingFacilityMarker;
+  int index = 0;
 
   //operation info variables
   bool _isExpanded = false;
   bool _isResponding = false;
-  double _opacity = 1;
+  bool _hidden = false;
   var args;
   String time = '00:00 AM';
   PageController pageController = new PageController();
+
+  String? etd_base;
+  String? eta_scene;
+  String? etd_scene;
+  String? eta_hospital;
+  String? etd_hospital;
+  String? eta_base;
+  String? receivingFacility;
+  String? nd_latitude;
+  String? nd_longitude;
+
+  final rfValidator = MultiValidator([
+    RequiredValidator(errorText: 'Please indicate receiving facility'),
+  ]);
 
   @override
   void setState(fn) {
     if (mounted) {
       super.setState(fn);
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller?.dispose();
+    pageController.dispose();
   }
 
   @override
@@ -101,10 +128,11 @@ class _NewOperationState extends State<NewOperation> {
         IconButton(
           onPressed: () {
             setState(() {
-              _opacity = _opacity == 1 ? 0 : 1;
+              _hidden = _hidden == true ? false : true;
             });
+            pageController = PageController(initialPage: index);
           },
-          icon: Icon(_opacity == 1 ? Icons.visibility_off : Icons.visibility),
+          icon: Icon(_hidden == 1 ? Icons.visibility_off : Icons.visibility),
         ),
         SizedBox(width: 20)
       ],
@@ -115,58 +143,67 @@ class _NewOperationState extends State<NewOperation> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          // !show_map
-          //     ? Center(
-          //         child: CircularProgressIndicator(),
-          //       )
-          //     : StreamBuilder<LocationData>(
-          //         stream: location.onLocationChanged,
-          //         builder: (context, snapshot) {
-          //           if (snapshot.hasData) {
-          //             LocationData curLoc = snapshot.data!;
-          //             getDirections(curLoc);
-          //           }
-
-          //           return GoogleMap(
-          //             onMapCreated: _onMapCreated,
-          //             markers: _markers,
-          //             initialCameraPosition: CameraPosition(
-          //               target: LatLng(
-          //                 current_location.latitude!,
-          //                 current_location.longitude!,
-          //               ),
-          //               zoom: 5,
-          //             ),
-          //             polylines: polylines,
-          //             myLocationEnabled: true,
-          //             zoomControlsEnabled: false,
-          //             myLocationButtonEnabled: false,
-          //             buildingsEnabled: true,
-          //             tiltGesturesEnabled: false,
-          //             trafficEnabled: true,
-          //           );
-          //         },
-          //       ),
-          !_isResponding
-              ? buildOperationInfo(context, appBar, args)
-              : AnimatedOpacity(
-                  duration: Duration(milliseconds: 150),
-                  opacity: _opacity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      ExpandablePageView(
-                        physics: NeverScrollableScrollPhysics(),
-                        controller: pageController,
-                        children: [
-                          BuildBaseDepartPhase(),
-                          BuildSceneArrivalPhase(),
-                          BuildSceneDepartPhase(),
-                        ],
+          !show_map
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : StreamBuilder<LocationData>(
+                  stream: location.onLocationChanged,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      LocationData curLoc = snapshot.data!;
+                      if (receivingFacility == null && nd_latitude == null) {
+                        getDirections(curLoc, args.latitude, args.longitude);
+                      } else {
+                        getDirections(curLoc, nd_latitude!, nd_longitude!);
+                      }
+                    }
+                    return GoogleMap(
+                      onMapCreated: _onMapCreated,
+                      markers: _markers,
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(
+                          current_location.latitude!,
+                          current_location.longitude!,
+                        ),
+                        zoom: 5,
                       ),
-                    ],
-                  ),
+                      polylines: polylines,
+                      myLocationEnabled: true,
+                      zoomControlsEnabled: false,
+                      myLocationButtonEnabled: false,
+                      buildingsEnabled: true,
+                      tiltGesturesEnabled: false,
+                      trafficEnabled: true,
+                    );
+                  },
                 ),
+          AnimatedSwitcher(
+            duration: Duration(milliseconds: 150),
+            child: !_isResponding
+                ? buildOperationInfo(context, appBar, args)
+                : AnimatedSwitcher(
+                    duration: Duration(milliseconds: 150),
+                    child: _hidden
+                        ? SizedBox.shrink()
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              ExpandablePageView(
+                                physics: NeverScrollableScrollPhysics(),
+                                controller: pageController,
+                                children: [
+                                  BuildBaseDepartPhase(),
+                                  BuildSceneArrivalPhase(),
+                                  BuildSceneDepartPhase(),
+                                  BuildReceivingFacilityArrivalPhase(),
+                                  BuildRFDeparturePhase(),
+                                ],
+                              ),
+                            ],
+                          ),
+                  ),
+          ),
         ],
       ),
     );
@@ -207,6 +244,8 @@ class _NewOperationState extends State<NewOperation> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    etd_base = DateTime.now().toString();
+                    index = 1;
                     pageController.nextPage(
                       duration: Duration(milliseconds: 200),
                       curve: Curves.easeIn,
@@ -253,6 +292,8 @@ class _NewOperationState extends State<NewOperation> {
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    eta_scene = DateTime.now().toString();
+                    index = 2;
                     pageController.nextPage(
                       duration: Duration(milliseconds: 200),
                       curve: Curves.easeIn,
@@ -290,23 +331,196 @@ class _NewOperationState extends State<NewOperation> {
               borderRadius: BorderRadius.circular(10),
               boxShadow: boxShadow,
             ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  Text('Depart from scene'),
+                  Text(
+                    time,
+                    style: DefaultTextTheme.headline1,
+                  ),
+                  SizedBox(height: 10),
+                  DropdownSearch<LocationInfo>(
+                    mode: Mode.BOTTOM_SHEET,
+                    autoValidateMode: AutovalidateMode.onUserInteraction,
+                    validator: (u) =>
+                        u == null ? "Please indicate receiving facility" : null,
+                    dropdownSearchDecoration: InputDecoration(
+                      hintText: 'Receiving Facility',
+                      labelText: 'Receiving Facility',
+                      prefixIconColor: contentColorLightTheme,
+                      prefixIcon: Icon(CustomIcons.cross),
+                    ),
+                    items: [
+                      LocationInfo(
+                        location_name: 'Bicol Medical Center',
+                        location_type: 'Hospital',
+                        latitude: '13.622969196874783',
+                        longitude: '123.1987274877563',
+                      ),
+                      LocationInfo(
+                        location_name: 'Mother Seton',
+                        location_type: 'Hospital',
+                        latitude: '13.620336742324852',
+                        longitude: '123.20075894366795',
+                      ),
+                      LocationInfo(
+                        location_name: 'St. John Hospital',
+                        location_type: 'Hospital',
+                        latitude: '13.622964748278392',
+                        longitude: '123.19047700181723',
+                      ),
+                      LocationInfo(
+                        location_name: 'NICC Doctors Hospital',
+                        location_type: 'Hospital',
+                        latitude: '13.616231763348953',
+                        longitude: '123.1926857722549',
+                      ),
+                    ],
+                    onChanged: (val) {
+                      receivingFacility = val?.location_name;
+                      String type;
+                      switch (val?.location_type?.toUpperCase()) {
+                        case 'HOSPITAL':
+                          type = 'hospital';
+                          break;
+                        case 'FIRE STATION':
+                          type = 'fire_station';
+                          break;
+                        case 'POLICE STATION':
+                          type = 'police_station';
+                          break;
+                        case 'EVACUATION CENTER':
+                          type = 'evacuation';
+                          break;
+                        default:
+                          type = 'hospital';
+                      }
+                      getBytesFromAsset('assets/images/markers/$type.png', 80)
+                          .then((onValue) {
+                        receivingFacilityMarker =
+                            BitmapDescriptor.fromBytes(onValue);
+                        setState(() {
+                          nd_latitude = val!.latitude;
+                          nd_longitude = val.latitude;
+                        });
+
+                        _setNewDestination(
+                          'receiving facility',
+                          receivingFacility!,
+                          receivingFacilityMarker!,
+                          val!.latitude!,
+                          val.longitude!,
+                        );
+                      });
+                    },
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        etd_scene = DateTime.now().toString();
+
+                        index = 3;
+                        pageController.nextPage(
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeIn,
+                        );
+                      }
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(accentColor),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: Text('Confirm'),
+                  )
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget BuildReceivingFacilityArrivalPhase() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: boxShadow,
+            ),
             child: Column(
               children: [
-                Text('Depart from scene'),
+                Text('Arrived at the receiving facility'),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                SizedBox(height: 10),
-                CustomTextFormField(
-                  keyboardType: TextInputType.text,
-                  prefixIcon: CustomIcons.cross,
-                  label: 'Receiving Facility',
-                  onSaved: (val) {},
-                ),
-                SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
+                    eta_hospital = DateTime.now().toString();
+                    index = 4;
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(accentColor),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: Text('Confirm'),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget BuildRFDeparturePhase() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: boxShadow,
+            ),
+            child: Column(
+              children: [
+                Text('Depart from receiving facility'),
+                Text(
+                  time,
+                  style: DefaultTextTheme.headline1,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    etd_base = DateTime.now().toString();
+                    index = 5;
                     pageController.nextPage(
                       duration: Duration(milliseconds: 200),
                       curve: Curves.easeIn,
@@ -332,86 +546,89 @@ class _NewOperationState extends State<NewOperation> {
 
   Widget buildOperationInfo(
       BuildContext context, AppBar appBar, ScreenArguments args) {
-    return AnimatedOpacity(
+    return AnimatedSwitcher(
       duration: Duration(milliseconds: 150),
-      opacity: _opacity,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              buildTopBanner(args),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Stack(
-                    children: [
-                      AnimatedContainer(
-                        duration: Duration(milliseconds: 150),
-                        curve: Curves.easeInCirc,
-                        height: _isExpanded
-                            ? MediaQuery.of(context).size.height -
-                                (appBar.preferredSize.height + 290)
-                            : 130,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: boxShadow,
+      child: _hidden
+          ? SizedBox.shrink()
+          : SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    buildTopBanner(args),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Stack(
+                          children: [
+                            AnimatedContainer(
+                              duration: Duration(milliseconds: 150),
+                              curve: Curves.easeInCirc,
+                              height: _isExpanded
+                                  ? MediaQuery.of(context).size.height -
+                                      (appBar.preferredSize.height + 290)
+                                  : 130,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: boxShadow,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: ListView(
+                                  padding: EdgeInsets.all(20),
+                                  children: [
+                                    Text(
+                                      'Operation Info',
+                                      style: DefaultTextTheme.headline4,
+                                    ),
+                                    SizedBox(height: 15),
+                                    buildOperationDetail(
+                                      field: 'Sex',
+                                      value: args.incident_report?.sex
+                                              ?.totTitleCase ??
+                                          'Undefined',
+                                    ),
+                                    buildOperationDetail(
+                                      field: 'Age',
+                                      value: args.incident_report?.age ??
+                                          'Undefined',
+                                    ),
+                                    buildOperationDetail(
+                                      field: 'Victim Status',
+                                      value: args.incident_report?.victim_status
+                                              ?.totTitleCase ??
+                                          'Undefined',
+                                    ),
+                                    buildOperationDetail(
+                                      field: 'Description',
+                                      value:
+                                          args.incident_report?.description ??
+                                              'Undefined',
+                                    ),
+                                    buildOperationDetail(
+                                      field: 'Landmark',
+                                      value: args.incident_report?.landmark ??
+                                          'Undefined',
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            buildExpandButton(context),
+                          ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: ListView(
-                            padding: EdgeInsets.all(20),
-                            children: [
-                              Text(
-                                'Operation Info',
-                                style: DefaultTextTheme.headline4,
-                              ),
-                              SizedBox(height: 15),
-                              buildOperationDetail(
-                                field: 'Sex',
-                                value:
-                                    args.incident_report?.sex?.totTitleCase ??
-                                        'Undefined',
-                              ),
-                              buildOperationDetail(
-                                field: 'Age',
-                                value: args.incident_report?.age ?? 'Undefined',
-                              ),
-                              buildOperationDetail(
-                                field: 'Victim Status',
-                                value: args.incident_report?.victim_status
-                                        ?.totTitleCase ??
-                                    'Undefined',
-                              ),
-                              buildOperationDetail(
-                                field: 'Description',
-                                value: args.incident_report?.description ??
-                                    'Undefined',
-                              ),
-                              buildOperationDetail(
-                                field: 'Landmark',
-                                value: args.incident_report?.landmark ??
-                                    'Undefined',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      buildExpandButton(context),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  buildRespondButton(),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
+                        SizedBox(height: 10),
+                        buildRespondButton(),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -640,8 +857,6 @@ class _NewOperationState extends State<NewOperation> {
       }
       _isInitialized = true;
       polylines.add(polyline);
-    } else {
-      print('may mali');
     }
   }
 
@@ -655,7 +870,12 @@ class _NewOperationState extends State<NewOperation> {
       zoom: 18,
     );
     _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-    if (args.latitude != null) getDirections(current_location);
+    if (args.latitude != null)
+      getDirections(
+        current_location,
+        args.latitude,
+        args.longitude,
+      );
   }
 
   //set camera to center of 2 markers
@@ -704,7 +924,11 @@ class _NewOperationState extends State<NewOperation> {
     });
   }
 
-  void getDirections(LocationData curLoc) async {
+  void getDirections(
+    LocationData curLoc,
+    String latitude,
+    String longitude,
+  ) async {
     if (args.latitude != null)
       try {
         Dio dio = new Dio();
@@ -715,7 +939,7 @@ class _NewOperationState extends State<NewOperation> {
           baseUrl,
           queryParameters: {
             'origin': '${curLoc.latitude},${curLoc.longitude}',
-            'destination': '${args.latitude}, ${args.longitude}',
+            'destination': '$latitude, $longitude',
             'key': googleAPIKey,
           },
         );
@@ -748,16 +972,32 @@ class _NewOperationState extends State<NewOperation> {
       controller.setMapStyle(string);
     });
 
+    _controller = controller;
+
+    _setNewDestination(
+      'incident_location',
+      args.incident_report?.incident_type?.totTitleCase ?? 'Undefined',
+      incidentLocationMarker!,
+      args.latitude,
+      args.longitude,
+    );
+  }
+
+  void _setNewDestination(
+    String id,
+    String title,
+    BitmapDescriptor icon,
+    String latitude,
+    String longitude,
+  ) {
     Set<Marker> _mrkrs = {
       Marker(
-        markerId: MarkerId('incident_location'),
-        position:
-            LatLng(double.parse(args.latitude), double.parse(args.longitude)),
+        markerId: MarkerId(id),
+        position: LatLng(double.parse(latitude), double.parse(longitude)),
         infoWindow: InfoWindow(
-          title: 'Vehicle Accident',
-          snippet: 'Danao Pasacao Rd, Pasacao, Camarines Sur',
+          title: title,
         ),
-        icon: incidentLocationMarker!,
+        icon: icon,
       )
     };
 
@@ -765,10 +1005,8 @@ class _NewOperationState extends State<NewOperation> {
       _markers = _mrkrs;
     });
 
-    _controller = controller;
-
     if (args.latitude != null) {
-      getDirections(current_location);
+      getDirections(current_location, latitude, longitude);
     }
   }
 }

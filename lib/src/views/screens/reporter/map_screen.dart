@@ -53,6 +53,13 @@ class _MapScreenState extends State<MapScreen> {
   Set<Marker> _markers = {};
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controller?.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
 
@@ -183,13 +190,13 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       args = ScreenArguments();
       currentlySelectedPin = PinInformation(
-        locationIcon: getLocationIcon(e.location_type),
+        locationIcon: getLocationIcon(e.location_type!),
         location: LatLng(
-          double.parse(e.latitude),
-          double.parse(e.longitude),
+          double.parse(e.latitude!),
+          double.parse(e.longitude!),
         ),
-        locationName: e.location_name,
-        address: e.address,
+        locationName: e.location_name!,
+        address: e.address!,
       );
 
       pinPillPosition = 0;
@@ -197,8 +204,8 @@ class _MapScreenState extends State<MapScreen> {
     if (await DataConnectionChecker().hasConnection)
       getDistanceAndReach(
         LatLng(
-          double.parse(e.latitude),
-          double.parse(e.longitude),
+          double.parse(e.latitude!),
+          double.parse(e.longitude!),
         ),
       );
   }
@@ -297,10 +304,10 @@ class _MapScreenState extends State<MapScreen> {
           (e) => Marker(
             markerId: MarkerId(e.location_id.toString()),
             position: LatLng(
-              double.parse(e.latitude),
-              double.parse(e.longitude),
+              double.parse(e.latitude!),
+              double.parse(e.longitude!),
             ),
-            icon: setMarkerIcon(e.location_type),
+            icon: setMarkerIcon(e.location_type!),
             onTap: () {
               setmarkerTapAction(e);
             },

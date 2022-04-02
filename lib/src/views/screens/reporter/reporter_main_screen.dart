@@ -23,10 +23,10 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
       icon: Icon(CustomIcons.home),
       label: 'Home',
     ),
-    BottomNavigationBarItem(
-      icon: Icon(CustomIcons.warning),
-      label: 'Alerts',
-    ),
+    // BottomNavigationBarItem(
+    //   icon: Icon(CustomIcons.warning),
+    //   label: 'Alerts',
+    // ),
     BottomNavigationBarItem(
       icon: Icon(FontAwesomeIcons.mapMarked),
       label: 'Locations',
@@ -50,7 +50,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
           controller: pageController,
           children: [
             HomeScreen(),
-            AlertsScreen(),
+            // AlertsScreen(),
             LocationsScreen(),
             ProfileScreen(),
           ],
