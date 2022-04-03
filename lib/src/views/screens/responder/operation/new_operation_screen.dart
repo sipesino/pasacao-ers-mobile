@@ -198,6 +198,7 @@ class _NewOperationState extends State<NewOperation> {
                                   BuildSceneDepartPhase(),
                                   BuildReceivingFacilityArrivalPhase(),
                                   BuildRFDeparturePhase(),
+                                  BuildBaseArrivalPhase(),
                                 ],
                               ),
                             ],
@@ -380,6 +381,7 @@ class _NewOperationState extends State<NewOperation> {
                     ],
                     onChanged: (val) {
                       receivingFacility = val?.location_name;
+
                       String type;
                       switch (val?.location_type?.toUpperCase()) {
                         case 'HOSPITAL':
@@ -401,6 +403,7 @@ class _NewOperationState extends State<NewOperation> {
                           .then((onValue) {
                         receivingFacilityMarker =
                             BitmapDescriptor.fromBytes(onValue);
+                        print(val);
                         setState(() {
                           nd_latitude = val!.latitude;
                           nd_longitude = val.latitude;
@@ -519,8 +522,72 @@ class _NewOperationState extends State<NewOperation> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    etd_base = DateTime.now().toString();
-                    index = 5;
+                    getBytesFromAsset('assets/images/markers/base.png', 80)
+                        .then((onValue) {
+                      setState(() {
+                        nd_latitude = mdrrmo_latitude;
+                        nd_longitude = mdrrmo_longitude;
+                      });
+
+                      _setNewDestination(
+                        'base',
+                        receivingFacility!,
+                        BitmapDescriptor.fromBytes(onValue),
+                        mdrrmo_latitude,
+                        mdrrmo_longitude,
+                      );
+                      etd_hospital = DateTime.now().toString();
+                      index = 5;
+                      pageController.nextPage(
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      );
+                    });
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(accentColor),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: Text('Confirm'),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget BuildBaseArrivalPhase() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: boxShadow,
+            ),
+            child: Column(
+              children: [
+                Text('Arrived at the base'),
+                Text(
+                  time,
+                  style: DefaultTextTheme.headline1,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    showAlertDialog(context);
+                    eta_base = DateTime.now().toString();
+                    index = 6;
                     pageController.nextPage(
                       duration: Duration(milliseconds: 200),
                       curve: Curves.easeIn,
@@ -541,6 +608,38 @@ class _NewOperationState extends State<NewOperation> {
           ),
         ],
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget yesButton = TextButton(
+      child: Text("Yes"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget noButton = TextButton(
+      child: Text("No"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Base Arrival"),
+      content: Text("Confirm base arrival?"),
+      actions: [
+        noButton,
+        yesButton,
+      ],
+    );
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
@@ -949,6 +1048,8 @@ class _NewOperationState extends State<NewOperation> {
             _info = Directions.fromMap(response.data);
             setPolylines();
           });
+        } else {
+          print(response.statusCode);
         }
       } catch (e) {
         print(e);

@@ -19,6 +19,8 @@ final List<BoxShadow> boxShadow = <BoxShadow>[
   ),
 ];
 
+const String mdrrmo_latitude = "13.512623274675988";
+const String mdrrmo_longitude = "123.04247497268386";
 const String crimePng = 'assets/images/crime.png';
 const String medicalPng = 'assets/images/medical.png';
 const String firePng = 'assets/images/fire.png';

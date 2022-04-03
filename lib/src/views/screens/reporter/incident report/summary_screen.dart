@@ -247,8 +247,8 @@ class _SummaryScreenState extends State<SummaryScreen> {
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
-                  _testImageUpload(args.incident_report!.incident_images!);
-                  // _submitReport(args.incident_report!);
+                  // _testImageUpload(args.incident_report!.incident_images!);
+                  _submitReport(args.incident_report!);
                 },
                 child: Text('Submit Report'),
                 style: ButtonStyle(

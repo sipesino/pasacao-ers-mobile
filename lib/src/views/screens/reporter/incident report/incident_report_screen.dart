@@ -295,8 +295,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
         const SizedBox(height: 10),
         const SizedBox(height: 10),
         _buildDescriptionTextFormField(),
-        const SizedBox(height: 20),
-        _buildIncidentImages(),
+        // const SizedBox(height: 20),
+        // _buildIncidentImages(),
       ],
     );
   }
