@@ -108,7 +108,7 @@ InputDecoration textFormDecoration({
       ),
     ),
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(5),
+      borderRadius: BorderRadius.circular(10),
       borderSide: BorderSide(
         color: contentColorLightTheme.withOpacity(0.2),
         width: 1,
@@ -119,14 +119,14 @@ InputDecoration textFormDecoration({
         color: Colors.redAccent,
         width: 1,
       ),
-      borderRadius: BorderRadius.circular(5),
+      borderRadius: BorderRadius.circular(10),
     ),
     focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(
         color: chromeColor,
         width: 1,
       ),
-      borderRadius: BorderRadius.circular(5.5),
+      borderRadius: BorderRadius.circular(10),
     ),
     filled: true,
     focusColor: accentColor,

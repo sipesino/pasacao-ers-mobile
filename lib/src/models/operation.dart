@@ -13,6 +13,11 @@ class Operation {
   String? etd_hospital;
   String? eta_base;
   String? receivingFacility;
+  String? temperature;
+  String? pulse_rate;
+  String? respiration_rate;
+  String? blood_pressure;
+
   Operation({
     this.operation_id,
     this.incident_id,
@@ -26,37 +31,11 @@ class Operation {
     this.etd_hospital,
     this.eta_base,
     this.receivingFacility,
+    this.temperature,
+    this.pulse_rate,
+    this.respiration_rate,
+    this.blood_pressure,
   });
-
-  Operation copyWith({
-    String? operation_id,
-    String? incident_id,
-    String? external_agency_id,
-    String? dispatcher_id,
-    String? account_id,
-    String? etd_base,
-    String? eta_scene,
-    String? etd_scene,
-    String? eta_hospital,
-    String? etd_hospital,
-    String? eta_base,
-    String? receivingFacility,
-  }) {
-    return Operation(
-      operation_id: operation_id ?? this.operation_id,
-      incident_id: incident_id ?? this.incident_id,
-      external_agency_id: external_agency_id ?? this.external_agency_id,
-      dispatcher_id: dispatcher_id ?? this.dispatcher_id,
-      account_id: account_id ?? this.account_id,
-      etd_base: etd_base ?? this.etd_base,
-      eta_scene: eta_scene ?? this.eta_scene,
-      etd_scene: etd_scene ?? this.etd_scene,
-      eta_hospital: eta_hospital ?? this.eta_hospital,
-      etd_hospital: etd_hospital ?? this.etd_hospital,
-      eta_base: eta_base ?? this.eta_base,
-      receivingFacility: receivingFacility ?? this.receivingFacility,
-    );
-  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -72,6 +51,10 @@ class Operation {
       'etd_hospital': etd_hospital,
       'eta_base': eta_base,
       'receivingFacility': receivingFacility,
+      'temperature': temperature,
+      'pulse_rate': pulse_rate,
+      'respiration_rate': respiration_rate,
+      'blood_pressure': blood_pressure,
     };
   }
 
@@ -89,6 +72,10 @@ class Operation {
       etd_hospital: map['etd_hospital'],
       eta_base: map['eta_base'],
       receivingFacility: map['receivingFacility'],
+      temperature: map['temperature'],
+      pulse_rate: map['pulse_rate'],
+      respiration_rate: map['respiration_rate'],
+      blood_pressure: map['blood_pressure'],
     );
   }
 
@@ -99,7 +86,7 @@ class Operation {
 
   @override
   String toString() {
-    return 'Operation(operation_id: $operation_id, incident_id: $incident_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility)';
+    return 'Operation(operation_id: $operation_id, incident_id: $incident_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, temperature: $temperature, pulse_rate: $pulse_rate, respiration_rate: $respiration_rate, blood_pressure: $blood_pressure,)';
   }
 
   @override
@@ -118,7 +105,11 @@ class Operation {
         other.eta_hospital == eta_hospital &&
         other.etd_hospital == etd_hospital &&
         other.eta_base == eta_base &&
-        other.receivingFacility == receivingFacility;
+        other.receivingFacility == receivingFacility &&
+        other.temperature == temperature &&
+        other.pulse_rate == pulse_rate &&
+        other.respiration_rate == respiration_rate &&
+        other.blood_pressure == blood_pressure;
   }
 
   @override
@@ -134,6 +125,10 @@ class Operation {
         eta_hospital.hashCode ^
         etd_hospital.hashCode ^
         eta_base.hashCode ^
-        receivingFacility.hashCode;
+        receivingFacility.hashCode ^
+        temperature.hashCode ^
+        pulse_rate.hashCode ^
+        respiration_rate.hashCode ^
+        blood_pressure.hashCode;
   }
 }

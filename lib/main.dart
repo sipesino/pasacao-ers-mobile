@@ -1,17 +1,11 @@
-import 'dart:async';
 import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/services.dart';
 import 'package:pers/src/models/fcm_service.dart';
-import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/views/screens/responder/operation/operation_summary.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
@@ -29,7 +23,6 @@ import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/personal_info_screen.dart';
 import 'package:pers/src/views/screens/reporter/reporter_main_screen.dart';
 import 'package:pers/src/views/screens/responder/operation/new_operation_screen.dart';
-import 'package:pers/src/views/screens/responder/operation/proceeding_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_login_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_main_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -109,8 +102,8 @@ class _MERSState extends State<MERS> {
           '/reporter/home': (context) => ReporterMainScreen(),
           '/responder/home': (context) => ResponderMainScreen(),
           '/responder/home/new_operation': (context) => NewOperation(),
-          '/responder/home/proceeding_operation': (context) =>
-              ProceedingScreen(),
+          '/responder/home/new_operation/summary': (context) =>
+              OperationSummaryScreen(),
           '/responder/login': (context) => ResponderLoginScreen(),
           '/forgot_password/email': (context) => ForgotPasswordEmail(),
           '/forgot_password/mobile_no': (context) => ForgotPasswordMobileNo(),

@@ -18,6 +18,7 @@ import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/widgets/custom_text_form_field.dart';
 
 extension StringExtension on String {
   String get totTitleCase => this
@@ -65,6 +66,12 @@ class _NewOperationState extends State<NewOperation> {
   String time = '00:00 AM';
   PageController pageController = new PageController();
 
+  String? temperature;
+  String? pulse_rate;
+  String? respiration_rate;
+  String? blood_pressure;
+  String? bp1;
+  String? bp2;
   String? etd_base;
   String? eta_scene;
   String? etd_scene;
@@ -143,41 +150,41 @@ class _NewOperationState extends State<NewOperation> {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          !show_map
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : StreamBuilder<LocationData>(
-                  stream: location.onLocationChanged,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      LocationData curLoc = snapshot.data!;
-                      if (receivingFacility == null && nd_latitude == null) {
-                        getDirections(curLoc, args.latitude, args.longitude);
-                      } else {
-                        getDirections(curLoc, nd_latitude!, nd_longitude!);
-                      }
-                    }
-                    return GoogleMap(
-                      onMapCreated: _onMapCreated,
-                      markers: _markers,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(
-                          current_location.latitude!,
-                          current_location.longitude!,
-                        ),
-                        zoom: 5,
-                      ),
-                      polylines: polylines,
-                      myLocationEnabled: true,
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
-                      buildingsEnabled: true,
-                      tiltGesturesEnabled: false,
-                      trafficEnabled: true,
-                    );
-                  },
-                ),
+          // !show_map
+          //     ? Center(
+          //         child: CircularProgressIndicator(),
+          //       )
+          //     : StreamBuilder<LocationData>(
+          //         stream: location.onLocationChanged,
+          //         builder: (context, snapshot) {
+          //           if (snapshot.hasData) {
+          //             LocationData curLoc = snapshot.data!;
+          //             if (receivingFacility == null && nd_latitude == null) {
+          //               getDirections(curLoc, args.latitude, args.longitude);
+          //             } else {
+          //               getDirections(curLoc, nd_latitude!, nd_longitude!);
+          //             }
+          //           }
+          //           return GoogleMap(
+          //             onMapCreated: _onMapCreated,
+          //             markers: _markers,
+          //             initialCameraPosition: CameraPosition(
+          //               target: LatLng(
+          //                 current_location.latitude!,
+          //                 current_location.longitude!,
+          //               ),
+          //               zoom: 5,
+          //             ),
+          //             polylines: polylines,
+          //             myLocationEnabled: true,
+          //             zoomControlsEnabled: false,
+          //             myLocationButtonEnabled: false,
+          //             buildingsEnabled: true,
+          //             tiltGesturesEnabled: false,
+          //             trafficEnabled: true,
+          //           );
+          //         },
+          //       ),
           AnimatedSwitcher(
             duration: Duration(milliseconds: 150),
             child: !_isResponding
@@ -196,6 +203,7 @@ class _NewOperationState extends State<NewOperation> {
                                   BuildBaseDepartPhase(),
                                   BuildSceneArrivalPhase(),
                                   BuildSceneDepartPhase(),
+                                  BuildVitalSignForm(),
                                   BuildReceivingFacilityArrivalPhase(),
                                   BuildRFDeparturePhase(),
                                   BuildBaseArrivalPhase(),
@@ -238,12 +246,15 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Depart from base'),
+                Text(
+                  'Depart from base',
+                  style: DefaultTextTheme.headline5,
+                ),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                ElevatedButton(
+                buildNavigationButtons(
                   onPressed: () {
                     etd_base = DateTime.now().toString();
                     index = 1;
@@ -252,16 +263,7 @@ class _NewOperationState extends State<NewOperation> {
                       curve: Curves.easeIn,
                     );
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: Text('Confirm'),
-                )
+                ),
               ],
             ),
           ),
@@ -286,30 +288,22 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Arrived at the scene'),
+                Text(
+                  'Arrived at the scene',
+                  style: DefaultTextTheme.headline5,
+                ),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    eta_scene = DateTime.now().toString();
-                    index = 2;
-                    pageController.nextPage(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.easeIn,
-                    );
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: Text('Confirm'),
-                )
+                buildNavigationButtons(onPressed: () {
+                  eta_scene = DateTime.now().toString();
+                  index = 2;
+                  pageController.nextPage(
+                    duration: Duration(milliseconds: 200),
+                    curve: Curves.easeIn,
+                  );
+                }),
               ],
             ),
           ),
@@ -336,7 +330,10 @@ class _NewOperationState extends State<NewOperation> {
               key: _formKey,
               child: Column(
                 children: [
-                  Text('Depart from scene'),
+                  Text(
+                    'Depart from scene',
+                    style: DefaultTextTheme.headline5,
+                  ),
                   Text(
                     time,
                     style: DefaultTextTheme.headline1,
@@ -420,33 +417,125 @@ class _NewOperationState extends State<NewOperation> {
                     },
                   ),
                   SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        etd_scene = DateTime.now().toString();
+                  buildNavigationButtons(onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      etd_scene = DateTime.now().toString();
 
-                        index = 3;
-                        pageController.nextPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.easeIn,
-                        );
-                      }
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(accentColor),
-                      shape: MaterialStateProperty.all(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
-                    child: Text('Confirm'),
-                  )
+                      index = 3;
+                      pageController.nextPage(
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      );
+                    }
+                  }),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  final vs_formKey = GlobalKey<FormState>();
+
+  Widget BuildVitalSignForm() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+      child: Form(
+        key: vs_formKey,
+        child: Container(
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: boxShadow,
+          ),
+          child: Column(
+            children: [
+              Text(
+                'Patient Vital Sign',
+                style: DefaultTextTheme.headline5,
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                width: 170,
+                child: buildCustomTextField(
+                  label: 'Temperature (°C)',
+                  onSaved: (val) {
+                    temperature = val?.trim();
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                width: 170,
+                child: buildCustomTextField(
+                  label: 'Pulse Rate (BPM)',
+                  onSaved: (val) {
+                    pulse_rate = val?.trim();
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 10),
+              SizedBox(
+                width: 170,
+                child: buildCustomTextField(
+                  label: 'Respiration Rate (BPM)',
+                  onSaved: (val) {
+                    respiration_rate = val?.trim();
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+              ),
+              SizedBox(height: 10),
+              Column(
+                children: [
+                  Text(
+                    'Blood Pressure',
+                    style: TextStyle(color: contentColorLightTheme),
+                  ),
+                  SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 80,
+                        child: buildCustomTextField(
+                          onSaved: (val) {
+                            bp1 = val?.trim();
+                          },
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      Text('  /  '),
+                      SizedBox(
+                        width: 80,
+                        child: buildCustomTextField(
+                          onSaved: (val) {
+                            bp2 = val?.trim();
+                          },
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              buildNavigationButtons(onPressed: () {
+                vs_formKey.currentState!.save();
+                index = 4;
+                pageController.nextPage(
+                  duration: Duration(milliseconds: 200),
+                  curve: Curves.easeIn,
+                );
+              }),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -467,30 +556,25 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Arrived at the receiving facility'),
+                Text(
+                  'Arrived at the receiving facility',
+                  style: DefaultTextTheme.headline5,
+                ),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                ElevatedButton(
+                SizedBox(height: 10),
+                buildNavigationButtons(
                   onPressed: () {
                     eta_hospital = DateTime.now().toString();
-                    index = 4;
+                    index = 5;
                     pageController.nextPage(
                       duration: Duration(milliseconds: 200),
                       curve: Curves.easeIn,
                     );
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: Text('Confirm'),
-                )
+                ),
               ],
             ),
           ),
@@ -515,12 +599,15 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Depart from receiving facility'),
+                Text(
+                  'Depart from receiving facility',
+                  style: DefaultTextTheme.headline5,
+                ),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                ElevatedButton(
+                buildNavigationButtons(
                   onPressed: () {
                     getBytesFromAsset('assets/images/markers/base.png', 80)
                         .then((onValue) {
@@ -537,23 +624,14 @@ class _NewOperationState extends State<NewOperation> {
                         mdrrmo_longitude,
                       );
                       etd_hospital = DateTime.now().toString();
-                      index = 5;
+                      index = 6;
                       pageController.nextPage(
                         duration: Duration(milliseconds: 200),
                         curve: Curves.easeIn,
                       );
                     });
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: Text('Confirm'),
-                )
+                ),
               ],
             ),
           ),
@@ -578,36 +656,115 @@ class _NewOperationState extends State<NewOperation> {
             ),
             child: Column(
               children: [
-                Text('Arrived at the base'),
+                Text(
+                  'Arrived at the base',
+                  style: DefaultTextTheme.headline5,
+                ),
                 Text(
                   time,
                   style: DefaultTextTheme.headline1,
                 ),
-                ElevatedButton(
+                buildNavigationButtons(
                   onPressed: () {
-                    showAlertDialog(context);
                     eta_base = DateTime.now().toString();
-                    index = 6;
-                    pageController.nextPage(
-                      duration: Duration(milliseconds: 200),
-                      curve: Curves.easeIn,
-                    );
+                    index = 7;
+                    Navigator.of(context)
+                        .pushNamed('/responder/home/new_operation/summary');
                   },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(accentColor),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: Text('Confirm'),
-                )
+                ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget buildNavigationButtons({required VoidCallback onPressed}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextButton(
+          onPressed: () {
+            pageController.previousPage(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.easeIn,
+            );
+          },
+          child: Text('Back'),
+        ),
+        SizedBox(width: 10),
+        Flexible(
+          child: ElevatedButton(
+            onPressed: onPressed,
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(accentColor),
+              shape: MaterialStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            child: Text('Confirm'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildCustomTextField({
+    String? label,
+    required FormFieldSetter<String> onSaved,
+    required TextInputType keyboardType,
+  }) {
+    return Column(
+      children: [
+        if (label != null)
+          Text(
+            label,
+            style: TextStyle(color: contentColorLightTheme),
+          ),
+        SizedBox(height: 5),
+        TextFormField(
+          onSaved: onSaved,
+          keyboardType: keyboardType,
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+            fillColor: Colors.white,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: contentColorLightTheme.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: contentColorLightTheme.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.redAccent,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: chromeColor,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            filled: true,
+            focusColor: accentColor,
+          ),
+        ),
+      ],
     );
   }
 
