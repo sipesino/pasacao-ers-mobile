@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/locations.dart';
+import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
 
@@ -52,8 +54,21 @@ class OperationCard extends StatelessWidget {
                   context,
                   '/responder/home/new_operation',
                   arguments: ScreenArguments(
-                    latitude: location.latitude,
-                    longitude: location.longitude,
+                    operation: Operation(
+                      operation_id: '1',
+                      report: IncidentReport(
+                        incident_id: '1',
+                        incident_type: 'Vehicle Accident',
+                        sex: 'fEmale',
+                        age: '78',
+                        description: 'The quick brown fox',
+                        victim_status: 'Unconscious',
+                        landmark: '711',
+                        longitude: location.longitude,
+                        latitude: location.latitude,
+                        name: 'Juan Tamad',
+                      ),
+                    ),
                   ),
                 );
               },

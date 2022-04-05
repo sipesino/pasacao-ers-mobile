@@ -316,6 +316,11 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             landmark = val;
           },
         ),
+        SizedBox(height: 10),
+        Text(
+          'Note: Location Coordinates is automaticaly detected',
+          style: TextStyle(color: Colors.grey),
+        ),
       ],
     );
   }

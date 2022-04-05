@@ -9,8 +9,8 @@ class IncidentReport {
   final String? age;
   final String? description;
   final List<XFile>? incident_images;
-  final String? longitude;
-  final String? latitude;
+  String? longitude;
+  String? latitude;
   final String? landmark;
   final String? victim_status;
   final String? account_id;

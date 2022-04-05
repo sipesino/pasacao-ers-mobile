@@ -107,6 +107,8 @@ class _MapScreenState extends State<MapScreen> {
 
             setPolylines();
           });
+        } else {
+          print(response.statusCode);
         }
       } catch (e) {
         print(e);
@@ -127,6 +129,7 @@ class _MapScreenState extends State<MapScreen> {
         },
       );
 
+      print('\n\n>>> $response\n\n');
       if (response.statusCode == 200) {
         setState(() {
           _info = Directions.fromMap(response.data);
@@ -430,27 +433,6 @@ class _MapScreenState extends State<MapScreen> {
                     ),
                   ),
                 ),
-                if (_info != null)
-                  Positioned(
-                    bottom: 20,
-                    left: 20,
-                    child: Container(
-                      padding: EdgeInsets.all(15),
-                      decoration: BoxDecoration(
-                        color: Colors.amber[800],
-                        boxShadow: boxShadow,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '${_info!.totalDistance}, ${_info!.totalDuration}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
       floatingActionButton: FloatingActionButton(

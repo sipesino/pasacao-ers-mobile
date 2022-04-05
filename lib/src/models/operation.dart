@@ -1,8 +1,9 @@
 import 'dart:convert';
 
+import 'package:pers/src/models/incident_report.dart';
+
 class Operation {
   String? operation_id;
-  String? incident_id;
   String? external_agency_id;
   String? dispatcher_id;
   String? account_id;
@@ -17,10 +18,10 @@ class Operation {
   String? pulse_rate;
   String? respiration_rate;
   String? blood_pressure;
+  IncidentReport? report;
 
   Operation({
     this.operation_id,
-    this.incident_id,
     this.external_agency_id,
     this.dispatcher_id,
     this.account_id,
@@ -35,12 +36,12 @@ class Operation {
     this.pulse_rate,
     this.respiration_rate,
     this.blood_pressure,
+    this.report,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'operation_id': operation_id,
-      'incident_id': incident_id,
       'external_agency_id': external_agency_id,
       'dispatcher_id': dispatcher_id,
       'account_id': account_id,
@@ -55,13 +56,13 @@ class Operation {
       'pulse_rate': pulse_rate,
       'respiration_rate': respiration_rate,
       'blood_pressure': blood_pressure,
+      'report': report,
     };
   }
 
   factory Operation.fromMap(Map<String, dynamic> map) {
     return Operation(
       operation_id: map['operation_id'],
-      incident_id: map['incident_id'],
       external_agency_id: map['external_agency_id'],
       dispatcher_id: map['dispatcher_id'],
       account_id: map['account_id'],
@@ -76,6 +77,7 @@ class Operation {
       pulse_rate: map['pulse_rate'],
       respiration_rate: map['respiration_rate'],
       blood_pressure: map['blood_pressure'],
+      report: map['report'],
     );
   }
 
@@ -86,7 +88,7 @@ class Operation {
 
   @override
   String toString() {
-    return 'Operation(operation_id: $operation_id, incident_id: $incident_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, temperature: $temperature, pulse_rate: $pulse_rate, respiration_rate: $respiration_rate, blood_pressure: $blood_pressure,)';
+    return 'Operation(operation_id: $operation_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, temperature: $temperature, pulse_rate: $pulse_rate, respiration_rate: $respiration_rate, blood_pressure: $blood_pressure, incident_report: ${report.toString()})';
   }
 
   @override
@@ -95,7 +97,6 @@ class Operation {
 
     return other is Operation &&
         other.operation_id == operation_id &&
-        other.incident_id == incident_id &&
         other.external_agency_id == external_agency_id &&
         other.dispatcher_id == dispatcher_id &&
         other.account_id == account_id &&
@@ -109,13 +110,13 @@ class Operation {
         other.temperature == temperature &&
         other.pulse_rate == pulse_rate &&
         other.respiration_rate == respiration_rate &&
-        other.blood_pressure == blood_pressure;
+        other.blood_pressure == blood_pressure &&
+        other.report == report;
   }
 
   @override
   int get hashCode {
     return operation_id.hashCode ^
-        incident_id.hashCode ^
         external_agency_id.hashCode ^
         dispatcher_id.hashCode ^
         account_id.hashCode ^
@@ -129,6 +130,7 @@ class Operation {
         temperature.hashCode ^
         pulse_rate.hashCode ^
         respiration_rate.hashCode ^
-        blood_pressure.hashCode;
+        blood_pressure.hashCode ^
+        report.hashCode;
   }
 }
