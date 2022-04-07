@@ -27,7 +27,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       ),
     ),
   );
-
   await Firebase.initializeApp();
 }
 
@@ -44,7 +43,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   playSound: true,
 );
 
-void setupFcm() {
+void setupFcm(void Function(String) onNewOperation) {
   var initializationSettingsAndroid =
       const AndroidInitializationSettings('@mipmap/ic_launcher');
   var initializationSettingsIOs = const IOSInitializationSettings();
@@ -71,32 +70,32 @@ void setupFcm() {
     print('>>> getInitialMessage() fired');
 
     if (message != null) {
-      if (message.data != null)
-        flutterLocalNotificationsPlugin.show(
-          message.hashCode,
-          message.data['title'],
-          message.data['body'],
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: 'channel description',
-              color: Colors.blue,
-              playSound: true,
-              sound: RawResourceAndroidNotificationSound('alert_sound'),
-              icon: '@mipmap/ic_launcher',
-            ),
+      flutterLocalNotificationsPlugin.show(
+        message.hashCode,
+        message.data['title'],
+        message.data['body'],
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: 'channel description',
+            color: Colors.blue,
+            playSound: true,
+            sound: RawResourceAndroidNotificationSound('alert_sound'),
+            icon: '@mipmap/ic_launcher',
           ),
-          payload: message.data['"operation"'],
-        );
-
+        ),
+        payload: message.data['"operation"'],
+      );
       // goToNextScreen(message.data);
+      onNewOperation(message.data['"operation"']);
     }
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     print('>>> onMessage() fired');
-    print('>>> Operation: ${message.data['"operation"']}');
+    // print('>>> Operation: ${message.data['"operation"']}');
+    onNewOperation(message.data['"operation"']);
     flutterLocalNotificationsPlugin.show(
       message.hashCode,
       message.data['title'],

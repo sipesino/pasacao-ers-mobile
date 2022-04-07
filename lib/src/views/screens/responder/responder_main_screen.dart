@@ -1,14 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/models/notification_api.dart';
 import 'package:pers/src/views/screens/responder/responder_home_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_operations_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_profile_screen.dart';
-import 'package:workmanager/workmanager.dart';
-import 'package:http/http.dart' as http;
 
 class ResponderMainScreen extends StatefulWidget {
   ResponderMainScreen({Key? key}) : super(key: key);
@@ -37,7 +32,6 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     if (mounted) super.setState(fn);
   }
 
@@ -58,6 +52,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       body: SafeArea(
         child: PageView(
           controller: pageController,
+          physics: NeverScrollableScrollPhysics(),
           children: [
             ResponderHomeScreen(),
             ResponderOperationsScreen(),
@@ -70,36 +65,24 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: _barItems,
-        currentIndex: _selectedIndex,
-        unselectedItemColor: chromeColor,
-        unselectedIconTheme: IconThemeData(color: chromeColor),
-        selectedItemColor: accentColor,
-        selectedIconTheme: IconThemeData(color: accentColor),
-        onTap: onTap,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            top: BorderSide(color: Colors.grey, width: 0.5),
+          ),
+        ),
+        child: BottomNavigationBar(
+          elevation: 0,
+          items: _barItems,
+          currentIndex: _selectedIndex,
+          unselectedItemColor: chromeColor,
+          unselectedIconTheme: IconThemeData(color: chromeColor),
+          selectedItemColor: accentColor,
+          selectedIconTheme: IconThemeData(color: accentColor),
+          onTap: onTap,
+        ),
       ),
     );
   }
-}
-
-void callbackDispatcher() {
-  Workmanager().executeTask((taskName, inputData) async {
-    var res = await http.get(
-      Uri.parse('http://192.168.1.2/test/api/message/getMessages.php?id=1'),
-    );
-    var jsonResponse;
-
-    if (res.statusCode == 200) {
-      jsonResponse = jsonDecode(res.body);
-      NotificationAPI.showNotification(
-        title: 'Notification Title',
-        body: 'Notification body',
-        payload: 'Notification payload',
-      );
-    } else {
-      print(res.body);
-    }
-    return Future.value(true);
-  });
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/models/user.dart';
 import 'package:pers/src/views/screens/reporter/home_screen.dart';
 import 'package:pers/src/views/screens/reporter/locations_screen.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
@@ -78,24 +77,33 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
             ),
           ],
         ),
-        child: BottomNavigationBar(
-          items: _barItems,
-          currentIndex: _selectedIndex,
-          unselectedItemColor: chromeColor,
-          unselectedIconTheme: IconThemeData(color: chromeColor),
-          selectedItemColor: accentColor,
-          selectedIconTheme: IconThemeData(color: accentColor),
-          onTap: (index) {
-            pageController.animateToPage(
-              index,
-              duration: Duration(milliseconds: 300),
-              curve: Curves.ease,
-            );
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          showUnselectedLabels: true,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(
+              top: BorderSide(color: Colors.grey, width: 0.5),
+            ),
+          ),
+          child: BottomNavigationBar(
+            elevation: 0,
+            items: _barItems,
+            currentIndex: _selectedIndex,
+            unselectedItemColor: chromeColor,
+            unselectedIconTheme: IconThemeData(color: chromeColor),
+            selectedItemColor: accentColor,
+            selectedIconTheme: IconThemeData(color: accentColor),
+            onTap: (index) {
+              pageController.animateToPage(
+                index,
+                duration: Duration(milliseconds: 300),
+                curve: Curves.ease,
+              );
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            showUnselectedLabels: true,
+          ),
         ),
       ),
     );

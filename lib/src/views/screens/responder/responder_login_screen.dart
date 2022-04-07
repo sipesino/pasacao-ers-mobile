@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
@@ -229,6 +228,8 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
       );
 
   signIn() async {
+    String message = "";
+    final Connectivity _connectivity = Connectivity();
     String url = "http://143.198.92.250/api/login";
     Map body = {"email": email, "password": password};
 
@@ -236,80 +237,78 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     var res;
 
     print(body);
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+      //check if there is internet connection
+      if (_connectionStatus != ConnectivityResult.none) {
+        res = await http.post(Uri.parse(url), body: body);
 
-    //check if there is internet connection
-    if (await DataConnectionChecker().hasConnection) {
-      res = await http.post(Uri.parse(url), body: body);
+        //check if request is successfull
+        if (res.statusCode == 201) {
+          jsonResponse = jsonDecode(res.body);
 
-      //check if request is successfull
-      if (res.statusCode == 201) {
-        jsonResponse = jsonDecode(res.body);
+          if (jsonResponse.isNotEmpty) {
+            setState(() {
+              isLoading = true;
+            });
 
-        if (jsonResponse != null) {
-          setState(() {
-            isLoading = true;
-          });
+            if (jsonResponse["success"] &&
+                jsonResponse["user"]["account_type"] == 'responder') {
+              SharedPref preferences = SharedPref();
+              // save bearer token in the local storage
+              preferences.save("token", jsonResponse["token"]);
 
-          if (jsonResponse["success"] &&
-              jsonResponse["user"]["account_type"] == 'responder') {
-            SharedPref preferences = SharedPref();
-            // save bearer token in the local storage
-            preferences.save("token", jsonResponse["token"]);
+              User user = User.fromMap(jsonResponse["user"]);
 
-            User user = User.fromMap(jsonResponse["user"]);
+              // save user credentials inside local storage
+              preferences.save("user", user);
 
-            // save user credentials inside local storage
-            preferences.save("user", user);
+              url = 'http://143.198.92.250/api/register_token';
+              body = {"account_id": user.id.toString(), "token": fbToken};
 
-            url = 'http://143.198.92.250/api/register_token';
-            body = {"account_id": user.id.toString(), "token": fbToken};
+              print(body);
 
-            print(body);
+              res = await http.post(Uri.parse(url), body: body);
 
-            res = await http.post(Uri.parse(url), body: body);
+              if (res.statusCode == 201) {
+                setState(() {
+                  isLoading = false;
+                });
 
-            if (res.statusCode == 201) {
-              setState(() {
-                isLoading = false;
-              });
-
-              print('Token inserted');
-              print(res.body);
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/responder/home',
-                (Route<dynamic> route) => false,
-              );
-              return;
-            } else {
-              print(res.body);
+                print('Token inserted');
+                print(res.body);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/responder/home',
+                  (Route<dynamic> route) => false,
+                );
+                return;
+              } else if (res.statusCode == 401) {
+                message = "Invalid user credentials";
+              } else {
+                message = "Something went wrong.";
+              }
             }
           }
         }
+      } else {
+        message = "No internet. Check your internet connection";
       }
-    }
 
-    String message = "";
-    if (!await DataConnectionChecker().hasConnection)
-      message = "No internet. Check your internet connection";
-    else if (res.statusCode == 401)
-      message = "Invalid user credentials";
-    else
-      message = "Something went wrong.";
+      setState(() {
+        isLoading = false;
+      });
 
-    setState(() {
-      isLoading = false;
+      print(res.body);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: new Text(message),
+          backgroundColor: Colors.red,
+          duration: new Duration(seconds: 3),
+        ),
+      );
     });
-
-    print(res.body);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: new Text(message),
-        backgroundColor: Colors.red,
-        duration: new Duration(seconds: 3),
-      ),
-    );
   }
 }

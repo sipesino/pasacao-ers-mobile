@@ -96,6 +96,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
             return Stack(
               children: <Widget>[
                 TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
                   children: [
                     LoginScreen(
                       model: this.widget.model,

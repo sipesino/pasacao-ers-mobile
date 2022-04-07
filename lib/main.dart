@@ -58,35 +58,6 @@ class MERS extends StatefulWidget {
 }
 
 class _MERSState extends State<MERS> {
-  ConnectivityResult _connectionStatus = ConnectivityResult.none;
-  final Connectivity _connectivity = Connectivity();
-
-  @override
-  void initState() {
-    _connectivity.checkConnectivity().then((status) {
-      _connectionStatus = status;
-
-      print(_connectionStatus);
-      if (_connectionStatus != ConnectivityResult.none) {
-        try {
-          InternetAddress.lookup('example.com').then((value) {
-            final result = value;
-
-            if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-              print('connected');
-              setupFcm();
-            }
-          });
-        } on SocketException catch (_) {
-          print('not connected');
-        }
-      } else {
-        print("No internet connection");
-      }
-    });
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final MainModel _model = MainModel();
