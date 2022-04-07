@@ -66,6 +66,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                 ],
               ),
             ),
+            SizedBox(width: 10),
             SizedBox(
               height: 50,
               child: ElevatedButton(
@@ -73,7 +74,10 @@ class _LocationsScreenState extends State<LocationsScreen> {
                   Navigator.pushNamed(
                     context,
                     '/reporter/home/map',
-                    arguments: ScreenArguments(),
+                    arguments: ScreenArguments(
+                      latitude: null,
+                      longitude: null,
+                    ),
                   );
                 },
                 child: Icon(
@@ -95,7 +99,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
         SizedBox(
           height: 20,
         ),
-        _buildLocationsStats(),
+        // _buildLocationsStats(),
         Column(
           children: getLocations()
               .map(

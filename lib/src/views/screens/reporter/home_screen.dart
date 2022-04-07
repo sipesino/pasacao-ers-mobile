@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -9,12 +10,27 @@ import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/incident_button.dart';
 
-class HomeScreen extends StatelessWidget {
-  User? user;
-
+class HomeScreen extends StatefulWidget {
   HomeScreen({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = true;
+  @override
+  void initState() {
+    super.initState();
+    SharedPref().read('user').then((value) {
+      setState(() {
+        user = User.fromJson(value);
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -136,104 +152,98 @@ class HomeScreen extends StatelessWidget {
     ];
     return SafeArea(
       child: LayoutBuilder(builder: (context, constraint) {
-        return SingleChildScrollView(
-          clipBehavior: Clip.none,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraint.maxHeight),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 50),
-                  FutureBuilder(
-                    future: SharedPref().read('user'),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        user = User.fromJson(snapshot.data as String);
-                        return Text(
-                          'Hey ${user!.first_name}!\nwe\'re here for you.',
+        return isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                clipBehavior: Clip.none,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 50),
+                        Text(
+                          'Hey ${user!.first_name ?? ''}!\nwe\'re here for you.',
                           style: DefaultTextTheme.headline3,
-                        );
-                      } else
-                        return Text('');
-                    },
-                  ),
-                  SizedBox(height: 30),
-                  Text(
-                    'Call directly using Hotline',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    height: 75.0,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(width: 1),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(10),
-                      ),
-                      boxShadow: boxShadow,
-                    ),
-                    child: Material(
-                      // elevation: 5,
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(
-                            '/reporter/home/hotlines',
-                          );
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Icon(
-                              FontAwesomeIcons.phone,
-                              size: 30,
+                        ),
+                        SizedBox(height: 30),
+                        Text(
+                          'Call directly using Hotline',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Container(
+                          height: 75.0,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(width: 1),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10),
                             ),
-                            SizedBox(
-                              width: 170,
-                              child: Text(
-                                'Emergency Hotlines',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                ),
+                            boxShadow: boxShadow,
+                          ),
+                          child: Material(
+                            // elevation: 5,
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                  '/reporter/home/hotlines',
+                                );
+                              },
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Icon(
+                                    FontAwesomeIcons.phone,
+                                    size: 30,
+                                  ),
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      'Emergency Hotlines',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    CustomIcons.right_arrow,
+                                    size: 15,
+                                  )
+                                ],
                               ),
                             ),
-                            Icon(
-                              CustomIcons.right_arrow,
-                              size: 15,
-                            )
-                          ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Send Incident Report',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Column(
+                          children: incident_buttons,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Send Incident Report',
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                  SizedBox(height: 15),
-                  Column(
-                    children: incident_buttons,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+                ),
+              );
       }),
     );
   }

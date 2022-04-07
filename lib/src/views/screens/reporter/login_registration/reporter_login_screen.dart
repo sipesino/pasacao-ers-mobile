@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:data_connection_checker/data_connection_checker.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -47,71 +47,84 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     RequiredValidator(errorText: 'Password is required'),
   ]);
 
-  signIn() async {
-    setState(() {
-      widget.isLoading = true;
-    });
-    String url = "http://143.198.92.250/api/login";
-    Map body = {"email": email, "password": password};
-
-    Map<String, dynamic> jsonResponse;
-    var res;
+  void signIn() async {
+    String message = "";
+    final Connectivity _connectivity = Connectivity();
 
     //check if there is internet connection
-    if (await DataConnectionChecker().hasConnection) {
-      res = await http.post(Uri.parse(url), body: body);
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+      setState(() {
+        widget.isLoading = true;
+      });
+      String url = "http://143.198.92.250/api/login";
+      Map body = {"email": email, "password": password};
 
-      //check if request is successfull
-      if (res.statusCode == 201) {
-        jsonResponse = jsonDecode(res.body);
+      Map<String, dynamic> jsonResponse;
+      var res;
+      if (_connectionStatus != ConnectivityResult.none) {
+        try {
+          res = await http.post(Uri.parse(url), body: body).catchError((error) {
+            print(error);
+          });
 
-        //check if response body has data
-        if (jsonResponse != null) {
-          if (jsonResponse["success"]) {
-            SharedPref preferences = SharedPref();
-            // save bearer token in the local storage
-            preferences.save("token", jsonResponse["token"]);
+          //check if request is successfull
+          if (res != null) {
+            if (res.statusCode == 201) {
+              jsonResponse = jsonDecode(res.body);
 
-            User user = User.fromMap(jsonResponse["user"]);
+              //check if response body has data
+              if (jsonResponse.isNotEmpty) {
+                if (jsonResponse["success"]) {
+                  SharedPref preferences = SharedPref();
+                  // save bearer token in the local storage
+                  preferences.save("token", jsonResponse["token"]);
 
-            // save user credentials inside local storage
-            preferences.save("user", user);
+                  User user = User.fromMap(jsonResponse["user"]);
 
-            setState(() {
-              widget.isLoading = false;
-            });
+                  // save user credentials inside local storage
+                  preferences.save("user", user);
 
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              '/reporter/home',
-              (Route<dynamic> route) => false,
-            );
+                  setState(() {
+                    widget.isLoading = false;
+                  });
+
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/reporter/home',
+                    (Route<dynamic> route) => false,
+                  );
+                }
+              }
+              return;
+            }
           }
+        } on SocketException catch (_) {
+          print('not connected');
+          message = "No internet. Check your internet connection";
         }
-        return;
+      } else {
+        print("No internet connection");
+        message = "No internet. Check your internet connection";
       }
-    }
+      if (res.statusCode == 401)
+        message = "Invalid user credentials";
+      else
+        message = "Something went wrong.";
 
-    String message = "";
-    if (!await DataConnectionChecker().hasConnection)
-      message = "No internet. Check your internet connection";
-    else if (res.statusCode == 401)
-      message = "Invalid user credentials";
-    else
-      message = "Something went wrong.";
+      setState(() {
+        widget.isLoading = false;
+      });
 
-    setState(() {
-      widget.isLoading = false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: new Text(message),
+          backgroundColor: Colors.red,
+          duration: new Duration(seconds: 3),
+        ),
+      );
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: new Text(message),
-        backgroundColor: Colors.red,
-        duration: new Duration(seconds: 3),
-      ),
-    );
   }
 
   @override

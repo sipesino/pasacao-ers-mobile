@@ -1360,26 +1360,7 @@ class _NewOperationState extends State<NewOperation> {
         _setMapFitToTour(polylines);
       }
       _isInitialized = true;
-      // polylineCoordinates.clear();
     }
-    // if (_info!.polylinePoints != null) {
-    //   polylines.clear();
-    //   Polyline polyline = Polyline(
-    //     polylineId: const PolylineId('overview_polyline'),
-    //     color: Colors.blue,
-    //     endCap: Cap.roundCap,
-    //     startCap: Cap.roundCap,
-    //     width: 5,
-    //     points: _info!.polylinePoints!
-    //         .map((e) => LatLng(e.latitude, e.longitude))
-    //         .toList(),
-    //   );
-    // if (!_isInitialized) {
-    //   _setMapFitToTour(polylines);
-    // }
-    // _isInitialized = true;
-    // polylines.add(polyline);
-    // }
   }
 
   void updatePinOnMap() async {

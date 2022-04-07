@@ -1,17 +1,17 @@
 import 'dart:convert';
 
 class User {
-  final int? id;
-  final String? address;
-  final String? birthday;
-  final String? account_type;
-  final String? email;
-  final String? first_name;
-  final String? sex;
-  final String? last_name;
-  final String? mobile_no;
-  final String? password;
-  final String? password_confirmation;
+  int? id;
+  String? address;
+  String? birthday;
+  String? account_type;
+  String? email;
+  String? first_name;
+  String? sex;
+  String? last_name;
+  String? mobile_no;
+  String? password;
+  String? password_confirmation;
 
   User({
     this.id,

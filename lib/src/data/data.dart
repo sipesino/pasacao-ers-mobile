@@ -1,6 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/locations.dart';
+import 'package:pers/src/models/user.dart';
 
 List<EmergencyContact> _emergencyContacts = [
   EmergencyContact(
@@ -105,3 +106,5 @@ void addEmergencyContacts(EmergencyContact contact) {
 void editEmergencyContact(EmergencyContact contact, int index) {
   _emergencyContacts[index] = contact;
 }
+
+User? user;

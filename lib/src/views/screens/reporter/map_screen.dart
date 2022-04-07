@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show ByteData, rootBundle;
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
@@ -27,7 +29,9 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-  var args;
+  ScreenArguments? args;
+  Completer<GoogleMapController> _controller = Completer();
+  StreamSubscription<LocationData>? locationSubscription;
   late LocationData current_location;
   PinInformation currentlySelectedPin = PinInformation(
     locationIcon: CustomIcons.siren_2,
@@ -35,29 +39,29 @@ class _MapScreenState extends State<MapScreen> {
     location: LatLng(0, 0),
     locationName: "",
   );
-
+  double bearing = 0;
   BitmapDescriptor? evacuationMarker;
   BitmapDescriptor? fireStationMarker;
   BitmapDescriptor? hospitalMarker;
   late Location location;
   double pinPillPosition = -120;
+  String distance = '';
+
+  String? dest_lat;
+  String? dest_lng;
+
   //Icons for location marker
   BitmapDescriptor? policeStationMarker;
 
+  //PolylinePoints variables
+  List<LatLng> polylineCoordinates = [];
+  PolylinePoints? polylinePoints;
   Set<Polyline> polylines = {};
-  bool show_map = false;
+  int polyId = 1;
 
-  GoogleMapController? _controller;
-  Directions? _info;
+  bool show_map = false;
   bool _isInitialized = false;
   Set<Marker> _markers = {};
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _controller?.dispose();
-  }
 
   @override
   void initState() {
@@ -65,15 +69,20 @@ class _MapScreenState extends State<MapScreen> {
 
     PermissionHandler.checkLocationPermission();
     location = new Location();
-
-    location.getLocation().then((cLoc) {
+    setInitialLocation();
+    polylinePoints = PolylinePoints();
+    locationSubscription =
+        location.onLocationChanged.listen((LocationData cLoc) {
       current_location = cLoc;
-      setInitialLocation();
+      // updatePinOnMap();
+      if (args?.latitude != null && !_isInitialized) {
+        dest_lat = args!.latitude;
+        dest_lng = args!.longitude;
+        setPolylines();
+      }
 
-      Future.delayed(const Duration(milliseconds: 500), () {
-        setState(() {
-          show_map = true;
-        });
+      setState(() {
+        bearing = current_location.heading!;
       });
     });
     _setCustomMarker();
@@ -86,82 +95,88 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
-  void getDirections(LocationData curLoc) async {
-    if (args.latitude != null)
-      try {
-        Dio dio = new Dio();
-        String baseUrl =
-            'https://maps.googleapis.com/maps/api/directions/json?';
-        final response = await dio.get(
-          baseUrl,
-          queryParameters: {
-            'origin': '${curLoc.latitude},${curLoc.longitude}',
-            'destination': '${args.latitude}, ${args.longitude}',
-            'key': googleAPIKey,
-          },
+  double _coordinateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
+  setPolylines() async {
+    final Connectivity _connectivity = Connectivity();
+
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+      if (_connectionStatus != ConnectivityResult.none) {
+        final result = await polylinePoints?.getRouteBetweenCoordinates(
+          googleAPIKey,
+          PointLatLng(
+            current_location.latitude!,
+            current_location.longitude!,
+          ),
+          PointLatLng(
+            double.parse(dest_lat!),
+            double.parse(dest_lng!),
+          ),
         );
 
-        if (response.statusCode == 200) {
-          setState(() {
-            _info = Directions.fromMap(response.data);
-
-            setPolylines();
+        if (result != null && result.points.isNotEmpty) {
+          List<PointLatLng> points = result.points;
+          polylineCoordinates.clear();
+          points.forEach((PointLatLng point) {
+            polylineCoordinates.add(LatLng(point.latitude, point.longitude));
           });
-        } else {
-          print(response.statusCode);
+          final String polylineIdVal = 'polyline_id_$polyId';
+          polyId++;
+          final PolylineId polylineId = PolylineId(polylineIdVal);
+          polylines.clear();
+
+          double totalDistance = 0.0;
+
+          //get total distance from origin to destination
+          for (int i = 0; i < polylineCoordinates.length - 1; i++) {
+            totalDistance += _coordinateDistance(
+              polylineCoordinates[i].latitude,
+              polylineCoordinates[i].longitude,
+              polylineCoordinates[i + 1].latitude,
+              polylineCoordinates[i + 1].longitude,
+            );
+          }
+          setState(() {
+            distance = totalDistance.toStringAsFixed(2);
+            polylines.add(
+              Polyline(
+                polylineId: polylineId,
+                jointType: JointType.round,
+                width: 5,
+                color: Colors.blue,
+                endCap: Cap.roundCap,
+                startCap: Cap.roundCap,
+                // set the width of the polylines
+                points: polylineCoordinates,
+              ),
+            );
+          });
+
+          if (!_isInitialized && args?.latitude != null) {
+            print('>>> Initial camera position was set');
+            _setMapFitToTour(polylines);
+          }
+          _isInitialized = true;
         }
-      } catch (e) {
-        print(e);
-      }
-  }
-
-  void getDistanceAndReach(LatLng destination) async {
-    try {
-      Dio dio = new Dio();
-      String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
-      final response = await dio.get(
-        baseUrl,
-        queryParameters: {
-          'origin':
-              '${current_location.latitude},${current_location.longitude}',
-          'destination': '${destination.latitude}, ${destination.longitude}',
-          'key': googleAPIKey,
-        },
-      );
-
-      print('\n\n>>> $response\n\n');
-      if (response.statusCode == 200) {
-        setState(() {
-          _info = Directions.fromMap(response.data);
-          setPolylines();
-        });
       } else {
-        print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
-        print(response.data);
-        print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: new Text('No internet connection'),
+            backgroundColor: Colors.red,
+            duration: new Duration(seconds: 3),
+          ),
+        );
       }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  setPolylines() {
-    if (_info!.polylinePoints != null) {
-      polylines.clear();
-      Polyline polyline = Polyline(
-        polylineId: const PolylineId('overview_polyline'),
-        color: Colors.blue,
-        endCap: Cap.roundCap,
-        startCap: Cap.roundCap,
-        width: 5,
-        points: _info!.polylinePoints!
-            .map((e) => LatLng(e.latitude, e.longitude))
-            .toList(),
-      );
-      if (!_isInitialized) _setMapFitToTour({polyline});
-      _isInitialized = true;
-      polylines.add(polyline);
-    }
+    });
   }
 
   static Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -191,7 +206,6 @@ class _MapScreenState extends State<MapScreen> {
 
   void setmarkerTapAction(LocationInfo e) async {
     setState(() {
-      args = ScreenArguments();
       currentlySelectedPin = PinInformation(
         locationIcon: getLocationIcon(e.location_type!),
         location: LatLng(
@@ -204,16 +218,18 @@ class _MapScreenState extends State<MapScreen> {
 
       pinPillPosition = 0;
     });
-    if (await DataConnectionChecker().hasConnection)
-      getDistanceAndReach(
-        LatLng(
-          double.parse(e.latitude!),
-          double.parse(e.longitude!),
-        ),
-      );
+
+    dest_lat = e.latitude;
+    dest_lng = e.longitude;
+
+    setPolylines();
   }
 
   void setInitialLocation() async {
+    current_location = await location.getLocation();
+    setState(() {
+      show_map = true;
+    });
     CameraPosition cPosition = CameraPosition(
       target: LatLng(
         current_location.latitude!,
@@ -221,8 +237,8 @@ class _MapScreenState extends State<MapScreen> {
       ),
       zoom: 18,
     );
-    if (_controller != null)
-      _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
   }
 
   void updatePinOnMap() async {
@@ -234,8 +250,8 @@ class _MapScreenState extends State<MapScreen> {
       ),
       zoom: 18,
     );
-    _controller!.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-    if (args.latitude != null) getDirections(current_location);
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
   }
 
   getLocationIcon(String location_type) {
@@ -267,16 +283,17 @@ class _MapScreenState extends State<MapScreen> {
         if (point.longitude > maxLong) maxLong = point.longitude;
       });
     });
-    if (_controller != null)
-      _controller!.animateCamera(
-        CameraUpdate.newLatLngBounds(
-          LatLngBounds(
-            southwest: LatLng(minLat, minLong),
-            northeast: LatLng(maxLat, maxLong),
-          ),
-          50,
+    final GoogleMapController controller = await _controller.future;
+
+    controller.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat, minLong),
+          northeast: LatLng(maxLat, maxLong),
         ),
-      );
+        50,
+      ),
+    );
   }
 
   void _setCustomMarker() {
@@ -302,6 +319,8 @@ class _MapScreenState extends State<MapScreen> {
       controller.setMapStyle(string);
     });
 
+    _controller.complete(controller);
+
     Set<Marker> _mrkrs = getLocations()
         .map(
           (e) => Marker(
@@ -311,9 +330,7 @@ class _MapScreenState extends State<MapScreen> {
               double.parse(e.longitude!),
             ),
             icon: setMarkerIcon(e.location_type!),
-            onTap: () {
-              setmarkerTapAction(e);
-            },
+            onTap: () => setmarkerTapAction(e),
           ),
         )
         .toSet();
@@ -321,10 +338,6 @@ class _MapScreenState extends State<MapScreen> {
     setState(() {
       _markers = _mrkrs;
     });
-
-    if (args.latitude != null && _info != null) getDirections(current_location);
-
-    _controller = controller;
   }
 
   @override
@@ -343,37 +356,29 @@ class _MapScreenState extends State<MapScreen> {
             )
           : Stack(
               children: [
-                StreamBuilder<LocationData>(
-                    stream: location.onLocationChanged,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        LocationData curLoc = snapshot.data!;
-                        getDirections(curLoc);
-                      }
-                      return GoogleMap(
-                        onMapCreated: _onMapCreated,
-                        markers: _markers,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(
-                            current_location.latitude!,
-                            current_location.longitude!,
-                          ),
-                          zoom: 18,
-                        ),
-                        compassEnabled: false,
-                        polylines: polylines,
-                        myLocationEnabled: true,
-                        zoomControlsEnabled: false,
-                        myLocationButtonEnabled: false,
-                        buildingsEnabled: true,
-                        tiltGesturesEnabled: false,
-                        onTap: (LatLng location) {
-                          setState(() {
-                            pinPillPosition = -120;
-                          });
-                        },
-                      );
-                    }),
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  markers: _markers,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(
+                      current_location.latitude!,
+                      current_location.longitude!,
+                    ),
+                    zoom: 18,
+                  ),
+                  compassEnabled: false,
+                  polylines: polylines,
+                  myLocationEnabled: true,
+                  zoomControlsEnabled: false,
+                  myLocationButtonEnabled: false,
+                  buildingsEnabled: true,
+                  tiltGesturesEnabled: false,
+                  onTap: (LatLng location) {
+                    setState(() {
+                      pinPillPosition = -120;
+                    });
+                  },
+                ),
                 AnimatedPositioned(
                   bottom: pinPillPosition,
                   right: 0,
@@ -416,14 +421,18 @@ class _MapScreenState extends State<MapScreen> {
                                   Text(
                                     '${currentlySelectedPin.locationName}',
                                     style: DefaultTextTheme.headline5,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  Text('${currentlySelectedPin.address}',
-                                      style: DefaultTextTheme.subtitle1),
-                                  if (_info != null)
-                                    Text(
-                                      '${_info!.totalDistance}, ${_info!.totalDuration}',
-                                      style: DefaultTextTheme.subtitle2,
-                                    ),
+                                  Text(
+                                    '${currentlySelectedPin.address}',
+                                    style: DefaultTextTheme.subtitle1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    '${distance} km away',
+                                    style: DefaultTextTheme.subtitle2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ],
                               ),
                             ),

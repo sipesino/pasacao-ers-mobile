@@ -17,23 +17,17 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  User? user;
-
-  // get user info from shared preferences
-  getUserInfo() async {
-    try {
-      SharedPref pref = new SharedPref();
-      print(user.toString());
-      return User.fromJson(await pref.read("user"));
-    } catch (e) {
-      print(e);
-    }
-  }
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    SharedPref().reload();
+    SharedPref().read('user').then((value) {
+      user = User.fromJson(value);
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -49,7 +43,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   vertical: 20.0,
                   horizontal: 20.0,
                 ),
-                child: _buildColumn(),
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildColumn(),
               ),
             ),
           ),
@@ -67,91 +63,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
   Widget _buildTopContainer() {
-    return FutureBuilder(
-        future: SharedPref().read('user'),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            user = User.fromJson(snapshot.data as String);
-            return Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      height: 120.0,
-                      width: 120.0,
-                      decoration: BoxDecoration(
-                        color: chromeColor.withOpacity(0.5),
-                        border: Border.all(width: 5, color: Colors.white),
-                        borderRadius: BorderRadius.circular(10.0),
-                        boxShadow: boxShadow,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10.0),
-                        child: Image(
-                          image: AssetImage('assets/images/avatar-image.png'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    Text(
-                      "${user!.first_name} ${user!.last_name}",
-                      style: DefaultTextTheme.headline3,
-                    ),
-                    Text(
-                      user!.email!,
-                      style: TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context)
-                                .pushNamed('/reporter/home/emergency_contacts');
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Emergency Contacts',
-                                style: TextStyle(color: primaryColor),
-                              ),
-                              Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 18,
-                                color: primaryColor,
-                              ),
-                            ],
-                          ),
-                        ),
-                        SingleChildScrollView(
-                          clipBehavior: Clip.none,
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: getEmergencyContacts().map((e) {
-                              return EmergencyContactCard(
-                                contact_name: e.contact_name,
-                                contact_number: e.contact_number,
-                                contact_image: e.contact_image,
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+    return Container(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 120.0,
+              width: 120.0,
+              decoration: BoxDecoration(
+                color: chromeColor.withOpacity(0.5),
+                border: Border.all(width: 5, color: Colors.white),
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: boxShadow,
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10.0),
+                child: Image(
+                  image: AssetImage('assets/images/avatar-image.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-            );
-          } else {
-            return Text('');
-          }
-        });
+            ),
+            SizedBox(height: 15),
+            Text(
+              "${user!.first_name} ${user!.last_name}",
+              style: DefaultTextTheme.headline3,
+            ),
+            Text(
+              user!.email!,
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed('/reporter/home/emergency_contacts');
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Emergency Contacts',
+                        style: TextStyle(color: primaryColor),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 18,
+                        color: primaryColor,
+                      ),
+                    ],
+                  ),
+                ),
+                SingleChildScrollView(
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: getEmergencyContacts().map((e) {
+                      return EmergencyContactCard(
+                        contact_name: e.contact_name,
+                        contact_number: e.contact_number,
+                        contact_image: e.contact_image,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _buildBottomContainer() {
@@ -160,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          // buildPersonalInfoButton(context: context),
+          buildPersonalInfoButton(),
           // buildIncidentsReportedButton(),
           // buildSettingsButton(),
           // buildAboutButton(),
@@ -186,21 +173,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-}
 
-class buildPersonalInfoButton extends StatelessWidget {
-  const buildPersonalInfoButton({
-    Key? key,
-    required this.context,
-  }) : super(key: key);
-
-  final BuildContext context;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget buildPersonalInfoButton() {
     return TextButton.icon(
-      onPressed: () {
-        Navigator.of(context).pushNamed('/reporter/home/profile');
+      onPressed: () async {
+        final result =
+            await Navigator.of(context).pushNamed('/reporter/home/profile');
+        if (result != null) {
+          setState(() {
+            user = result as User;
+          });
+        }
       },
       label: Text(
         'Personal Information',

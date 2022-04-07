@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/views/screens/reporter/alerts_screen.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/views/screens/reporter/home_screen.dart';
 import 'package:pers/src/views/screens/reporter/locations_screen.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
@@ -48,6 +48,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
       body: SafeArea(
         child: PageView(
           controller: pageController,
+          physics: NeverScrollableScrollPhysics(),
           children: [
             HomeScreen(),
             // AlertsScreen(),
