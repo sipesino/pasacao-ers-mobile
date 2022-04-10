@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/views/screens/responder/operation/operation_summary.dart';

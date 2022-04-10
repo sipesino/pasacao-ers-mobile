@@ -15,6 +15,7 @@ import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/directions.dart';
+import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/permission_handler.dart';
@@ -156,7 +157,6 @@ class _NewOperationState extends State<NewOperation> {
     locationSubscription =
         location?.onLocationChanged.listen((LocationData cLoc) {
       current_location = cLoc;
-      // updatePinOnMap();
       setPolylines();
       setState(() {
         bearing = current_location!.heading!;
@@ -174,6 +174,7 @@ class _NewOperationState extends State<NewOperation> {
     ScreenArguments args =
         ModalRoute.of(context)!.settings.arguments! as ScreenArguments;
     operation = args.operation;
+    sex = args.operation!.report!.sex;
 
     AppBar appBar = AppBar(
       elevation: 0,
@@ -503,6 +504,12 @@ class _NewOperationState extends State<NewOperation> {
                   buildNavigationButtons(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
+                        etd_scene = DateTime.now().toString();
+                        index = 3;
+                        pageController.nextPage(
+                          duration: Duration(milliseconds: 200),
+                          curve: Curves.easeIn,
+                        );
                         final controller = await _controller.future;
                         controller.animateCamera(
                           CameraUpdate.newCameraPosition(
@@ -515,13 +522,6 @@ class _NewOperationState extends State<NewOperation> {
                               bearing: bearing,
                             ),
                           ),
-                        );
-                        etd_scene = DateTime.now().toString();
-
-                        index = 3;
-                        pageController.nextPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.easeIn,
                         );
                       }
                     },
@@ -557,31 +557,33 @@ class _NewOperationState extends State<NewOperation> {
                 style: DefaultTextTheme.headline5,
               ),
               SizedBox(height: 10),
-              NameTextField(operation?.report!.name),
+              NameTextField(),
               SizedBox(height: 10),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: SexPicker(operation!.report!.sex)),
+                  Expanded(child: SexPicker()),
                   SizedBox(
                     width: 110,
-                    child: AgeTextField(operation?.report!.age),
+                    child: AgeTextField(),
                   ),
                 ],
               ),
               SizedBox(height: 10),
               AddressTextField(),
               SizedBox(height: 10),
-              buildNavigationButtons(onPressed: () {
-                if (pi_formKey.currentState!.validate()) {
-                  pi_formKey.currentState!.save();
-                  index = 4;
-                  pageController.nextPage(
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.easeIn,
-                  );
-                }
-              }),
+              buildNavigationButtons(
+                onPressed: () {
+                  if (pi_formKey.currentState!.validate()) {
+                    pi_formKey.currentState!.save();
+                    index = 4;
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -616,57 +618,50 @@ class _NewOperationState extends State<NewOperation> {
             boxShadow: boxShadow,
           ),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Patient Vital Sign',
                 style: DefaultTextTheme.headline5,
               ),
-              SizedBox(height: 10),
-              SizedBox(
-                width: 170,
-                child: buildCustomTextField(
-                  label: 'Temperature (°C)',
-                  onSaved: (val) {
-                    temperature = val?.trim();
-                  },
-                  keyboardType: TextInputType.number,
-                ),
+              SizedBox(height: 20),
+              buildCustomTextField(
+                label: 'Temperature (°C)',
+                onSaved: (val) {
+                  temperature = val?.trim();
+                },
+                keyboardType: TextInputType.number,
               ),
               SizedBox(height: 10),
-              SizedBox(
-                width: 170,
-                child: buildCustomTextField(
-                  label: 'Pulse Rate (BPM)',
-                  onSaved: (val) {
-                    pulse_rate = val?.trim();
-                  },
-                  keyboardType: TextInputType.number,
-                ),
+              buildCustomTextField(
+                label: 'Pulse Rate (BPM)',
+                onSaved: (val) {
+                  pulse_rate = val?.trim();
+                },
+                keyboardType: TextInputType.number,
               ),
               SizedBox(height: 10),
-              SizedBox(
-                width: 170,
-                child: buildCustomTextField(
-                  label: 'Respiration Rate (BPM)',
-                  onSaved: (val) {
-                    respiration_rate = val?.trim();
-                  },
-                  keyboardType: TextInputType.number,
-                ),
+              buildCustomTextField(
+                label: 'Respiration Rate (BPM)',
+                onSaved: (val) {
+                  respiration_rate = val?.trim();
+                },
+                keyboardType: TextInputType.number,
               ),
               SizedBox(height: 10),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Blood Pressure',
                     style: TextStyle(color: contentColorLightTheme),
                   ),
                   SizedBox(height: 5),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 80,
+                      Expanded(
                         child: buildCustomTextField(
                           onSaved: (val) {
                             bp1 = val?.trim();
@@ -674,9 +669,11 @@ class _NewOperationState extends State<NewOperation> {
                           keyboardType: TextInputType.number,
                         ),
                       ),
-                      Text('  /  '),
                       SizedBox(
-                        width: 80,
+                        height: 55,
+                        child: Center(child: const Text('  /  ')),
+                      ),
+                      Expanded(
                         child: buildCustomTextField(
                           onSaved: (val) {
                             bp2 = val?.trim();
@@ -689,14 +686,18 @@ class _NewOperationState extends State<NewOperation> {
                 ],
               ),
               SizedBox(height: 10),
-              buildNavigationButtons(onPressed: () {
-                vs_formKey.currentState!.save();
-                index = 5;
-                pageController.nextPage(
-                  duration: Duration(milliseconds: 200),
-                  curve: Curves.easeIn,
-                );
-              }),
+              buildNavigationButtons(
+                onPressed: () {
+                  if (vs_formKey.currentState!.validate()) {
+                    vs_formKey.currentState!.save();
+                    index = 5;
+                    pageController.nextPage(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeIn,
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -832,8 +833,42 @@ class _NewOperationState extends State<NewOperation> {
                   onPressed: () {
                     eta_base = DateTime.now().toString();
                     index = 8;
-                    Navigator.of(context)
-                        .pushNamed('/responder/home/new_operation/summary');
+
+                    Operation op = Operation(
+                      operation_id: operation!.operation_id,
+                      eta_base: eta_base,
+                      eta_hospital: eta_hospital,
+                      etd_base: etd_base,
+                      eta_scene: eta_scene,
+                      etd_hospital: etd_hospital,
+                      etd_scene: etd_scene,
+                      receivingFacility: receivingFacility,
+                      report: IncidentReport(
+                        incident_id: operation!.report!.incident_id,
+                        incident_type: operation!.report!.incident_type,
+                        age: age,
+                        sex: sex,
+                        name: name,
+                        permanent_address: address,
+                        description: operation!.report!.description,
+                        temperature: temperature,
+                        pulse_rate: pulse_rate,
+                        respiration_rate: respiration_rate,
+                        blood_pressure: '$bp1/$bp2',
+                        landmark: operation!.report!.landmark,
+                        latitude: operation!.report!.latitude,
+                        longitude: operation!.report!.longitude,
+                      ),
+                    );
+
+                    print(op.toString());
+
+                    Navigator.of(context).pushNamed(
+                      '/responder/home/new_operation/summary',
+                      arguments: ScreenArguments(
+                        operation: op,
+                      ),
+                    );
                   },
                 ),
               ],
@@ -849,6 +884,7 @@ class _NewOperationState extends State<NewOperation> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextButton(
+          child: Text('Back'),
           onPressed: () {
             if (index == 0) {
               _isResponding = false;
@@ -861,12 +897,14 @@ class _NewOperationState extends State<NewOperation> {
             index--;
             FocusManager.instance.primaryFocus?.unfocus();
           },
-          child: Text('Back'),
         ),
         SizedBox(width: 10),
         Flexible(
           child: ElevatedButton(
-            onPressed: onPressed,
+            onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              onPressed();
+            },
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.all(accentColor),
               shape: MaterialStateProperty.all(
@@ -888,6 +926,7 @@ class _NewOperationState extends State<NewOperation> {
     required TextInputType keyboardType,
   }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (label != null)
           Text(
@@ -896,20 +935,21 @@ class _NewOperationState extends State<NewOperation> {
           ),
         SizedBox(height: 5),
         TextFormField(
+          validator: RequiredValidator(errorText: 'Fill this in too'),
           onSaved: onSaved,
           keyboardType: keyboardType,
-          textAlign: TextAlign.center,
           decoration: tff_decoration(),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
         ),
       ],
     );
   }
 
-  Widget NameTextField(String? name) {
+  Widget NameTextField() {
     return CustomTextFormField(
       keyboardType: TextInputType.name,
       label: 'Victim Name',
-      initialValue: name,
+      initialValue: operation?.report!.name,
       onSaved: (value) {
         if (value != null) name = value.trim();
       },
@@ -918,21 +958,22 @@ class _NewOperationState extends State<NewOperation> {
     );
   }
 
-  Widget SexPicker(String? s) {
+  Widget SexPicker() {
     return CustomGenderPicker(
-      initialValue: s?.toUpperCase().trim() == 'MALE' ? 0 : 1,
+      initialValue:
+          operation?.report!.sex?.toUpperCase().trim() == 'MALE' ? 0 : 1,
       onChanged: (val) {
         sex = val;
       },
     );
   }
 
-  Widget AgeTextField(String? a) {
+  Widget AgeTextField() {
     return CustomTextFormField(
       keyboardType: TextInputType.number,
       prefixIcon: CustomIcons.age,
       label: 'Age',
-      initialValue: a,
+      initialValue: operation?.report!.age,
       onSaved: (val) {
         age = val;
       },
@@ -1139,6 +1180,9 @@ class _NewOperationState extends State<NewOperation> {
           ),
         ),
         onPressed: () async {
+          setState(() {
+            _isResponding = true;
+          });
           final GoogleMapController controller = await _controller.future;
 
           controller.animateCamera(
@@ -1152,23 +1196,7 @@ class _NewOperationState extends State<NewOperation> {
                 bearing: bearing,
               ),
             ),
-            // CameraUpdate.newLatLngZoom(
-            //   LatLng(
-            //       current_location!.latitude!, current_location!.longitude!),
-            //   50,
-            // ),
           );
-
-          setState(() {
-            _isResponding = true;
-          });
-          // Navigator.of(context).pushReplacementNamed(
-          //   '/responder/home/proceeding_operation',
-          //   arguments: ScreenArguments(
-          //     longitude: '123.040576',
-          //     latitude: '13.504323',
-          //   ),
-          // );
         },
         child: Text('Respond'),
       ),

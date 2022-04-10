@@ -12,7 +12,6 @@ import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/custom_label.dart';
 import 'package:http/http.dart' as http;
 
 class SummaryScreen extends StatefulWidget {
@@ -378,7 +377,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
           "victim_status": report.victim_status,
           "description": report.description,
           "account_id": report.account_id,
-
           // "incident_images": incident_images,
           "location": location_info.location_id.toString(),
           "landmark": report.landmark,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/widgets/incident_card.dart';
 
 class ResponderOperationsScreen extends StatelessWidget {
@@ -9,15 +10,25 @@ class ResponderOperationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Incidents Responded',
-          style: TextStyle(
-            color: primaryColor,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
+        title: Row(
+          children: [
+            Icon(
+              CustomIcons.siren_2,
+              color: accentColor,
+            ),
+            SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Operations Responded',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
       ),
       body: Padding(
         padding: EdgeInsets.all(20),

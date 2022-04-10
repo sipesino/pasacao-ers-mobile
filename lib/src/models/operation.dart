@@ -14,10 +14,6 @@ class Operation {
   String? etd_hospital;
   String? eta_base;
   String? receivingFacility;
-  String? temperature;
-  String? pulse_rate;
-  String? respiration_rate;
-  String? blood_pressure;
   IncidentReport? report;
 
   Operation({
@@ -32,10 +28,6 @@ class Operation {
     this.etd_hospital,
     this.eta_base,
     this.receivingFacility,
-    this.temperature,
-    this.pulse_rate,
-    this.respiration_rate,
-    this.blood_pressure,
     this.report,
   });
 
@@ -52,10 +44,6 @@ class Operation {
       'etd_hospital': etd_hospital,
       'eta_base': eta_base,
       'receivingFacility': receivingFacility,
-      'temperature': temperature,
-      'pulse_rate': pulse_rate,
-      'respiration_rate': respiration_rate,
-      'blood_pressure': blood_pressure,
       'report': report,
     };
   }
@@ -73,10 +61,6 @@ class Operation {
       etd_hospital: map['etd_hospital'],
       eta_base: map['eta_base'],
       receivingFacility: map['receivingFacility'],
-      temperature: map['temperature'],
-      pulse_rate: map['pulse_rate'],
-      respiration_rate: map['respiration_rate'],
-      blood_pressure: map['blood_pressure'],
       report: map['report'],
     );
   }
@@ -88,30 +72,7 @@ class Operation {
 
   @override
   String toString() {
-    return 'Operation(operation_id: $operation_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, temperature: $temperature, pulse_rate: $pulse_rate, respiration_rate: $respiration_rate, blood_pressure: $blood_pressure, incident_report: ${report.toString()})';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is Operation &&
-        other.operation_id == operation_id &&
-        other.external_agency_id == external_agency_id &&
-        other.dispatcher_id == dispatcher_id &&
-        other.account_id == account_id &&
-        other.etd_base == etd_base &&
-        other.eta_scene == eta_scene &&
-        other.etd_scene == etd_scene &&
-        other.eta_hospital == eta_hospital &&
-        other.etd_hospital == etd_hospital &&
-        other.eta_base == eta_base &&
-        other.receivingFacility == receivingFacility &&
-        other.temperature == temperature &&
-        other.pulse_rate == pulse_rate &&
-        other.respiration_rate == respiration_rate &&
-        other.blood_pressure == blood_pressure &&
-        other.report == report;
+    return 'Operation(operation_id: $operation_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, incident_report: ${report.toString()})';
   }
 
   @override
@@ -127,10 +88,6 @@ class Operation {
         etd_hospital.hashCode ^
         eta_base.hashCode ^
         receivingFacility.hashCode ^
-        temperature.hashCode ^
-        pulse_rate.hashCode ^
-        respiration_rate.hashCode ^
-        blood_pressure.hashCode ^
         report.hashCode;
   }
 }

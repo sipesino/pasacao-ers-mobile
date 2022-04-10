@@ -8,7 +8,10 @@ import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/emergency_contact_card.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({
+  final bool isResponder;
+
+  ProfileScreen({
+    this.isResponder = false,
     Key? key,
   }) : super(key: key);
 
@@ -96,45 +99,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: Colors.grey,
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed('/reporter/home/emergency_contacts');
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Emergency Contacts',
-                        style: TextStyle(color: primaryColor),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 18,
-                        color: primaryColor,
-                      ),
-                    ],
+            if (!widget.isResponder)
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pushNamed('/reporter/home/emergency_contacts');
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Emergency Contacts',
+                          style: TextStyle(color: primaryColor),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 18,
+                          color: primaryColor,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SingleChildScrollView(
-                  clipBehavior: Clip.none,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: getEmergencyContacts().map((e) {
-                      return EmergencyContactCard(
-                        contact_name: e.contact_name,
-                        contact_number: e.contact_number,
-                        contact_image: e.contact_image,
-                      );
-                    }).toList(),
+                  SingleChildScrollView(
+                    clipBehavior: Clip.none,
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: getEmergencyContacts().map((e) {
+                        return EmergencyContactCard(
+                          contact_name: e.contact_name,
+                          contact_number: e.contact_number,
+                          contact_image: e.contact_image,
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
           ],
         ),
       ),
@@ -180,6 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final result =
             await Navigator.of(context).pushNamed('/reporter/home/profile');
         if (result != null) {
+          SharedPref().reload();
           setState(() {
             user = result as User;
           });

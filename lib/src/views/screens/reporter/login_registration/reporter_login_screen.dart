@@ -216,10 +216,10 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               Flexible(
                 flex: 1,
                 child: SizedBox(
-                  height: 20,
+                  height: 70,
                 ),
               ),
-              ForgotPassButton(),
+              // ForgotPassButton(),
             ],
           ),
         ),

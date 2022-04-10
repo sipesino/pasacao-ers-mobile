@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/views/screens/reporter/profile_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_home_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_operations_screen.dart';
-import 'package:pers/src/views/screens/responder/responder_profile_screen.dart';
 
 class ResponderMainScreen extends StatefulWidget {
   ResponderMainScreen({Key? key}) : super(key: key);
@@ -42,7 +42,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
     pageController.animateToPage(
       index,
       duration: Duration(milliseconds: 300),
-      curve: Curves.bounceInOut,
+      curve: Curves.easeInOut,
     );
   }
 
@@ -56,7 +56,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
           children: [
             ResponderHomeScreen(),
             ResponderOperationsScreen(),
-            ResponderProfileScreen(),
+            ProfileScreen(isResponder: true),
           ],
           onPageChanged: (index) {
             setState(() {

@@ -21,9 +21,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
+    SharedPref().reload();
     SharedPref().read('user').then((value) {
       setState(() {
         user = User.fromJson(value);

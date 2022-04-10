@@ -8,9 +8,9 @@ import 'package:pers/main.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('>>> onBackgroundMessage() fired');
   flutterLocalNotificationsPlugin.show(
     message.hashCode,
     message.data['title'],
@@ -27,7 +27,27 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       ),
     ),
   );
+  saveOperation(message);
   await Firebase.initializeApp();
+}
+
+void saveOperation(RemoteMessage message) {
+  Map<String, dynamic> data = jsonDecode(message.data['"operation"']);
+  final operation = Operation(
+    operation_id: data['operation_id'],
+    report: IncidentReport(
+      incident_id: data['incident_id'],
+      description: data['description'],
+      incident_type: data['incident_type'],
+      name: data['name'],
+      sex: data['sex'],
+      age: data['age'],
+      victim_status: data['victim_status'],
+      landmark: data['landmark'],
+    ),
+  );
+  SharedPref().save('gotNewOperation', 'true');
+  SharedPref().save('operation', operation);
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -67,8 +87,6 @@ void setupFcm(void Function(String) onNewOperation) {
   //When the app is terminated, i.e., app is neither in foreground or background.
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     //Its compulsory to check if RemoteMessage instance is null or not.
-    print('>>> getInitialMessage() fired');
-
     if (message != null) {
       flutterLocalNotificationsPlugin.show(
         message.hashCode,
@@ -93,8 +111,7 @@ void setupFcm(void Function(String) onNewOperation) {
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    print('>>> onMessage() fired');
-    // print('>>> Operation: ${message.data['"operation"']}');
+    saveOperation(message);
     onNewOperation(message.data['"operation"']);
     flutterLocalNotificationsPlugin.show(
       message.hashCode,
@@ -119,7 +136,7 @@ void setupFcm(void Function(String) onNewOperation) {
   FirebaseMessaging.onMessageOpenedApp.listen(
     (message) {
       if (message != null) {
-        print('>>> onMessagedOpened() fired\n\n');
+        saveOperation(message);
         goToNextScreen(message.data['"operation"']);
       }
     },

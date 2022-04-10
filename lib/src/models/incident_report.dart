@@ -1,65 +1,46 @@
-import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 
 class IncidentReport {
-  final String? incident_id;
-  final String? incident_type;
-  final String? name;
-  final String? sex;
-  final String? age;
-  final String? description;
-  final List<XFile>? incident_images;
+  String? incident_id;
+  String? incident_type;
+  String? name;
+  String? sex;
+  String? age;
+  String? description;
+  List<XFile>? incident_images;
   String? longitude;
   String? latitude;
-  final String? landmark;
-  final String? victim_status;
-  final String? account_id;
+  String? landmark;
+  String? victim_status;
+  String? account_id;
+  String? permanent_address;
+  String? temperature;
+  String? pulse_rate;
+  String? respiration_rate;
+  String? blood_pressure;
+  String? address;
 
   IncidentReport({
     this.incident_id,
     this.incident_type,
+    this.name,
     this.sex,
     this.age,
     this.description,
-    this.victim_status,
     this.incident_images,
-    this.landmark,
-    this.account_id,
     this.longitude,
     this.latitude,
-    this.name,
+    this.landmark,
+    this.victim_status,
+    this.account_id,
+    this.permanent_address,
+    this.temperature,
+    this.pulse_rate,
+    this.respiration_rate,
+    this.blood_pressure,
+    this.address,
   });
-
-  IncidentReport copyWith({
-    String? incident_id,
-    String? incident_type,
-    String? sex,
-    String? age,
-    String? description,
-    String? location,
-    String? victim_status,
-    String? account_id,
-    List<XFile>? incident_images,
-    String? longitude,
-    String? latitude,
-    String? landmark,
-    String? name,
-  }) {
-    return IncidentReport(
-      incident_id: incident_id ?? this.incident_id,
-      incident_type: incident_type ?? this.incident_type,
-      sex: sex ?? this.sex,
-      age: age ?? this.age,
-      description: description ?? this.description,
-      victim_status: victim_status ?? this.victim_status,
-      account_id: account_id ?? this.account_id,
-      incident_images: incident_images ?? this.incident_images,
-      longitude: longitude ?? this.longitude,
-      latitude: latitude ?? this.latitude,
-      landmark: landmark ?? this.landmark,
-      name: landmark ?? this.name,
-    );
-  }
 
   factory IncidentReport.fromMap(Map<String, dynamic> map) {
     return IncidentReport(
@@ -74,46 +55,66 @@ class IncidentReport {
       landmark: map['landmark'],
       victim_status: map['victim_status'],
       account_id: map['account_id'],
+      permanent_address: map['permanent_address'],
+      temperature: map['temperature'],
+      pulse_rate: map['pulse_rate'],
+      respiration_rate: map['respiration_rate'],
+      blood_pressure: map['blood_pressure'],
+      address: map['address'],
     );
   }
 
   @override
   String toString() {
-    return 'IncidentReport(incident_id: $incident_id, incident_type: $incident_type, name: $name, sex: $sex, age: $age, victim_status: $victim_status, description: $description, incident_images: $incident_images, latitude: $latitude, longitude: $longitude, landmark: $landmark, account_id: $account_id)';
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is IncidentReport &&
-        other.incident_id == incident_id &&
-        other.incident_type == incident_type &&
-        other.name == name &&
-        other.sex == sex &&
-        other.age == age &&
-        other.victim_status == victim_status &&
-        other.description == description &&
-        listEquals(other.incident_images, incident_images) &&
-        other.longitude == longitude &&
-        other.latitude == latitude &&
-        other.landmark == landmark &&
-        other.account_id == account_id;
+    return 'IncidentReport(incident_id: $incident_id, incident_type: $incident_type, name: $name, sex: $sex, age: $age, description: $description, incident_images: $incident_images, longitude: $longitude, latitude: $latitude, landmark: $landmark, victim_status: $victim_status, account_id: $account_id, permanent_address: $permanent_address, temperature: $temperature, pulse_rate: $pulse_rate, respiration_rate: $respiration_rate, blood_pressure: $blood_pressure, address: $address)';
   }
 
   @override
   int get hashCode {
-    return incident_type.hashCode ^
-        incident_id.hashCode ^
+    return incident_id.hashCode ^
+        incident_type.hashCode ^
         name.hashCode ^
         sex.hashCode ^
         age.hashCode ^
-        victim_status.hashCode ^
         description.hashCode ^
         incident_images.hashCode ^
-        latitude.hashCode ^
         longitude.hashCode ^
+        latitude.hashCode ^
         landmark.hashCode ^
-        account_id.hashCode;
+        victim_status.hashCode ^
+        account_id.hashCode ^
+        permanent_address.hashCode ^
+        temperature.hashCode ^
+        pulse_rate.hashCode ^
+        respiration_rate.hashCode ^
+        blood_pressure.hashCode ^
+        address.hashCode;
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'incident_id': incident_id,
+      'incident_type': incident_type,
+      'name': name,
+      'sex': sex,
+      'age': age,
+      'description': description,
+      'longitude': longitude,
+      'latitude': latitude,
+      'landmark': landmark,
+      'victim_status': victim_status,
+      'account_id': account_id,
+      'permanent_address': permanent_address,
+      'temperature': temperature,
+      'pulse_rate': pulse_rate,
+      'respiration_rate': respiration_rate,
+      'blood_pressure': blood_pressure,
+      'address': address,
+    };
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory IncidentReport.fromJson(String source) =>
+      IncidentReport.fromMap(json.decode(source));
 }

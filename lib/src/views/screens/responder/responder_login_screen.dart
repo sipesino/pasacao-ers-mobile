@@ -214,14 +214,14 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 },
               ),
               const SizedBox(
-                height: 50,
+                height: 70,
               ),
-              TextButton(
-                child: const Text('Forgot password?'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/forgot_password/email');
-                },
-              ),
+              // TextButton(
+              //   child: const Text('Forgot password?'),
+              //   onPressed: () {
+              //     Navigator.of(context).pushNamed('/forgot_password/email');
+              //   },
+              // ),
             ],
           ),
         ),

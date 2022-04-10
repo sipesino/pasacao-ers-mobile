@@ -78,6 +78,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     String token = await pref.read("token");
 
     String url = "http://143.198.92.250/api/accounts/${user!.id}";
+    print(url);
     Map body = {"$field": value};
 
     Map<String, dynamic> jsonResponse;
@@ -93,8 +94,11 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
         User user = User.fromMap(jsonResponse);
 
+        print(user.toString());
+
         // save user credentials inside local storage
         preferences.save("user", user);
+
         setState(() {
           preferences.reload();
         });
@@ -102,6 +106,14 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           isLoading = false;
         });
       }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: new Text('Profile successfuly updated'),
+          backgroundColor: Colors.green,
+          duration: new Duration(seconds: 3),
+        ),
+      );
     } else {
       print(res.body);
     }
@@ -148,30 +160,35 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
                   if (user!.first_name != first_name) {
                     _saveEdits('first_name', first_name!);
+                    setState(() {
+                      user!.first_name = first_name;
+                    });
                   }
                   if (user!.last_name != last_name) {
                     _saveEdits('last_name', last_name!);
+                    setState(() {
+                      user!.last_name = last_name;
+                    });
                   }
                   if (user!.sex != sex) {
                     _saveEdits('sex', sex);
+                    setState(() {
+                      user!.sex = sex;
+                    });
                   }
+                  print(user!.birthday);
+                  print(birthdate);
                   if (user!.birthday != birthdate) {
+                    print('yey!');
                     _saveEdits('birthday', birthdate!);
+                    setState(() {
+                      user!.birthday = birthdate;
+                    });
                   }
                   setState(() {
                     readOnly = true;
-                  });
-                  setState(() {
                     isLoading = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: new Text('Profile successfuly updated'),
-                      backgroundColor: Colors.green,
-                      duration: new Duration(seconds: 3),
-                    ),
-                  );
                 }
               } else {
                 setState(() {
@@ -311,7 +328,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         const SizedBox(height: 5),
         CustomLabel(label: 'Birthday', value: user!.birthday!),
         const SizedBox(height: 5),
-        ChangePasswordButton(),
+        // ChangePasswordButton(),
       ],
     );
   }
@@ -334,7 +351,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           const SizedBox(height: 5),
           BirthDatePicker(user!.birthday!),
           const SizedBox(height: 5),
-          ChangePasswordButton(),
+          // ChangePasswordButton(),
         ],
       ),
     );
@@ -346,9 +363,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       keyboardType: TextInputType.name,
       label: 'First Name',
       onSaved: (val) {
-        setState(() {
-          user?.first_name = val!.trim();
-        });
         this.first_name = val!.trim();
       },
       initialValue: first_name,
@@ -362,9 +376,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       validator: nameValidator,
       label: 'Last Name',
       onSaved: (value) {
-        setState(() {
-          user?.last_name = value!.trim();
-        });
         this.last_name = value!.trim();
       },
       initialValue: last_name,
@@ -377,9 +388,6 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   Widget GenderDropDown(String _sex) {
     return CustomGenderPicker(
       onChanged: (val) {
-        setState(() {
-          user!.sex = val.trim();
-        });
         this.sex = val.trim();
       },
     );
@@ -399,10 +407,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
             prefixIcon: CustomIcons.calendar,
             initialValue: birthday,
             onSaved: (val) {
-              setState(() {
-                user!.birthday = val!.trim();
-              });
-              this.birthdate = val!.trim();
+              birthdate = val!.trim();
             },
             validator: birthdateValidator,
           ),
@@ -419,11 +424,16 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                         width: 80,
                         child: OutlinedButton(
                           focusNode: bdayFocusNode,
-                          onPressed: readOnly ? null : _showDatePicker,
+                          onPressed: () async {
+                            if (!readOnly) {
+                              await _showDatePicker();
+                              bdateController.text = birthdate!;
+                            }
+                          },
                           child: Text('Set'),
                           style: ButtonStyle(
                               padding: MaterialStateProperty.all(
-                                EdgeInsets.all(22),
+                                EdgeInsets.all(15),
                               ),
                               backgroundColor: MaterialStateProperty.all(
                                 Colors.white,
@@ -479,22 +489,21 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         ),
       );
 
-  void _showDatePicker() {
+  Future<void> _showDatePicker() async {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
-    print(DateTime.now().year);
-    showDatePicker(
+    final now = DateTime.now();
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(DateTime.now().year - 100),
+      initialDate: now,
+      firstDate: DateTime(now.year - 100),
       lastDate: DateTime.now(),
-    ).then((d) {
+    );
+
+    if (picked != null && picked != DateTime.parse(user!.birthday!)) {
       setState(() {
-        DateTime date = d!;
-        birthdate = formatter.format(date);
-        bdateController.text = birthdate!;
+        birthdate = formatter.format(picked);
       });
-      mobileFocusNode.requestFocus();
-    });
+    }
   }
 
   Widget choosePhoto() {

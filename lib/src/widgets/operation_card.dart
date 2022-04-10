@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
-import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/incident_report.dart';
-import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
@@ -69,6 +67,9 @@ class OperationCard extends StatelessWidget {
                         victim_status: operation.report!.victim_status,
                         landmark: operation.report!.landmark,
                         name: operation.report!.name,
+                        longitude: '122.9915123481884',
+                        latitude: '13.551874638206568',
+                        address: operation.report!.address,
                       ),
                     ),
                   ),

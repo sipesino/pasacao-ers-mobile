@@ -1,16 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/data/data.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
-import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/operation.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/incident_card.dart';
 import 'package:pers/src/widgets/operation_card.dart';
 
 class ResponderHomeScreen extends StatefulWidget {
@@ -22,12 +20,55 @@ class ResponderHomeScreen extends StatefulWidget {
 
 class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
   final Connectivity _connectivity = Connectivity();
-  bool gotNewOperation = false;
+  bool? gotNewOperation;
   Operation? operation;
+
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
 
   @override
   void initState() {
     super.initState();
+    SharedPref pref = SharedPref();
+
+    pref
+        .read('gotNewOperation')
+        .then((value) => gotNewOperation = value.toLowerCase() == 'true');
+
+    pref.read('operation').then((value) {
+      if (value != 'null' && value.isNotEmpty) {
+        print(value);
+        Map<String, dynamic> operation_data = jsonDecode(value);
+        operation = Operation(
+          operation_id: operation_data['operation_id'],
+          external_agency_id: operation_data['external_agency_id'],
+          dispatcher_id: operation_data['dispatcher_id'],
+          etd_base: operation_data['etd_base'],
+          eta_scene: operation_data['eta_scene'],
+          etd_scene: operation_data['etd_scene'],
+          eta_hospital: operation_data['eta_hospital'],
+          etd_hospital: operation_data['etd_hospital'],
+          eta_base: operation_data['eta_base'],
+          receivingFacility: operation_data['receivingFacility'],
+        );
+        Map<String, dynamic> report_data = jsonDecode(operation_data['report']);
+        final report = IncidentReport(
+          incident_id: report_data['incident_id'],
+          description: report_data['description'],
+          incident_type: report_data['incident_type'],
+          name: report_data['name'],
+          sex: report_data['sex'],
+          age: report_data['age'],
+          victim_status: report_data['victim_status'],
+          landmark: report_data['landmark'],
+        );
+        operation!.report = report;
+        print(operation);
+      }
+    });
+
     _connectivity.checkConnectivity().then((status) {
       ConnectivityResult _connectionStatus = status;
       if (_connectionStatus != ConnectivityResult.none) {
@@ -36,7 +77,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
             final result = value;
 
             if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-              print('connected');
               setupFcm((val) {
                 setState(() {
                   try {
@@ -49,13 +89,16 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                         description: data['description'],
                         incident_type: data['incident_type'],
                         name: data['name'],
+                        sex: data['sex'],
+                        age: data['age'],
+                        victim_status: data['victim_status'],
+                        landmark: data['landmark'],
                       ),
                     );
-                    print(operation.toString());
+                    gotNewOperation = true;
                   } catch (e) {
                     print(e);
                   }
-                  gotNewOperation = true;
                 });
               });
             }
@@ -78,12 +121,27 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Incident Notification',
-              style: DefaultTextTheme.headline4,
+            Row(
+              children: [
+                Icon(
+                  CustomIcons.siren_filled,
+                  color: accentColor,
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Incident Notification',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 20),
-            gotNewOperation
+            gotNewOperation ?? false
                 ? OperationCard(
                     operation: operation!,
                   )
