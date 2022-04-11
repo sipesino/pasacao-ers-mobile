@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -37,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   late User user;
   String? email;
   String? password;
+  String? fbToken;
 
   final emailValidator = MultiValidator([
     EmailValidator(errorText: 'Invalid email address'),
@@ -85,15 +87,50 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                   // save user credentials inside local storage
                   preferences.save("user", user);
 
-                  setState(() {
-                    widget.isLoading = false;
-                  });
+                  if (user.account_type!.toUpperCase() == 'REPORTER') {
+                    setState(() {
+                      widget.isLoading = false;
+                    });
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/reporter/home',
+                      (Route<dynamic> route) => false,
+                    );
+                  } else {
+                    url = 'http://143.198.92.250/api/register_token';
+                    body = {"account_id": user.id.toString(), "token": fbToken};
 
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    '/reporter/home',
-                    (Route<dynamic> route) => false,
-                  );
+                    res = await http.post(
+                      Uri.parse(url),
+                      body: body,
+                      headers: {
+                        "Authorization": "Bearer ${jsonResponse['token']}",
+                        "Connection": "Keep-Alive",
+                        "Keep-Alive": "timeout=5, max=1000",
+                      },
+                    );
+                    if (res.statusCode == 201) {
+                      setState(() {
+                        widget.isLoading = false;
+                      });
+
+                      // print('Token inserted');
+                      // print(res.body);
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/responder/home',
+                        (Route<dynamic> route) => false,
+                      );
+                      return;
+                    } else if (res.statusCode == 401) {
+                      message = "Invalid user credentials";
+                    } else {
+                      print(res.statusCode);
+                      print(res.body);
+                      message = "Something went wrong.";
+                      print('Something went wrong');
+                    }
+                  }
                 }
               }
               return;
@@ -125,6 +162,12 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         ),
       );
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getToken();
   }
 
   @override
@@ -302,4 +345,9 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           );
         },
       );
+
+  getToken() async {
+    fbToken = await FirebaseMessaging.instance.getToken();
+    // print('Firebase Token: $fbToken');
+  }
 }

@@ -60,9 +60,11 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
             validator: widget.validator,
             onSaved: widget.onSaved,
             decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
               prefixIcon: Icon(
-                CustomIcons.sex,
+                widget.icon,
                 color: contentColorLightTheme,
+                size: 17,
               ),
               hintText: widget.hintText,
               hintStyle: TextStyle(
@@ -78,7 +80,7 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
                 ),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide(
                   color: contentColorLightTheme.withOpacity(0.2),
                   width: 1,
@@ -89,14 +91,14 @@ class _CustomDropDownButtonState extends State<CustomDropDownButton> {
                   color: Colors.redAccent,
                   width: 1,
                 ),
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(10),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: chromeColor,
                   width: 1,
                 ),
-                borderRadius: BorderRadius.circular(5.5),
+                borderRadius: BorderRadius.circular(10),
               ),
               filled: true,
             ),

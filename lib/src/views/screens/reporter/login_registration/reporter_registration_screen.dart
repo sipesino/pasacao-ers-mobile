@@ -148,6 +148,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   "account_type": 'reporter',
                 };
 
+                print(body);
+
                 String url = 'http://143.198.92.250/api/register';
                 var jsonResponse;
                 var res = await http.post(

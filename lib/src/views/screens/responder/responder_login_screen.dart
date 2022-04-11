@@ -8,6 +8,8 @@ import 'package:pers/src/constants.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/views/screens/responder/responder_home_screen.dart';
+import 'package:pers/src/widgets/custom_dropdown_button.dart';
 import 'package:pers/src/widgets/custom_password_text_form_field.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
 import 'package:pers/src/widgets/bottom_container.dart';
@@ -76,54 +78,6 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
       initialIndex: 0,
       length: 1,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              const SizedBox(
-                height: 40,
-                width: 90,
-                child: TabBar(
-                  indicatorColor: accentColor,
-                  tabs: [
-                    Tab(
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
-              child: SizedBox(
-                width: 142,
-                child: OutlinedButton(
-                  onPressed: () {
-                    Navigator.of(context).popAndPushNamed('/');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    primary: Colors.black,
-                    side: const BorderSide(width: 1),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                  ),
-                  child: const Text('I\'m a reporter'),
-                ),
-              ),
-            )
-          ],
-        ),
         body: LayoutBuilder(
           builder: (context, constraint) {
             return SingleChildScrollView(
@@ -236,7 +190,6 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
     Map<String, dynamic> jsonResponse;
     var res;
 
-    print(body);
     _connectivity.checkConnectivity().then((status) async {
       ConnectivityResult _connectionStatus = status;
       //check if there is internet connection
@@ -247,13 +200,16 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
         if (res.statusCode == 201) {
           jsonResponse = jsonDecode(res.body);
 
+          print('>>> got in');
           if (jsonResponse.isNotEmpty) {
             setState(() {
               isLoading = true;
             });
 
+            print('>>> got in again');
             if (jsonResponse["success"] &&
-                jsonResponse["user"]["account_type"] == 'responder') {
+                    jsonResponse["user"]["account_type"] == 'responder' ||
+                jsonResponse["user"]["account_type"] == 'external agency') {
               SharedPref preferences = SharedPref();
               // save bearer token in the local storage
               preferences.save("token", jsonResponse["token"]);
@@ -266,9 +222,17 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
               url = 'http://143.198.92.250/api/register_token';
               body = {"account_id": user.id.toString(), "token": fbToken};
 
-              print(body);
+              res = await http.post(
+                Uri.parse(url),
+                body: body,
+                headers: {
+                  "Authorization": "Bearer ${jsonResponse['token']}",
+                  "Connection": "Keep-Alive",
+                  "Keep-Alive": "timeout=5, max=1000",
+                },
+              );
 
-              res = await http.post(Uri.parse(url), body: body);
+              print('>>> and again');
 
               if (res.statusCode == 201) {
                 setState(() {
@@ -276,7 +240,7 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
                 });
 
                 print('Token inserted');
-                print(res.body);
+                // print(res.body);
                 Navigator.pushNamedAndRemoveUntil(
                   context,
                   '/responder/home',
@@ -286,10 +250,18 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
               } else if (res.statusCode == 401) {
                 message = "Invalid user credentials";
               } else {
+                print(res.statusCode);
+                print(res.body);
                 message = "Something went wrong.";
+                print('Something went wrong');
               }
             }
           }
+        } else if (res.statusCode == 401) {
+          message = "Invalid user credentials";
+        } else {
+          print(res.statusCode);
+          message = "Something went wrong.";
         }
       } else {
         message = "No internet. Check your internet connection";
@@ -298,8 +270,6 @@ class _ResponderLoginScreenState extends State<ResponderLoginScreen>
       setState(() {
         isLoading = false;
       });
-
-      print(res.body);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
