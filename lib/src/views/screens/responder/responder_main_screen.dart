@@ -102,7 +102,10 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border(
-                  top: BorderSide(color: Colors.grey, width: 0.5),
+                  top: BorderSide(
+                    color: Color(0xFFE0E0E0),
+                    width: 0.4,
+                  ),
                 ),
               ),
               child: BottomNavigationBar(

@@ -92,17 +92,15 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       if (jsonResponse.isNotEmpty) {
         SharedPref preferences = SharedPref();
 
-        User user = User.fromMap(jsonResponse);
+        User user = User.fromMap(jsonResponse['data']);
 
-        print(user.toString());
+        print(user);
 
         // save user credentials inside local storage
         preferences.save("user", user);
 
         setState(() {
           preferences.reload();
-        });
-        setState(() {
           isLoading = false;
         });
       }

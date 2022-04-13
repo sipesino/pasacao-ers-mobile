@@ -20,9 +20,6 @@ class OperationCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: primaryColor,
-        ),
       ),
       child: Container(
         height: 300,

@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
@@ -121,25 +122,34 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Icon(
-                  CustomIcons.siren_filled,
-                  color: accentColor,
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Incident Notification',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ],
+            if (user != null)
+              Text(
+                'Hi ${user!.first_name}!',
+                style: DefaultTextTheme.headline4,
+              ),
+            Text(
+              'Are you ready to respond?',
+              style: DefaultTextTheme.subtitle2,
             ),
+            // Row(
+            //   children: [
+            //     Icon(
+            //       CustomIcons.siren_filled,
+            //       color: accentColor,
+            //     ),
+            //     SizedBox(width: 10),
+            //     Expanded(
+            //       child: Text(
+            //         'Incident Notification',
+            //         style: TextStyle(
+            //           color: primaryColor,
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.w700,
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             SizedBox(height: 20),
             gotNewOperation ?? false
                 ? OperationCard(
@@ -157,15 +167,12 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(
-          color: primaryColor,
-        ),
       ),
       child: Container(
         height: 300,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.grey[200],
+          color: Colors.white,
           boxShadow: boxShadow,
         ),
         child: Center(

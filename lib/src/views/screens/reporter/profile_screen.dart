@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
+import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
@@ -21,6 +22,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = true;
+  List<EmergencyContact> contacts = [];
 
   @override
   void initState() {
@@ -30,6 +32,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         isLoading = false;
       });
+    });
+    SharedPref().read('contacts').then((value) {
+      print(value);
+      if (value != 'null')
+        setState(() {
+          contacts = EmergencyContact.decode(value);
+        });
     });
   }
 
@@ -94,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: DefaultTextTheme.headline3,
             ),
             Text(
-              user!.email!,
+              user!.email ?? 'undefined',
               style: TextStyle(
                 color: Colors.grey,
               ),
@@ -128,11 +137,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     clipBehavior: Clip.none,
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: getEmergencyContacts().map((e) {
+                      children: contacts.map((e) {
                         return EmergencyContactCard(
                           contact_name: e.contact_name,
                           contact_number: e.contact_number,
-                          contact_image: e.contact_image,
                         );
                       }).toList(),
                     ),

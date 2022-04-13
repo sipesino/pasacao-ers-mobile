@@ -388,11 +388,15 @@ class _SummaryScreenState extends State<SummaryScreen> {
           isLoading = true;
         });
 
-        res = await http.post(Uri.parse(url), body: body, headers: {
-          'Authorization': 'Bearer $token',
-          "Connection": "Keep-Alive",
-          "Keep-Alive": "timeout=5, max=1000",
-        });
+        res = await http.post(
+          Uri.parse(url),
+          body: body,
+          headers: {
+            'Authorization': 'Bearer $token',
+            "Connection": "Keep-Alive",
+            "Keep-Alive": "timeout=5, max=1000",
+          },
+        );
 
         if (res.statusCode == 200) {
           jsonResponse = jsonDecode(res.body);

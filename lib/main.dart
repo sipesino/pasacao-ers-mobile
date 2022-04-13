@@ -21,7 +21,6 @@ import 'package:pers/src/views/screens/reporter/map_screen.dart';
 import 'package:pers/src/views/screens/reporter/personal_info_screen.dart';
 import 'package:pers/src/views/screens/reporter/reporter_main_screen.dart';
 import 'package:pers/src/views/screens/responder/operation/new_operation_screen.dart';
-import 'package:pers/src/views/screens/responder/responder_login_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_main_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -40,11 +39,15 @@ void main() async {
   User? user;
   if (data != 'null') user = User.fromJson(await data);
   Paint.enableDithering = true;
+  String account_type = 'reporter';
+  if (user != null) {
+    if (user.account_type != null &&
+        user.account_type!.toLowerCase() != 'reporter') {
+      account_type = 'responder';
+    }
+  }
 
-  var token = await FirebaseMessaging.instance.getToken();
-  print('token: $token');
-
-  runApp(MERS(initialRoute: user != null ? '/${user.account_type}/home' : '/'));
+  runApp(MERS(initialRoute: user != null ? '/$account_type/home' : '/'));
 }
 
 class MERS extends StatefulWidget {
@@ -73,7 +76,6 @@ class _MERSState extends State<MERS> {
           '/responder/home/new_operation': (context) => NewOperation(),
           '/responder/home/new_operation/summary': (context) =>
               OperationSummaryScreen(),
-          '/responder/login': (context) => ResponderLoginScreen(),
           '/forgot_password/email': (context) => ForgotPasswordEmail(),
           '/forgot_password/mobile_no': (context) => ForgotPasswordMobileNo(),
           '/forgot_password/email/verification': (context) =>

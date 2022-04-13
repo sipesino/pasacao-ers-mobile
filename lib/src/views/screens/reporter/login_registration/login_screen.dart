@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/globals.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
@@ -20,13 +21,14 @@ class LoginScreen extends StatefulWidget {
   static const String idScreen = 'login';
   final MainModel model;
   final GlobalKey<ScaffoldState> scaffold_key;
-  bool? isLoading;
+
+  final Function() notify_parent;
 
   LoginScreen({
     Key? key,
     required this.model,
     required this.scaffold_key,
-    this.isLoading,
+    required this.notify_parent,
   }) : super(key: key);
 
   @override
@@ -49,121 +51,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     RequiredValidator(errorText: 'Password is required'),
   ]);
 
-  void signIn() async {
-    String message = "";
-    final Connectivity _connectivity = Connectivity();
-
-    //check if there is internet connection
-    _connectivity.checkConnectivity().then((status) async {
-      ConnectivityResult _connectionStatus = status;
-      setState(() {
-        widget.isLoading = true;
-      });
-      String url = "http://143.198.92.250/api/login";
-      Map body = {"email": email, "password": password};
-
-      Map<String, dynamic> jsonResponse;
-      var res;
-      if (_connectionStatus != ConnectivityResult.none) {
-        try {
-          res = await http.post(Uri.parse(url), body: body).catchError((error) {
-            print(error);
-          });
-
-          //check if request is successfull
-          if (res != null) {
-            if (res.statusCode == 201) {
-              jsonResponse = jsonDecode(res.body);
-
-              //check if response body has data
-              if (jsonResponse.isNotEmpty) {
-                if (jsonResponse["success"]) {
-                  SharedPref preferences = SharedPref();
-                  // save bearer token in the local storage
-                  preferences.save("token", jsonResponse["token"]);
-
-                  User user = User.fromMap(jsonResponse["user"]);
-
-                  // save user credentials inside local storage
-                  preferences.save("user", user);
-
-                  if (user.account_type!.toUpperCase() == 'REPORTER') {
-                    setState(() {
-                      widget.isLoading = false;
-                    });
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/reporter/home',
-                      (Route<dynamic> route) => false,
-                    );
-                  } else {
-                    url = 'http://143.198.92.250/api/register_token';
-                    body = {"account_id": user.id.toString(), "token": fbToken};
-
-                    res = await http.post(
-                      Uri.parse(url),
-                      body: body,
-                      headers: {
-                        "Authorization": "Bearer ${jsonResponse['token']}",
-                        "Connection": "Keep-Alive",
-                        "Keep-Alive": "timeout=5, max=1000",
-                      },
-                    );
-                    if (res.statusCode == 201) {
-                      setState(() {
-                        widget.isLoading = false;
-                      });
-
-                      // print('Token inserted');
-                      // print(res.body);
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/responder/home',
-                        (Route<dynamic> route) => false,
-                      );
-                      return;
-                    } else if (res.statusCode == 401) {
-                      message = "Invalid user credentials";
-                    } else {
-                      print(res.statusCode);
-                      print(res.body);
-                      message = "Something went wrong.";
-                      print('Something went wrong');
-                    }
-                  }
-                }
-              }
-              return;
-            }
-          }
-        } on SocketException catch (_) {
-          print('not connected');
-          message = "No internet. Check your internet connection";
-        }
-      } else {
-        print("No internet connection");
-        message = "No internet. Check your internet connection";
-      }
-      if (res.statusCode == 401)
-        message = "Invalid user credentials";
-      else
-        message = "Something went wrong.";
-
-      setState(() {
-        widget.isLoading = false;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: new Text(message),
-          backgroundColor: Colors.red,
-          duration: new Duration(seconds: 3),
-        ),
-      );
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -171,10 +58,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraint) {
-        Widget loadingIndicator = widget.isLoading!
+        Widget loadingIndicator = isLoading
             ? new Container(
                 width: 70.0,
                 height: 70.0,
@@ -223,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           BottomContainer(
             displayHotlinesButton: true,
             onPressed: () {
+              FocusScope.of(context).unfocus();
               if (_formKey.currentState!.validate()) {
                 _formKey.currentState?.save();
                 signIn();
@@ -349,5 +242,115 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   getToken() async {
     fbToken = await FirebaseMessaging.instance.getToken();
     // print('Firebase Token: $fbToken');
+  }
+
+  signIn() async {
+    String message = "";
+    final Connectivity _connectivity = Connectivity();
+
+    //check if there is internet connection
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+      setState(() {
+        isLoading = true;
+      });
+
+      widget.notify_parent();
+
+      String url = "http://143.198.92.250/api/login";
+      Map body = {"email": email, "password": password};
+
+      Map<String, dynamic> jsonResponse;
+      var res;
+      if (_connectionStatus != ConnectivityResult.none) {
+        try {
+          res = await http.post(Uri.parse(url), body: body).catchError((error) {
+            print(error);
+          });
+
+          //check if request is successfull
+          if (res != null && res.statusCode == 201) {
+            jsonResponse = jsonDecode(res.body);
+
+            //check if response body has data
+            if (jsonResponse.isNotEmpty) {
+              if (jsonResponse["success"]) {
+                SharedPref preferences = SharedPref();
+                // save bearer token in the local storage
+                preferences.save("token", jsonResponse["token"]);
+
+                User user = User.fromMap(jsonResponse["user"]);
+
+                // save user credentials inside local storage
+                preferences.save("user", user);
+
+                if (user.account_type!.toUpperCase() == 'REPORTER') {
+                  setState(() {
+                    isLoading = false;
+                  });
+                  widget.notify_parent();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/reporter/home',
+                    (Route<dynamic> route) => false,
+                  );
+                  return;
+                } else {
+                  url = 'http://143.198.92.250/api/register_token';
+                  body = {"account_id": user.id.toString(), "token": fbToken};
+
+                  res = await http.post(
+                    Uri.parse(url),
+                    body: body,
+                    headers: {
+                      "Authorization": "Bearer ${jsonResponse['token']}",
+                      "Connection": "Keep-Alive",
+                      "Keep-Alive": "timeout=5, max=1000",
+                    },
+                  ).catchError((error) {
+                    print(error);
+                  });
+
+                  if (res != null && res.statusCode == 201) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/responder/home',
+                      (Route<dynamic> route) => false,
+                    );
+                    return;
+                  }
+                  print(res.statusCode);
+                  print(res.body);
+                }
+              }
+            }
+          }
+          if (res.statusCode == 401) message = "Invalid user credentials";
+        } on SocketException catch (e) {
+          print('not connected');
+          message = e.message;
+        }
+      } else {
+        print("No internet connection");
+        message = "No internet. Check your internet connection";
+      }
+
+      setState(() {
+        isLoading = false;
+      });
+      widget.notify_parent();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: new Text(message),
+          backgroundColor: Colors.red,
+          duration: new Duration(seconds: 3),
+        ),
+      );
+    });
   }
 }

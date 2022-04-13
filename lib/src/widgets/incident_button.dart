@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 
 class IncidentButton extends StatelessWidget {
@@ -26,14 +27,7 @@ class IncidentButton extends StatelessWidget {
             Radius.circular(10),
           ),
           color: Colors.white,
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              offset: new Offset(-10, 10),
-              blurRadius: 10.0,
-              spreadRadius: 0.0,
-            ),
-          ],
+          boxShadow: boxShadow,
         ),
         child: Material(
           color: Colors.transparent,

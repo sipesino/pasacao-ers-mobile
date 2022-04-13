@@ -3,12 +3,10 @@ import 'dart:convert';
 class EmergencyContact {
   final String contact_name;
   final String contact_number;
-  final String contact_image;
 
   const EmergencyContact({
     required this.contact_name,
     required this.contact_number,
-    required this.contact_image,
   });
 
   EmergencyContact copyWith({
@@ -19,15 +17,13 @@ class EmergencyContact {
     return EmergencyContact(
       contact_name: contact_name ?? this.contact_name,
       contact_number: contact_number ?? this.contact_number,
-      contact_image: contact_image ?? this.contact_image,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  static Map<String, dynamic> toMap(EmergencyContact contact) {
     return {
-      'contact_name': contact_name,
-      'contact_number': contact_number,
-      'contact_image': contact_image,
+      'contact_name': contact.contact_name,
+      'contact_number': contact.contact_number,
     };
   }
 
@@ -35,18 +31,30 @@ class EmergencyContact {
     return EmergencyContact(
       contact_name: map['contact_name'],
       contact_number: map['contact_number'],
-      contact_image: map['contact_image'],
     );
   }
 
-  String toJson() => json.encode(toMap());
+  static String encode(List<EmergencyContact> contacts) => json.encode(
+        contacts
+            .map<Map<String, dynamic>>((music) => EmergencyContact.toMap(music))
+            .toList(),
+      );
 
-  factory EmergencyContact.fromJson(String source) =>
-      EmergencyContact.fromMap(json.decode(source));
+  static List<EmergencyContact> decode(String contacts) =>
+      (json.decode(contacts) as List<dynamic>)
+          .map<EmergencyContact>((item) => EmergencyContact.fromJson(item))
+          .toList();
+
+  factory EmergencyContact.fromJson(Map<String, dynamic> jsonData) {
+    return EmergencyContact(
+      contact_name: jsonData['contact_name'],
+      contact_number: jsonData['contact_number'],
+    );
+  }
 
   @override
   String toString() =>
-      'EmergencyContact(contact_name: $contact_name, contact_number: $contact_number, contact_image: $contact_image)';
+      'EmergencyContact(contact_name: $contact_name, contact_number: $contact_number)';
 
   @override
   bool operator ==(Object other) {
@@ -54,11 +62,9 @@ class EmergencyContact {
 
     return other is EmergencyContact &&
         other.contact_name == contact_name &&
-        other.contact_number == contact_number &&
-        other.contact_image == contact_image;
+        other.contact_number == contact_number;
   }
 
   @override
-  int get hashCode =>
-      contact_name.hashCode ^ contact_number.hashCode ^ contact_image.hashCode;
+  int get hashCode => contact_name.hashCode ^ contact_number.hashCode;
 }

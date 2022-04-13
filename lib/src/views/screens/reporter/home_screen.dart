@@ -167,12 +167,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 50),
+                        SizedBox(height: 30),
                         Text(
-                          'Hey ${user!.first_name ?? ''}!\nwe\'re here for you.',
+                          'Hey ${user!.first_name ?? ''}!',
                           style: DefaultTextTheme.headline3,
                         ),
-                        SizedBox(height: 30),
+                        Text(
+                          'We are here for you.',
+                          style: DefaultTextTheme.subtitle2,
+                        ),
+                        SizedBox(height: 20),
                         Text(
                           'Call directly using Hotline',
                           style: TextStyle(

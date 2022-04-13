@@ -22,7 +22,7 @@ class EmergencyContactCard extends StatelessWidget {
     return Card(
       child: Container(
         width: 160,
-        height: 160,
+        height: 100,
         padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -32,22 +32,9 @@ class EmergencyContactCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10.0), //or 15.0
-              child: Container(
-                height: 60.0,
-                width: 60.0,
-                color: chromeColor.withOpacity(0.5),
-                child: Image(
-                  image: AssetImage(contact_image),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(height: 10),
             Text(
               this.contact_name,
-              style: DefaultTextTheme.headline4,
+              style: DefaultTextTheme.headline5,
               overflow: TextOverflow.ellipsis,
               softWrap: false,
             ),
@@ -87,8 +74,8 @@ class EmergencyContactCard2 extends StatelessWidget {
       child: Material(
         child: Container(
           width: double.infinity,
-          height: 80,
-          padding: const EdgeInsets.all(10.0),
+          height: 90,
+          padding: const EdgeInsets.all(20.0),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
@@ -97,19 +84,6 @@ class EmergencyContactCard2 extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10.0),
-                child: Container(
-                  height: 60.0,
-                  width: 60.0,
-                  color: chromeColor.withOpacity(0.5),
-                  child: Image(
-                    image: AssetImage(contact_image),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              SizedBox(width: 15),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -117,7 +91,7 @@ class EmergencyContactCard2 extends StatelessWidget {
                   children: [
                     Text(
                       this.contact_name,
-                      style: DefaultTextTheme.headline3,
+                      style: DefaultTextTheme.headline4,
                       overflow: TextOverflow.ellipsis,
                       softWrap: false,
                     ),
