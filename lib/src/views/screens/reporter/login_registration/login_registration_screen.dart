@@ -77,6 +77,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
                   RegistrationScreen(
                     model: this.widget.model,
                     scaffold_key: _scaffoldKey,
+                    notify_parent: refresh,
                   ),
                 ],
               );

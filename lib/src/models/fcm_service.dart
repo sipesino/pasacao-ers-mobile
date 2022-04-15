@@ -28,6 +28,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     ),
   );
   saveOperation(message);
+  print('>>> Background notification received');
   await Firebase.initializeApp();
 }
 
@@ -105,6 +106,7 @@ void setupFcm(void Function(String) onNewOperation) {
         ),
         payload: message.data['"operation"'],
       );
+      print('>>> Initial notification received');
       // goToNextScreen(message.data);
       onNewOperation(message.data['"operation"']);
     }
@@ -130,6 +132,7 @@ void setupFcm(void Function(String) onNewOperation) {
       ),
       payload: message.data['"operation"'],
     );
+    print('>>> Foreground notification received');
   });
 
   //When the app is in the background, but not terminated.

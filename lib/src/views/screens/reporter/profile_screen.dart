@@ -159,7 +159,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          buildPersonalInfoButton(),
+          if (user!.account_type! != 'external agency')
+            buildPersonalInfoButton(),
           // buildIncidentsReportedButton(),
           // buildSettingsButton(),
           // buildAboutButton(),

@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:intl/intl.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/globals.dart';
 import 'package:pers/src/models/phone_validator.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -22,8 +25,12 @@ import 'package:http/http.dart' as http;
 class RegistrationScreen extends StatefulWidget {
   final MainModel model;
   final GlobalKey<ScaffoldState> scaffold_key;
+  final Function() notify_parent;
 
-  RegistrationScreen({required this.model, required this.scaffold_key});
+  RegistrationScreen(
+      {required this.model,
+      required this.scaffold_key,
+      required this.notify_parent});
 
   @override
   State<RegistrationScreen> createState() => _RegistrationScreenState();
@@ -73,15 +80,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   ]);
 
   final birthdateValidator = MultiValidator([
-    RequiredValidator(errorText: 'Password is required'),
+    RequiredValidator(errorText: 'Birthdate is required.'),
     DateValidator('yyyy-MM-dd', errorText: 'Birthdate is required.'),
   ]);
+
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraint) {
-        Widget loadingIndicator = _load
+        Widget loadingIndicator = isLoading
             ? new Container(
                 width: 70.0,
                 height: 70.0,
@@ -128,69 +144,106 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         children: [
           _buildTopContainer(),
           BottomContainer(
-            onPressed: () async {
-              //check if all fields are valid
-              //if valid, save all field values
-              //then store it inside a map
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState?.save();
-
-                Map<String, dynamic> body = {
-                  "first_name": first_name,
-                  "last_name": last_name,
-                  "mobile_no": mobile_no,
-                  "email": email,
-                  "password": password,
-                  "password_confirmation": password,
-                  "sex": sex,
-                  "birthday": birthday,
-                  "address": 'Sample Address',
-                  "account_type": 'reporter',
-                };
-
-                print(body);
-
-                String url = 'http://143.198.92.250/api/register';
-                var jsonResponse;
-                var res = await http.post(
-                  Uri.parse(url),
-                  body: body,
-                );
-
-                if (res.statusCode == 201) {
-                  jsonResponse = jsonDecode(res.body);
-
-                  if (jsonResponse != null) {
-                    setState(() {
-                      _load = true;
-                    });
-
-                    SharedPref preferences = SharedPref();
-                    // save bearer token in the local storage
-                    preferences.save("token", jsonResponse["token"]);
-
-                    User user = User.fromMap(jsonResponse["user"]);
-
-                    // save user credentials inside local storage
-                    preferences.save("user", user);
-
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/reporter/home',
-                      (Route<dynamic> route) => false,
-                      arguments: ScreenArguments(
-                        user: user,
-                      ),
-                    );
-                  }
-                } else {
-                  print(res.statusCode);
-                }
-              }
-            },
+            onPressed: _register,
           ),
         ],
       );
+
+  _register() async {
+    String message = "";
+    //check if all fields are valid
+    //if valid, save all field values
+    //then store it inside a map
+
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState?.save();
+      setState(() {
+        isLoading = true;
+      });
+      widget.notify_parent();
+      final Connectivity _connectivity = Connectivity();
+      _connectivity.checkConnectivity().then((status) async {
+        ConnectivityResult _connectionStatus = status;
+
+        if (_connectionStatus != ConnectivityResult.none &&
+            await hasNetwork()) {
+          print('connected');
+          Map<String, dynamic> body = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "mobile_no": mobile_no,
+            "email": email,
+            "password": password,
+            "password_confirmation": password,
+            "sex": sex,
+            "birthday": '1980-04-03',
+            "address": 'Sample Address',
+            "account_type": 'reporter',
+          };
+
+          print(body);
+
+          String url = 'http://143.198.92.250/api/register';
+          var jsonResponse;
+          var res = await http.post(
+            Uri.parse(url),
+            body: body,
+            headers: {
+              "Accept": "application/json",
+            },
+          );
+
+          if (res.statusCode == 201) {
+            jsonResponse = jsonDecode(res.body);
+
+            if (jsonResponse != null) {
+              SharedPref preferences = SharedPref();
+              // save bearer token in the local storage
+              preferences.save("token", jsonResponse["token"]);
+
+              User user = User.fromMap(jsonResponse["user"]);
+
+              // save user credentials inside local storage
+              preferences.save("user", user);
+              setState(() {
+                isLoading = false;
+              });
+
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/reporter/home',
+                (Route<dynamic> route) => false,
+                arguments: ScreenArguments(
+                  user: user,
+                ),
+              );
+              return;
+            }
+          } else {
+            print(res.statusCode);
+            print(res.body);
+            message = "Error ${res.statusCode}";
+          }
+        } else {
+          print('>>> No internet');
+          message = "No internet. Check your internet connection";
+        }
+        setState(() {
+          isLoading = false;
+        });
+        widget.notify_parent();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: new Text(message),
+            backgroundColor: Colors.red,
+            duration: new Duration(seconds: 3),
+          ),
+        );
+      });
+    }
+  }
 
   Widget _buildTopContainer() {
     return Expanded(
@@ -281,7 +334,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Widget BirthDatePicker() {
-    final DateFormat formatter = DateFormat('yyyy-MM-dd');
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,7 +351,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             onSaved: (newValue) {
               birthday = newValue!;
             },
-            validator: birthdateValidator,
+            validator: (val) {
+              if (val == 'Birthdate') {
+                return 'Birthdate is required.';
+              }
+            },
           ),
         ),
         SizedBox(
@@ -316,24 +372,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               height: 50,
               child: OutlinedButton(
                 focusNode: bdayFocusNode,
-                onPressed: () {
-                  print(DateTime.now().year);
-                  showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(DateTime.now().year - 100),
-                    lastDate: DateTime.now(),
-                  ).then((d) {
-                    setState(() {
-                      if (d != null) {
-                        DateTime date = d;
-                        birthday = formatter.format(date);
-                        bdateController.text = birthday;
-                      }
-                    });
-                    mobileFocusNode.requestFocus();
-                  });
-                },
+                onPressed: _selectDate,
                 child: Text('Set'),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(
@@ -351,6 +390,26 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         )
       ],
     );
+  }
+
+  _selectDate() async {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    print(DateTime.now().year);
+    var bdate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(
+          DateTime.now().year - 13, DateTime.now().month, DateTime.now().day),
+      firstDate: DateTime(1950),
+      lastDate: DateTime(
+          DateTime.now().year - 13, DateTime.now().month, DateTime.now().day),
+    );
+    if (bdate != null) {
+      setState(() {
+        birthday = formatter.format(bdate);
+        bdateController.text = birthday;
+      });
+      mobileFocusNode.requestFocus();
+    }
   }
 
   Widget MobileNoTextField() {

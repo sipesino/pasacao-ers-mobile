@@ -298,43 +298,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
     );
   }
 
-  _testImageUpload(List<XFile>? incident_images) async {
-    List<String> images = [];
-    if (incident_images != null) {
-      for (XFile file in incident_images) {
-        File imagefile = File(file.path);
-        String encode = base64Encode(imagefile.readAsBytesSync());
-        print(encode);
-        images.add(encode);
-      }
-
-      print(images.length);
-
-      Map<String, dynamic> data = {
-        "incident_images": images.toString(),
-      };
-
-      // incident_images.map((file) async {
-      // Uint8List bytes = await file.readAsBytes();
-      // String encode = base64Encode(bytes);
-      // print(encode);
-      // images.add(encode);
-      // });
-
-      // print(data);
-
-      // String uri = 'http://192.168.1.2/test/api/message/uploadImages.php';
-      // final response = await http.post(Uri.parse(uri), body: data);
-      // if (response.statusCode == 200) {
-      //   print(response.body);
-      // } else {
-      //   print('Error');
-      // }
-    } else {
-      print('No images');
-    }
-  }
-
   _submitReport(IncidentReport report) async {
     Map<String, dynamic> location_body = {
       "location_type": "incident location",

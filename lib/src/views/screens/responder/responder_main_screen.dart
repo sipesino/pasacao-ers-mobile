@@ -77,48 +77,84 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : PageView(
-                controller: pageController,
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  ResponderHomeScreen(),
-                  if (!isExternalAgency!) ResponderOperationsScreen(),
-                  ProfileScreen(isResponder: true),
-                ],
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
-              ),
-      ),
-      bottomNavigationBar: isLoading
-          ? SizedBox.shrink()
-          : Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: Color(0xFFE0E0E0),
-                    width: 0.4,
+    return WillPopScope(
+      onWillPop: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Logout'),
+              content: Text('Are you sure you want to logout?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    SharedPref().clear();
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/', (route) => false);
+                  },
+                  child: Text(
+                    'YES',
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'NO',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        return Future.value(false);
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : PageView(
+                  controller: pageController,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    ResponderHomeScreen(),
+                    if (!isExternalAgency!) ResponderOperationsScreen(),
+                    ProfileScreen(isResponder: true),
+                  ],
+                  onPageChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                ),
+        ),
+        bottomNavigationBar: isLoading
+            ? SizedBox.shrink()
+            : Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border(
+                    top: BorderSide(
+                      color: Color(0xFFE0E0E0),
+                      width: 0.4,
+                    ),
+                  ),
+                ),
+                child: BottomNavigationBar(
+                  elevation: 0,
+                  items: _barItems,
+                  currentIndex: _selectedIndex,
+                  unselectedItemColor: chromeColor,
+                  unselectedIconTheme: IconThemeData(color: chromeColor),
+                  selectedItemColor: accentColor,
+                  selectedIconTheme: IconThemeData(color: accentColor),
+                  onTap: onTap,
+                ),
               ),
-              child: BottomNavigationBar(
-                elevation: 0,
-                items: _barItems,
-                currentIndex: _selectedIndex,
-                unselectedItemColor: chromeColor,
-                unselectedIconTheme: IconThemeData(color: chromeColor),
-                selectedItemColor: accentColor,
-                selectedIconTheme: IconThemeData(color: accentColor),
-                onTap: onTap,
-              ),
-            ),
+      ),
     );
   }
 }

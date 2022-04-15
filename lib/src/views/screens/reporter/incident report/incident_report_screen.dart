@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -79,6 +80,12 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   }
 
   @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    if (mounted) super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
     incident_type = args.incidentType;
@@ -126,63 +133,9 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                   CustomLabel(
                       label: 'Incident Type', value: args.incidentType!),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      SizedBox(
-                        height: 20.0,
-                        width: 20.0,
-                        child: Checkbox(
-                          value: not_victim,
-                          onChanged: (val) {
-                            setState(() {
-                              not_victim = val!;
-                            });
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            not_victim = !not_victim;
-                          });
-                        },
-                        child: Text('I\'m not the victim'),
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size(50, 30),
-                          alignment: Alignment.centerLeft,
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  AnimatedSwitcher(
-                    duration: Duration(milliseconds: 200),
-                    child: not_victim
-                        ? Column(
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(child: _buildSexPicker()),
-                                  const SizedBox(width: 10),
-                                  SizedBox(
-                                    width: 110,
-                                    child: _buildAgeTextFormField(),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              _buildVictimvictim_statusPicker(),
-                              const SizedBox(height: 20),
-                            ],
-                          )
-                        : SizedBox.shrink(),
-                  ),
+                  _buildNotVictimCheckbox(),
+                  const SizedBox(height: 10),
+                  _buildNotVictimFields(),
                   _buildDescriptionTextFormField(),
                   const SizedBox(height: 20),
                   _buildLandmarkTextFormField(),
@@ -192,25 +145,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 20),
-                  SizedBox(
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        _submitReport();
-                      },
-                      child: Text('Submit Report'),
-                      style: ButtonStyle(
-                        elevation: MaterialStateProperty.all(0),
-                        backgroundColor: MaterialStateProperty.all(accentColor),
-                        shape: MaterialStateProperty.all(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  _buildSubmitReportButton(context),
                 ],
               ),
             ),
@@ -218,6 +153,90 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Row _buildNotVictimCheckbox() {
+    return Row(
+      children: [
+        SizedBox(
+          height: 20.0,
+          width: 20.0,
+          child: Checkbox(
+            value: not_victim,
+            onChanged: (val) {
+              setState(() {
+                not_victim = val!;
+              });
+            },
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+          ),
+        ),
+        SizedBox(width: 10),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              not_victim = !not_victim;
+            });
+          },
+          child: Text('I\'m not the victim'),
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size(50, 30),
+            alignment: Alignment.centerLeft,
+          ),
+        )
+      ],
+    );
+  }
+
+  SizedBox _buildSubmitReportButton(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () {
+          FocusScope.of(context).unfocus();
+          _submitReport();
+        },
+        child: Text('Submit Report'),
+        style: ButtonStyle(
+          elevation: MaterialStateProperty.all(0),
+          backgroundColor: MaterialStateProperty.all(accentColor),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  AnimatedSwitcher _buildNotVictimFields() {
+    return AnimatedSwitcher(
+      duration: Duration(milliseconds: 200),
+      child: not_victim
+          ? Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: _buildSexPicker()),
+                    const SizedBox(width: 10),
+                    SizedBox(
+                      width: 110,
+                      child: _buildAgeTextFormField(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                _buildVictimvictim_statusPicker(),
+                const SizedBox(height: 10),
+              ],
+            )
+          : SizedBox.shrink(),
     );
   }
 
@@ -285,10 +304,10 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
               "sex": sex,
               "age": age,
               "incident_status": "pending",
-              "victim_status": victim_status,
+              "victim_status": victim_status!.toLowerCase(),
               "description": description,
               "account_id": user.id.toString(),
-              "location": location_info.location_id.toString(),
+              "location_id": location_info.location_id.toString(),
               "landmark": landmark,
             };
 
@@ -310,17 +329,20 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
               });
 
               if (jsonResponse != null) {
-                Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
-                    content: new Text("Incident reported successfuly"),
+                    content: new Text("Incident reported successfuly."),
                     backgroundColor: Colors.green,
                     duration: new Duration(seconds: 5),
                   ),
                 );
+                await showSendToContactsDialog();
+                Navigator.of(context).pop();
                 return;
               }
+            } else {
+              print(res.statusCode);
             }
           }
           setState(() {
@@ -338,53 +360,10 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           print(res.statusCode);
           print(res.body);
         } else {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('No internet detected.'),
-                content: Text('Do you want to send your report as SMS?'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      String message =
-                          "New Incident Report:\nIncident Type: $incident_type\nSex: $sex\nAge: $age\nVictim Status: $victim_status\nDescription: $description\nLocation: $latitude, $longitude";
-                      print('>>> Sending message...');
-                      _sendSMS(message, ['09296871657']);
-                      print('>>> Message sent.');
-                      setState(() {
-                        isLoading = false;
-                      });
-                    },
-                    child: Text(
-                      'YES',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Text(
-                      'NO',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ],
-              );
-            },
-          );
+          showNoInternetDialog();
         }
       });
     }
-  }
-
-  void _sendSMS(String message, List<String> recipents) async {
-    String _result = await sendSMS(message: message, recipients: recipents)
-        .catchError((onError) {
-      print(onError);
-    });
-    print(_result);
   }
 
   CustomTextFormField _buildLandmarkTextFormField() {
@@ -468,5 +447,99 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
       }
     }
     return age;
+  }
+
+  Future<void> showNoInternetDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('No internet detected.'),
+          content: Text('Do you want to send your report as SMS?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String message =
+                    "New Incident Report:\nIncident Type: $incident_type\nSex: $sex\nAge: $age\nVictim Status: $victim_status\nDescription: $description\nLocation: $latitude, $longitude";
+                print('>>> Sending message...');
+                _sendSMS(message, ['09296871657']);
+                print('>>> Message sent.');
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: Text(
+                'YES',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'NO',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> showSendToContactsDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Incident Report.'),
+          content: Text('Do you want to notify your emergency contacts?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                SharedPref().read('contacts').then((value) {
+                  print(value);
+                  String message =
+                      "Emergency Alert:\nI encoutered $incident_type in these coordinates: $latitude, $longitude. Dae ko aram ang sasabihon ko igdi";
+                  if (value != 'null') {
+                    List<EmergencyContact> contacts =
+                        EmergencyContact.decode(value);
+                    List<String> recepients = [];
+                    contacts.forEach((EmergencyContact element) =>
+                        recepients.add(element.contact_number));
+                    _sendSMS(message, recepients);
+                  } else {
+                    print('You have no contacts');
+                  }
+                });
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'YES',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'NO',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _sendSMS(String message, List<String> recipents) async {
+    String _result = await sendSMS(message: message, recipients: recipents)
+        .catchError((onError) {
+      print(onError);
+    });
+    print(_result);
   }
 }

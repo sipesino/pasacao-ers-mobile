@@ -21,7 +21,6 @@ class LoginScreen extends StatefulWidget {
   static const String idScreen = 'login';
   final MainModel model;
   final GlobalKey<ScaffoldState> scaffold_key;
-
   final Function() notify_parent;
 
   LoginScreen({
@@ -244,6 +243,15 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
     // print('Firebase Token: $fbToken');
   }
 
+  Future<bool> hasNetwork() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
   signIn() async {
     String message = "";
     final Connectivity _connectivity = Connectivity();
@@ -262,77 +270,77 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
 
       Map<String, dynamic> jsonResponse;
       var res;
-      if (_connectionStatus != ConnectivityResult.none) {
-        try {
-          res = await http.post(Uri.parse(url), body: body).catchError((error) {
-            print(error);
-          });
+      if (_connectionStatus != ConnectivityResult.none && await hasNetwork()) {
+        res = await http.post(Uri.parse(url), body: body).catchError((error) {
+          print(error);
+        });
 
-          //check if request is successfull
-          if (res != null && res.statusCode == 201) {
-            jsonResponse = jsonDecode(res.body);
+        //check if request is successfull
+        if (res != null && res.statusCode == 201) {
+          jsonResponse = jsonDecode(res.body);
 
-            //check if response body has data
-            if (jsonResponse.isNotEmpty) {
-              if (jsonResponse["success"]) {
-                SharedPref preferences = SharedPref();
-                // save bearer token in the local storage
-                preferences.save("token", jsonResponse["token"]);
+          //check if response body has data
+          if (jsonResponse.isNotEmpty) {
+            if (jsonResponse["success"]) {
+              SharedPref preferences = SharedPref();
+              // save bearer token in the local storage
+              preferences.save("token", jsonResponse["token"]);
 
-                User user = User.fromMap(jsonResponse["user"]);
+              User user = User.fromMap(jsonResponse["user"]);
 
-                // save user credentials inside local storage
-                preferences.save("user", user);
+              // save user credentials inside local storage
+              preferences.save("user", user);
 
-                if (user.account_type!.toUpperCase() == 'REPORTER') {
+              if (user.account_type!.toUpperCase() == 'REPORTER') {
+                setState(() {
+                  isLoading = false;
+                });
+                widget.notify_parent();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/reporter/home',
+                  (Route<dynamic> route) => false,
+                );
+                return;
+              } else {
+                url = 'http://143.198.92.250/api/register_token';
+                body = {"account_id": user.id.toString(), "token": fbToken};
+
+                print(body);
+                print(fbToken);
+
+                res = await http.post(
+                  Uri.parse(url),
+                  body: body,
+                  headers: {
+                    "Authorization": "Bearer ${jsonResponse['token']}",
+                    "Connection": "Keep-Alive",
+                    "Keep-Alive": "timeout=5, max=1000",
+                  },
+                ).catchError((error) {
+                  print(error);
+                });
+
+                if (res != null && res.statusCode == 201) {
+                  print(res.body);
                   setState(() {
                     isLoading = false;
                   });
-                  widget.notify_parent();
+                  print('>>> Token inserted');
                   Navigator.pushNamedAndRemoveUntil(
                     context,
-                    '/reporter/home',
+                    '/responder/home',
                     (Route<dynamic> route) => false,
                   );
                   return;
-                } else {
-                  url = 'http://143.198.92.250/api/register_token';
-                  body = {"account_id": user.id.toString(), "token": fbToken};
-
-                  res = await http.post(
-                    Uri.parse(url),
-                    body: body,
-                    headers: {
-                      "Authorization": "Bearer ${jsonResponse['token']}",
-                      "Connection": "Keep-Alive",
-                      "Keep-Alive": "timeout=5, max=1000",
-                    },
-                  ).catchError((error) {
-                    print(error);
-                  });
-
-                  if (res != null && res.statusCode == 201) {
-                    setState(() {
-                      isLoading = false;
-                    });
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/responder/home',
-                      (Route<dynamic> route) => false,
-                    );
-                    return;
-                  }
-                  print(res.statusCode);
-                  print(res.body);
                 }
+                print(res.statusCode);
+                print(res.body);
               }
             }
           }
-          if (res.statusCode == 401) message = "Invalid user credentials";
-        } on SocketException catch (e) {
-          print('not connected');
-          message = e.message;
         }
+        if (res.statusCode == 401) message = "Invalid user credentials";
       } else {
         print("No internet connection");
         message = "No internet. Check your internet connection";

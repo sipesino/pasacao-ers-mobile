@@ -18,6 +18,9 @@ class IncidentButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
+      borderRadius: BorderRadius.all(
+        Radius.circular(10),
+      ),
       child: Container(
         margin: EdgeInsets.only(bottom: 15),
         height: 75.0,

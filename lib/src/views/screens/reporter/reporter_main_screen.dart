@@ -46,7 +46,6 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        print('hey');
         showDialog(
           context: context,
           builder: (context) {

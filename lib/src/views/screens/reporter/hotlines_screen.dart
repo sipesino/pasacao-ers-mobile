@@ -43,36 +43,6 @@ class _HotlinesScreenState extends State<HotlinesScreen> {
                     hotline_number: '09669777143',
                     hotline_type: 'Mobile Number',
                   ),
-                  HotlineCard(
-                    agency_name: 'Pasacao PNP',
-                    hotline_number: '09123456789',
-                    hotline_type: 'Police',
-                  ),
-                  HotlineCard(
-                    agency_name: 'Pasacao BFP',
-                    hotline_number: '+(63) 987-654-3210',
-                    hotline_type: 'Police',
-                  ),
-                  HotlineCard(
-                    agency_name: 'Pasacao MDRRMO',
-                    hotline_number: '09669777143',
-                    hotline_type: 'Medic',
-                  ),
-                  HotlineCard(
-                    agency_name: 'Pasacao PNP',
-                    hotline_number: '09123456789',
-                    hotline_type: 'Mobile Number',
-                  ),
-                  HotlineCard(
-                    agency_name: 'Pasacao BFP',
-                    hotline_number: '+(63) 987-654-3210',
-                    hotline_type: 'Mobile Number',
-                  ),
-                  HotlineCard(
-                    agency_name: 'Pasacao MDRRMO',
-                    hotline_number: '09669777143',
-                    hotline_type: 'Mobile Number',
-                  ),
                 ],
               ),
             ),
