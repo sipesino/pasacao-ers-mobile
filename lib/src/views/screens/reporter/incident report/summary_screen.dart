@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
-import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_report.dart';
@@ -316,78 +313,75 @@ class _SummaryScreenState extends State<SummaryScreen> {
     var jsonResponse;
     var res;
 
-    if (await DataConnectionChecker().hasConnection) {
-      res = await http.post(Uri.parse(url), body: location_body, headers: {
-        'Authorization': 'Bearer $token',
-      });
+    res = await http.post(Uri.parse(url), body: location_body, headers: {
+      'Authorization': 'Bearer $token',
+    });
 
+    print(res.body);
+
+    if (res.statusCode == 200) {
+      print('Location inserted');
       print(res.body);
 
-      if (res.statusCode == 200) {
-        print('Location inserted');
-        print(res.body);
+      jsonResponse = jsonDecode(res.body);
 
+      LocationInfo location_info = LocationInfo.fromMap(jsonResponse["data"]);
+
+      Map<String, dynamic> body = {
+        "incident_type": report.incident_type,
+        if (report.name != null) "name": report.name,
+        "sex": report.sex,
+        "age": report.age,
+        "incident_status": "pending",
+        "victim_status": report.victim_status,
+        "description": report.description,
+        "account_id": report.account_id,
+        // "incident_images": incident_images,
+        "location": location_info.location_id.toString(),
+        "landmark": report.landmark,
+      };
+
+      url = 'http://143.198.92.250/api/incidents';
+
+      setState(() {
+        isLoading = true;
+      });
+
+      res = await http.post(
+        Uri.parse(url),
+        body: body,
+        headers: {
+          'Authorization': 'Bearer $token',
+          "Connection": "Keep-Alive",
+          "Keep-Alive": "timeout=5, max=1000",
+        },
+      );
+
+      if (res.statusCode == 200) {
         jsonResponse = jsonDecode(res.body);
 
-        LocationInfo location_info = LocationInfo.fromMap(jsonResponse["data"]);
-
-        Map<String, dynamic> body = {
-          "incident_type": report.incident_type,
-          if (report.name != null) "name": report.name,
-          "sex": report.sex,
-          "age": report.age,
-          "incident_status": "pending",
-          "victim_status": report.victim_status,
-          "description": report.description,
-          "account_id": report.account_id,
-          // "incident_images": incident_images,
-          "location": location_info.location_id.toString(),
-          "landmark": report.landmark,
-        };
-
-        url = 'http://143.198.92.250/api/incidents';
-
-        setState(() {
-          isLoading = true;
-        });
-
-        res = await http.post(
-          Uri.parse(url),
-          body: body,
-          headers: {
-            'Authorization': 'Bearer $token',
-            "Connection": "Keep-Alive",
-            "Keep-Alive": "timeout=5, max=1000",
-          },
-        );
-
-        if (res.statusCode == 200) {
-          jsonResponse = jsonDecode(res.body);
-
-          if (jsonResponse != null) {
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                behavior: SnackBarBehavior.floating,
-                content: new Text("Incident reported successfuly"),
-                backgroundColor: Colors.green,
-                duration: new Duration(seconds: 5),
-              ),
-            );
-            return;
-          }
-        } else {
-          print(res.statusCode);
-          print(res.body);
+        if (jsonResponse != null) {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/reporter/home', (route) => false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: new Text("Incident reported successfuly"),
+              backgroundColor: Colors.green,
+              duration: new Duration(seconds: 5),
+            ),
+          );
+          return;
         }
+      } else {
+        print(res.statusCode);
+        print(res.body);
       }
     }
 
     String message = "";
-    if (!await DataConnectionChecker().hasConnection)
-      message = "No internet. Check your internet connection";
-    else if (res.statusCode == 401)
+
+    if (res.statusCode == 401)
       message = "Invalid user credentials";
     else
       message = "Something went wrong.";

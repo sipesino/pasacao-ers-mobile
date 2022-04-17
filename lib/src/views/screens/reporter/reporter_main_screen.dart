@@ -1,3 +1,4 @@
+import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/custom_icons.dart';
@@ -38,6 +39,12 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
   ];
 
   @override
+  void setState(VoidCallback fn) {
+    // TODO: implement setState
+    if (mounted) setState(fn);
+  }
+
+  @override
   void dispose() {
     super.dispose();
   }
@@ -46,37 +53,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text('Logout'),
-              content: Text('Are you sure you want to logout?'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    SharedPref().clear();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/', (route) => false);
-                  },
-                  child: Text(
-                    'YES',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'NO',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+        logout(context);
         return Future.value(false);
       },
       child: Scaffold(
@@ -146,6 +123,40 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Future<dynamic> logout(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                SharedPref().clear();
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/', (route) => false);
+              },
+              child: Text(
+                'YES',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'NO',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

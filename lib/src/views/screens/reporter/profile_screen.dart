@@ -166,9 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           // buildAboutButton(),
           TextButton.icon(
             onPressed: () {
-              new SharedPref().clear();
-              Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/', (route) => false);
+              logout(context);
             },
             label: Text(
               'Logout',
@@ -184,6 +182,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<dynamic> logout(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                SharedPref().clear();
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/', (route) => false);
+              },
+              child: Text(
+                'YES',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'NO',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
