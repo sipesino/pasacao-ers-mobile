@@ -24,7 +24,6 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     if (mounted) super.setState(fn);
   }
 
@@ -34,6 +33,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
       duration: 3000,
       splash: 'assets/images/logo.png',
       splashTransition: SplashTransition.fadeTransition,
+      pageTransitionType: PageTransitionType.fade,
       nextScreen: AbsorbPointer(
         absorbing: isLoading,
         child: DefaultTabController(

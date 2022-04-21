@@ -15,7 +15,7 @@
         </intent>
     </queries>
    <application
-        android:label="PERMS"
+        android:label="PERS Aid"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
                    android:value="AIzaSyCLEtZd3wSnbz4heJ4TFPHrD9TaeaeCLhs"/>

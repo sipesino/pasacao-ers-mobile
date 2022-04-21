@@ -40,7 +40,6 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     if (mounted) setState(fn);
   }
 
@@ -60,7 +59,7 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
         body: SafeArea(
           child: PageView(
             controller: pageController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: AlwaysScrollableScrollPhysics(),
             children: [
               HomeScreen(),
               // AlertsScreen(),

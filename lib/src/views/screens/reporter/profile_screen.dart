@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 120.0,
               width: 120.0,
               decoration: BoxDecoration(
-                color: chromeColor.withOpacity(0.5),
+                color: Colors.white,
                 border: Border.all(width: 5, color: Colors.white),
                 borderRadius: BorderRadius.circular(10.0),
                 boxShadow: boxShadow,
