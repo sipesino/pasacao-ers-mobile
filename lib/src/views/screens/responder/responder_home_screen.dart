@@ -9,6 +9,7 @@ import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/operation_card.dart';
 
@@ -34,13 +35,16 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
     super.initState();
     SharedPref pref = SharedPref();
 
+    pref.read('user').then((value) {
+      user = User.fromJson(value);
+    });
+
     pref
         .read('gotNewOperation')
         .then((value) => gotNewOperation = value.toLowerCase() == 'true');
 
     pref.read('operation').then((value) {
       if (value != 'null' && value.isNotEmpty) {
-        print(value);
         Map<String, dynamic> operation_data = jsonDecode(value);
         operation = Operation(
           operation_id: operation_data['operation_id'],
@@ -64,9 +68,10 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
           age: report_data['age'],
           victim_status: report_data['victim_status'],
           landmark: report_data['landmark'],
+          latitude: report_data['latitude'],
+          longitude: report_data['longitude'],
         );
         operation!.report = report;
-        print(operation);
       }
     });
 
@@ -94,6 +99,8 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                         age: data['age'],
                         victim_status: data['victim_status'],
                         landmark: data['landmark'],
+                        latitude: data['latitude'].toString(),
+                        longitude: data['longitude'].toString(),
                       ),
                     );
                     gotNewOperation = true;
@@ -131,25 +138,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
               'Are you ready to respond?',
               style: DefaultTextTheme.subtitle2,
             ),
-            // Row(
-            //   children: [
-            //     Icon(
-            //       CustomIcons.siren_filled,
-            //       color: accentColor,
-            //     ),
-            //     SizedBox(width: 10),
-            //     Expanded(
-            //       child: Text(
-            //         'Incident Notification',
-            //         style: TextStyle(
-            //           color: primaryColor,
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.w700,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
             SizedBox(height: 20),
             gotNewOperation ?? false
                 ? OperationCard(

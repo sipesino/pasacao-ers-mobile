@@ -28,6 +28,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     ),
   );
   saveOperation(message);
+  print(message.data);
   print('>>> Background notification received');
   await Firebase.initializeApp();
 }
@@ -45,6 +46,8 @@ void saveOperation(RemoteMessage message) {
       age: data['age'],
       victim_status: data['victim_status'],
       landmark: data['landmark'],
+      latitude: data['latitude'].toString(),
+      longitude: data['longitude'].toString(),
     ),
   );
   SharedPref().save('gotNewOperation', 'true');
@@ -89,6 +92,7 @@ void setupFcm(void Function(String) onNewOperation) {
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     //Its compulsory to check if RemoteMessage instance is null or not.
     if (message != null) {
+      print(message.data);
       flutterLocalNotificationsPlugin.show(
         message.hashCode,
         message.data['title'],
@@ -114,6 +118,7 @@ void setupFcm(void Function(String) onNewOperation) {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     saveOperation(message);
+    print(message.data);
     onNewOperation(message.data['"operation"']);
     flutterLocalNotificationsPlugin.show(
       message.hashCode,
@@ -139,6 +144,7 @@ void setupFcm(void Function(String) onNewOperation) {
   FirebaseMessaging.onMessageOpenedApp.listen(
     (message) {
       if (message != null) {
+        print(message.data);
         saveOperation(message);
         goToNextScreen(message.data['"operation"']);
       }

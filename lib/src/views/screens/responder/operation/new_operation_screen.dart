@@ -14,6 +14,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/directions.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/locations.dart';
@@ -174,6 +175,7 @@ class _NewOperationState extends State<NewOperation> {
     ScreenArguments args =
         ModalRoute.of(context)!.settings.arguments! as ScreenArguments;
     operation = args.operation;
+
     sex = args.operation!.report!.sex;
 
     AppBar appBar = AppBar(
@@ -229,27 +231,30 @@ class _NewOperationState extends State<NewOperation> {
                       height: MediaQuery.of(context).size.height,
                       child: AnimatedSwitcher(
                         duration: Duration(milliseconds: 150),
-                        child: !_isResponding
+                        child: user!.account_type == 'bfp' ||
+                                user!.account_type == 'pnp'
                             ? buildOperationInfo(context, appBar, args)
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  ExpandablePageView(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    controller: pageController,
+                            : !_isResponding
+                                ? buildOperationInfo(context, appBar, args)
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      BuildBaseDepartPhase(),
-                                      BuildSceneArrivalPhase(),
-                                      BuildSceneDepartPhase(),
-                                      BuildPatientInfoForm(),
-                                      BuildVitalSignForm(),
-                                      BuildReceivingFacilityArrivalPhase(),
-                                      BuildRFDeparturePhase(),
-                                      BuildBaseArrivalPhase(),
+                                      ExpandablePageView(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        controller: pageController,
+                                        children: [
+                                          BuildBaseDepartPhase(),
+                                          BuildSceneArrivalPhase(),
+                                          BuildSceneDepartPhase(),
+                                          BuildPatientInfoForm(),
+                                          BuildVitalSignForm(),
+                                          BuildReceivingFacilityArrivalPhase(),
+                                          BuildRFDeparturePhase(),
+                                          BuildBaseArrivalPhase(),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                ],
-                              ),
                       ),
                     ),
                   ),
@@ -861,8 +866,6 @@ class _NewOperationState extends State<NewOperation> {
                       ),
                     );
 
-                    print(op.toString());
-
                     Navigator.of(context).pushNamed(
                       '/responder/home/new_operation/summary',
                       arguments: ScreenArguments(
@@ -1125,7 +1128,7 @@ class _NewOperationState extends State<NewOperation> {
                   ),
                 ),
                 SizedBox(height: 10),
-                buildRespondButton(),
+                if (user!.account_type == 'responder') buildRespondButton(),
               ],
             ),
           ],
