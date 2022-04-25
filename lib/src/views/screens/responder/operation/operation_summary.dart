@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/models/operation.dart';
+import 'package:pers/src/models/pop_with_results.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
@@ -304,8 +305,10 @@ class _OperationSummaryScreenState extends State<OperationSummaryScreen> {
             pref.remove('operation');
             pref.save('gotNewOperation', 'false');
             SharedPref().reload();
-            Navigator.of(context)
-                .popUntil(ModalRoute.withName("/responder/home"));
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/responder/home',
+              (Route<dynamic> route) => false,
+            );
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
