@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/views/screens/reporter/profile_screen.dart';
@@ -19,30 +20,60 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
   bool? isExternalAgency;
   int _selectedIndex = 0;
   bool isLoading = true;
+  List<Widget>? pages;
 
-  List<BottomNavigationBarItem> _barItems = [];
+  List<NavigationDestination> _navigationItems = [];
 
-  initBottomBarItems() {
-    _barItems.add(
-      BottomNavigationBarItem(
-        icon: Icon(CustomIcons.home),
+  initPages() {
+    pages = [
+      ResponderHomeScreen(),
+      if (!isExternalAgency!) ResponderOperationsScreen(),
+      ProfileScreen(isResponder: true),
+    ];
+  }
+
+  initNavigationButtons() {
+    _navigationItems = [
+      NavigationDestination(
+        icon: Icon(
+          CustomIcons.home,
+          color: contentColorLightTheme,
+          size: 20,
+        ),
+        selectedIcon: Icon(
+          CustomIcons.home,
+          color: accentColor,
+          size: 20,
+        ),
         label: 'Home',
       ),
-    );
-    if (!isExternalAgency!) {
-      _barItems.add(
-        BottomNavigationBarItem(
-          icon: Icon(CustomIcons.siren_2),
+      if (!isExternalAgency!)
+        NavigationDestination(
+          icon: Icon(
+            CustomIcons.siren_2,
+            color: contentColorLightTheme,
+          ),
+          selectedIcon: Icon(
+            CustomIcons.siren_2,
+            color: accentColor,
+            size: 20,
+          ),
           label: 'Operations',
         ),
-      );
-    }
-    _barItems.add(
-      BottomNavigationBarItem(
-        icon: Icon(CustomIcons.user),
+      NavigationDestination(
+        icon: Icon(
+          CustomIcons.user,
+          color: contentColorLightTheme,
+          size: 20,
+        ),
+        selectedIcon: Icon(
+          CustomIcons.user,
+          size: 20,
+          color: accentColor,
+        ),
         label: 'Profile',
       ),
-    );
+    ];
   }
 
   @override
@@ -64,14 +95,17 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
   @override
   void initState() {
     super.initState();
+
     SharedPref().read('user').then((value) {
-      User user = User.fromJson(value);
-      isExternalAgency = user.account_type!.toUpperCase() == 'EXTERNAL AGENCY';
-      initBottomBarItems();
-      print(_barItems.length);
       setState(() {
+        user = User.fromJson(value);
         isLoading = false;
       });
+      isExternalAgency = user!.account_type!.toUpperCase() == 'BFP' ||
+          user!.account_type!.toUpperCase() == 'PNP';
+      print(isExternalAgency);
+      initPages();
+      initNavigationButtons();
     });
   }
 
@@ -116,20 +150,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
         body: SafeArea(
           child: isLoading
               ? Center(child: CircularProgressIndicator())
-              : PageView(
-                  controller: pageController,
-                  physics: NeverScrollableScrollPhysics(),
-                  children: [
-                    ResponderHomeScreen(),
-                    if (!isExternalAgency!) ResponderOperationsScreen(),
-                    ProfileScreen(isResponder: true),
-                  ],
-                  onPageChanged: (index) {
-                    setState(() {
-                      _selectedIndex = index;
-                    });
-                  },
-                ),
+              : pages![_selectedIndex],
         ),
         bottomNavigationBar: isLoading
             ? SizedBox.shrink()
@@ -143,15 +164,19 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
                     ),
                   ),
                 ),
-                child: BottomNavigationBar(
-                  elevation: 0,
-                  items: _barItems,
-                  currentIndex: _selectedIndex,
-                  unselectedItemColor: chromeColor,
-                  unselectedIconTheme: IconThemeData(color: chromeColor),
-                  selectedItemColor: accentColor,
-                  selectedIconTheme: IconThemeData(color: accentColor),
-                  onTap: onTap,
+                child: NavigationBar(
+                  selectedIndex: _selectedIndex,
+                  backgroundColor: Colors.white,
+                  animationDuration: Duration(milliseconds: 500),
+                  labelBehavior:
+                      NavigationDestinationLabelBehavior.onlyShowSelected,
+                  height: 70,
+                  onDestinationSelected: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  destinations: _navigationItems,
                 ),
               ),
       ),

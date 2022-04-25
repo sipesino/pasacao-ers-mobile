@@ -34,7 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     });
     SharedPref().read('contacts').then((value) {
-      print(value);
       if (value != 'null')
         setState(() {
           contacts = EmergencyContact.decode(value);

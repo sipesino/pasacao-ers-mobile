@@ -19,29 +19,54 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
   PageController pageController = new PageController();
   int _selectedIndex = 0;
 
-  List<BottomNavigationBarItem> _barItems = [
-    BottomNavigationBarItem(
-      icon: Icon(CustomIcons.home),
+  List<NavigationDestination> _navigationItems = const [
+    NavigationDestination(
+      icon: Icon(
+        CustomIcons.home,
+        color: contentColorLightTheme,
+        size: 20,
+      ),
+      selectedIcon: Icon(
+        CustomIcons.home,
+        color: accentColor,
+        size: 20,
+      ),
       label: 'Home',
     ),
-    // BottomNavigationBarItem(
-    //   icon: Icon(CustomIcons.warning),
-    //   label: 'Alerts',
-    // ),
-    BottomNavigationBarItem(
-      icon: Icon(FontAwesomeIcons.mapMarked),
+    NavigationDestination(
+      icon: Icon(
+        FontAwesomeIcons.mapMarked,
+        color: contentColorLightTheme,
+        size: 20,
+      ),
+      selectedIcon: Icon(
+        FontAwesomeIcons.mapMarked,
+        color: accentColor,
+        size: 20,
+      ),
       label: 'Locations',
     ),
-    BottomNavigationBarItem(
-      icon: Icon(CustomIcons.user),
+    NavigationDestination(
+      icon: Icon(
+        CustomIcons.user,
+        color: contentColorLightTheme,
+        size: 20,
+      ),
+      selectedIcon: Icon(
+        CustomIcons.user,
+        size: 20,
+        color: accentColor,
+      ),
       label: 'Profile',
     ),
   ];
 
-  @override
-  void setState(VoidCallback fn) {
-    if (mounted) setState(fn);
-  }
+  List<Widget> pages = [
+    HomeScreen(),
+    // AlertsScreen(),
+    LocationsScreen(),
+    ProfileScreen(),
+  ];
 
   @override
   void dispose() {
@@ -57,70 +82,32 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
       },
       child: Scaffold(
         body: SafeArea(
-          child: PageView(
-            controller: pageController,
-            physics: AlwaysScrollableScrollPhysics(),
-            children: [
-              HomeScreen(),
-              // AlertsScreen(),
-              LocationsScreen(),
-              ProfileScreen(),
-            ],
-            onPageChanged: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
+          child: Center(
+            child: pages[_selectedIndex],
           ),
         ),
-        bottomNavigationBar: Container(
-          clipBehavior: Clip.none,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            ),
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.grey.withOpacity(0.3),
-                offset: new Offset(0, -5),
-                blurRadius: 20.0,
-                spreadRadius: 4.0,
-              ),
-            ],
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(
-                  color: Color(0xFFE0E0E0),
-                  width: 0.4,
-                ),
-              ),
-            ),
-            child: BottomNavigationBar(
-              elevation: 0,
-              items: _barItems,
-              currentIndex: _selectedIndex,
-              unselectedItemColor: chromeColor,
-              unselectedIconTheme: IconThemeData(color: chromeColor),
-              selectedItemColor: accentColor,
-              selectedIconTheme: IconThemeData(color: accentColor),
-              onTap: (index) {
-                pageController.animateToPage(
-                  index,
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.ease,
-                );
-                setState(() {
-                  _selectedIndex = index;
-                });
-              },
-              showUnselectedLabels: true,
-            ),
-          ),
-        ),
+        bottomNavigationBar: myNavigationBar(),
+      ),
+    );
+  }
+
+  Widget myNavigationBar() {
+    return NavigationBarTheme(
+      data: NavigationBarThemeData(
+        indicatorColor: accentColor.withOpacity(0.2),
+      ),
+      child: NavigationBar(
+        selectedIndex: _selectedIndex,
+        backgroundColor: Colors.white,
+        animationDuration: Duration(milliseconds: 500),
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        height: 70,
+        onDestinationSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        destinations: _navigationItems,
       ),
     );
   }
