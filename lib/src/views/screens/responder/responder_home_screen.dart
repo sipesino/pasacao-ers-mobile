@@ -56,7 +56,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
           eta_hospital: operation_data['eta_hospital'],
           etd_hospital: operation_data['etd_hospital'],
           eta_base: operation_data['eta_base'],
-          receivingFacility: operation_data['receivingFacility'],
+          receiving_facility: operation_data['receiving_facility'],
         );
         Map<String, dynamic> report_data = jsonDecode(operation_data['report']);
         final report = IncidentReport(

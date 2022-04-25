@@ -125,7 +125,7 @@ class _NewOperationState extends State<NewOperation> {
   String? eta_hospital;
   String? etd_hospital;
   String? eta_base;
-  String? receivingFacility;
+  String? receiving_facility;
   String? nd_latitude;
   String? nd_longitude;
 
@@ -464,7 +464,7 @@ class _NewOperationState extends State<NewOperation> {
                     ],
                     onChanged: (val) {
                       if (val != null) {
-                        receivingFacility = val.location_name;
+                        receiving_facility = val.location_name;
 
                         String type;
                         switch (val.location_type?.toUpperCase()) {
@@ -496,7 +496,7 @@ class _NewOperationState extends State<NewOperation> {
 
                           _setNewDestination(
                             'receiving facility',
-                            receivingFacility!,
+                            receiving_facility!,
                             receivingFacilityMarker!,
                             val.latitude!,
                             val.longitude!,
@@ -788,7 +788,7 @@ class _NewOperationState extends State<NewOperation> {
 
                       _setNewDestination(
                         'base',
-                        receivingFacility!,
+                        receiving_facility!,
                         BitmapDescriptor.fromBytes(onValue),
                         mdrrmo_latitude,
                         mdrrmo_longitude,
@@ -847,7 +847,7 @@ class _NewOperationState extends State<NewOperation> {
                       eta_scene: eta_scene,
                       etd_hospital: etd_hospital,
                       etd_scene: etd_scene,
-                      receivingFacility: receivingFacility,
+                      receiving_facility: receiving_facility,
                       report: IncidentReport(
                         incident_id: operation!.report!.incident_id,
                         incident_type: operation!.report!.incident_type,

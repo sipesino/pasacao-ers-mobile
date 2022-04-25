@@ -13,7 +13,7 @@ class Operation {
   String? eta_hospital;
   String? etd_hospital;
   String? eta_base;
-  String? receivingFacility;
+  String? receiving_facility;
   IncidentReport? report;
 
   Operation({
@@ -27,7 +27,7 @@ class Operation {
     this.eta_hospital,
     this.etd_hospital,
     this.eta_base,
-    this.receivingFacility,
+    this.receiving_facility,
     this.report,
   });
 
@@ -43,7 +43,7 @@ class Operation {
       'eta_hospital': eta_hospital,
       'etd_hospital': etd_hospital,
       'eta_base': eta_base,
-      'receivingFacility': receivingFacility,
+      'receiving_facility': receiving_facility,
       'report': report,
     };
   }
@@ -60,7 +60,7 @@ class Operation {
       eta_hospital: map['eta_hospital'],
       etd_hospital: map['etd_hospital'],
       eta_base: map['eta_base'],
-      receivingFacility: map['receivingFacility'],
+      receiving_facility: map['receiving_facility'],
       report: map['report'],
     );
   }
@@ -72,7 +72,7 @@ class Operation {
 
   @override
   String toString() {
-    return 'Operation(operation_id: $operation_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receivingFacility: $receivingFacility, incident_report: ${report.toString()})';
+    return 'Operation(operation_id: $operation_id, external_agency_id: $external_agency_id, dispatcher_id: $dispatcher_id, account_id: $account_id, etd_base: $etd_base, eta_scene: $eta_scene, etd_scene: $etd_scene, eta_hospital: $eta_hospital, etd_hospital: $etd_hospital, eta_base: $eta_base, receiving_facility: $receiving_facility, incident_report: ${report.toString()})';
   }
 
   @override
@@ -87,7 +87,7 @@ class Operation {
         eta_hospital.hashCode ^
         etd_hospital.hashCode ^
         eta_base.hashCode ^
-        receivingFacility.hashCode ^
+        receiving_facility.hashCode ^
         report.hashCode;
   }
 }
