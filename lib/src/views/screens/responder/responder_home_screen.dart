@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';

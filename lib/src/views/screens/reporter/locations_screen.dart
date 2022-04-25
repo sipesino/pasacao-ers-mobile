@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
@@ -117,105 +116,6 @@ class _LocationsScreenState extends State<LocationsScreen> {
               .toList(),
         ),
       ],
-    );
-  }
-
-  Widget _buildLocationsStats() {
-    return Card(
-      elevation: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: accentColor,
-          boxShadow: boxShadow,
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFFC9842),
-              Color(0xFFFE5F75),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        padding: EdgeInsets.all(20),
-        child: Wrap(
-          alignment: WrapAlignment.spaceBetween,
-          children: [
-            SizedBox(
-              width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Police Stations',
-                    textAlign: TextAlign.center,
-                    style: DefaultTextTheme.headline5,
-                  ),
-                  Text(
-                    '5',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 26,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            SizedBox(
-              width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Fire Stations',
-                    textAlign: TextAlign.center,
-                    style: DefaultTextTheme.headline5,
-                  ),
-                  Text(
-                    '3',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 26,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 20,
-            ),
-            SizedBox(
-              width: 80,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'Hospitals/Clinics',
-                    textAlign: TextAlign.center,
-                    style: DefaultTextTheme.headline5,
-                  ),
-                  Text(
-                    '2',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 26,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/widgets/add_contact_dialog.dart';

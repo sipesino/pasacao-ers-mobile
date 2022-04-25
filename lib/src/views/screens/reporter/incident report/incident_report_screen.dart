@@ -32,7 +32,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   final GlobalKey<FormState> form_key = GlobalKey<FormState>();
 
   bool not_victim = false;
-  bool _switchValue = true;
   bool toLocation = false;
   bool isLoading = false;
 
@@ -81,7 +80,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   @override
   void setState(VoidCallback fn) {
-    // TODO: implement setState
     if (mounted) super.setState(fn);
   }
 

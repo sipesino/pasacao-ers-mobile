@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/constants.dart';
-import 'package:pers/src/theme.dart';
-import 'package:pers/src/widgets/hotline_card.dart';
 
 class BottomContainer extends StatelessWidget {
   BottomContainer({

@@ -37,7 +37,6 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  bool _load = false;
   String pass = "";
   final _formKey = GlobalKey<FormState>();
   FocusNode bdayFocusNode = new FocusNode();

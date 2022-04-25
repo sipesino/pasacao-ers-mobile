@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 class LocationInfo {
   final int? location_id;
   final String? location_name;
