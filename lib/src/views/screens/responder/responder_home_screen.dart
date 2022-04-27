@@ -4,7 +4,6 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/data/data.dart';
-import 'package:pers/src/lifecycle_event_handler.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
@@ -32,6 +31,11 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('state = $state');
+  }
+
+  @override
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
@@ -40,19 +44,13 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(
-      LifecycleEventHandler(
-        resumeCallBack: () async => setState(() {
-          checkOperationAvailable();
-        }),
-      ),
-    );
-
-    checkOperationAvailable();
+    WidgetsBinding.instance?.addObserver(this);
 
     SharedPref().read('user').then((value) {
       user = User.fromJson(value);
     });
+
+    checkOperationAvailable();
 
     _connectivity.checkConnectivity().then((status) {
       ConnectivityResult _connectionStatus = status;
@@ -130,6 +128,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   }
 
   Widget displayNoOperationAssigned() {
+    final elevation = 3.0;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -141,9 +140,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
           boxShadow: boxShadow,
-          border: Border.all(
-            width: 1,
-          ),
         ),
         child: Center(
           child: Text(

@@ -85,8 +85,12 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('hey');
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-    incident_type = args.incidentType;
+    if (args != null)
+      incident_type = args.incidentType;
+    else
+      print('Null incident type');
 
     Widget loadingIndicator = isLoading
         ? new Container(
@@ -111,13 +115,12 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
       absorbing: isLoading,
       child: Scaffold(
         appBar: AppBar(
-          centerTitle: true,
           title: Text(
             'Incident Report',
             style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 20,
               color: primaryColor,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

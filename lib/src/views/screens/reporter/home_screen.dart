@@ -3,11 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
+import 'package:pers/src/fade_route_transition.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
+import 'package:pers/src/views/screens/reporter/incident%20report/incident_report_screen.dart';
 import 'package:pers/src/widgets/incident_button.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -132,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         navigateToIncidentReportScreen(
                           context,
-                          incident_types[index].icon,
+                          FontAwesomeIcons.carCrash,
                           incident_types[index].label,
                         );
                       },
@@ -161,14 +163,16 @@ class _HomeScreenState extends State<HomeScreen> {
   ) async {
     PermissionHandler.checkLocationPermission();
 
-    Navigator.of(context).pushNamed(
-      '/reporter/home/report',
-      arguments: ScreenArguments(
-        incidentType: incidentType,
-        icon: icon,
+    Navigator.push(
+      context,
+      FadeInRoute(
+        page: IncidentReportScreen(),
+        routeName: '/reporter/home/report',
+        arguments: ScreenArguments(
+          incidentType: incidentType,
+          icon: icon,
+        ),
       ),
     );
   }
-
-  getUserCredentials() {}
 }

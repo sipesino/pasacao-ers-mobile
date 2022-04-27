@@ -15,31 +15,29 @@ class ResponderOperationsScreen extends StatelessWidget {
         headerSliverBuilder: (context, innerBoxIsScrolled) => [
           SliverAppBar(
             floating: true,
+            leading: Icon(
+              CustomIcons.siren_2,
+              color: accentColor,
+            ),
+            titleSpacing: 0,
             title: Row(
               children: [
-                Icon(
-                  CustomIcons.siren_2,
-                  color: accentColor,
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Operations Responded',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+                Text(
+                  'Operations Responded',
+                  style: TextStyle(
+                    color: primaryColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
             ),
           ),
         ],
-        body: Padding(
-          padding: EdgeInsets.all(20),
-          child: SingleChildScrollView(
-            clipBehavior: Clip.none,
+        body: SingleChildScrollView(
+          clipBehavior: Clip.none,
+          child: Padding(
+            padding: EdgeInsets.all(20),
             child: Column(
               children: [
                 IncidentCard(),

@@ -17,7 +17,6 @@ class IncidentCard extends StatelessWidget {
           color: Colors.white,
           boxShadow: boxShadow,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

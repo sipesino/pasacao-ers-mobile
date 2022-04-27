@@ -165,7 +165,7 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
                 ),
                 child: NavigationBar(
                   selectedIndex: _selectedIndex,
-                  backgroundColor: Colors.white,
+                  backgroundColor: Color(0xFFF4F4FA),
                   animationDuration: Duration(milliseconds: 500),
                   labelBehavior:
                       NavigationDestinationLabelBehavior.onlyShowSelected,
