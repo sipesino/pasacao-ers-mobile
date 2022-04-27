@@ -18,6 +18,7 @@ class OperationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       splashColor: accentColor,
+      splashFactory: InkSplash.splashFactory,
       borderRadius: BorderRadius.circular(10),
       onTap: () {
         viewOperationDetails(context);

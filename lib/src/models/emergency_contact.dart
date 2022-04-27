@@ -3,20 +3,23 @@ import 'dart:convert';
 class EmergencyContact {
   final String contact_name;
   final String contact_number;
+  final int? contact_id;
 
-  const EmergencyContact({
+  EmergencyContact({
     required this.contact_name,
     required this.contact_number,
+    this.contact_id,
   });
 
   EmergencyContact copyWith({
     String? contact_name,
     String? contact_number,
-    String? contact_image,
+    int? contact_id,
   }) {
     return EmergencyContact(
       contact_name: contact_name ?? this.contact_name,
       contact_number: contact_number ?? this.contact_number,
+      contact_id: contact_id ?? this.contact_id,
     );
   }
 
@@ -24,6 +27,7 @@ class EmergencyContact {
     return {
       'contact_name': contact.contact_name,
       'contact_number': contact.contact_number,
+      'contact_id': contact.contact_id,
     };
   }
 
@@ -31,12 +35,14 @@ class EmergencyContact {
     return EmergencyContact(
       contact_name: map['contact_name'],
       contact_number: map['contact_number'],
+      contact_id: map['contact_id'],
     );
   }
 
   static String encode(List<EmergencyContact> contacts) => json.encode(
         contacts
-            .map<Map<String, dynamic>>((music) => EmergencyContact.toMap(music))
+            .map<Map<String, dynamic>>(
+                (contact) => EmergencyContact.toMap(contact))
             .toList(),
       );
 
@@ -49,12 +55,13 @@ class EmergencyContact {
     return EmergencyContact(
       contact_name: jsonData['contact_name'],
       contact_number: jsonData['contact_number'],
+      contact_id: jsonData['contact_id'],
     );
   }
 
   @override
   String toString() =>
-      'EmergencyContact(contact_name: $contact_name, contact_number: $contact_number)';
+      'EmergencyContact(contact_name: $contact_name, contact_number: $contact_number, contact_id: $contact_id)';
 
   @override
   bool operator ==(Object other) {
@@ -62,9 +69,11 @@ class EmergencyContact {
 
     return other is EmergencyContact &&
         other.contact_name == contact_name &&
-        other.contact_number == contact_number;
+        other.contact_number == contact_number &&
+        other.contact_id == contact_id;
   }
 
   @override
-  int get hashCode => contact_name.hashCode ^ contact_number.hashCode;
+  int get hashCode =>
+      contact_name.hashCode ^ contact_number.hashCode ^ contact_id.hashCode;
 }

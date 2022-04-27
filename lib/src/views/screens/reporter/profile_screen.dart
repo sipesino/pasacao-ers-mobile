@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
@@ -7,6 +10,7 @@ import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/emergency_contact_card.dart';
+import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
   final bool isResponder;
@@ -24,15 +28,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = true;
   List<EmergencyContact> contacts = [];
 
+  void getEmergencyContacts() async {
+    final Connectivity _connectivity = Connectivity();
+
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+
+      if (_connectionStatus != ConnectivityResult.none) {
+        SharedPref pref = new SharedPref();
+        String token = await pref.read("token");
+        user = User.fromJson(await pref.read('user'));
+        String url = 'http://143.198.92.250/api/emergencycontacts/${user!.id}';
+
+        var res = await http.get(
+          Uri.parse(url),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (res.statusCode == 200) {
+          var jsonResponse = jsonDecode(res.body);
+
+          for (var contact in jsonResponse['data']) {
+            contacts.add(EmergencyContact.fromJson(contact));
+          }
+          final String encoded_contacts = EmergencyContact.encode(contacts);
+          SharedPref().save('contacts', encoded_contacts);
+          getContactsFromSharedPref();
+          return;
+        }
+      }
+      getContactsFromSharedPref();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+
     SharedPref().read('user').then((value) {
       user = User.fromJson(value);
       setState(() {
         isLoading = false;
       });
     });
+    getEmergencyContacts();
+  }
+
+  void getContactsFromSharedPref() {
     SharedPref().read('contacts').then((value) {
       if (value != 'null')
         setState(() {
@@ -115,7 +159,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton(
                     onPressed: () {
                       Navigator.of(context)
-                          .pushNamed('/reporter/home/emergency_contacts');
+                          .pushNamed('/reporter/home/emergency_contacts')
+                          .then((value) => getContactsFromSharedPref());
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

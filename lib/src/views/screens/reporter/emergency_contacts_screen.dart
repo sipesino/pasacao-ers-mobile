@@ -19,13 +19,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   @override
   void initState() {
     super.initState();
-    SharedPref().read('contacts').then((value) {
-      print(value);
-      if (value != 'null')
-        setState(() {
-          contacts = EmergencyContact.decode(value);
-        });
-    });
+    refresh();
   }
 
   @override
@@ -76,7 +70,12 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
   }
 
   void refresh() {
-    setState(() {});
+    SharedPref().read('contacts').then((value) {
+      if (value != 'null')
+        setState(() {
+          contacts = EmergencyContact.decode(value);
+        });
+    });
   }
 
   void showAddContactDialog(BuildContext context) {

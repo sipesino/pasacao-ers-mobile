@@ -2,49 +2,6 @@ import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/user.dart';
 
-List<EmergencyContact> _emergencyContacts = [
-  EmergencyContact(
-    contact_name: 'Guy Dunn',
-    contact_number: '+63 898 555 9138',
-  ),
-  EmergencyContact(
-    contact_name: 'Carl Gill',
-    contact_number: '+63 917 467 8856',
-  ),
-  EmergencyContact(
-    contact_name: 'Anna Boyd',
-    contact_number: '+63 897 163 7011',
-  ),
-  EmergencyContact(
-    contact_name: 'Camille Flores',
-    contact_number: '+63 918 778 5738',
-  ),
-  EmergencyContact(
-    contact_name: 'Bryan Flowers',
-    contact_number: '+63 896 128 4499',
-  ),
-  EmergencyContact(
-    contact_name: 'Ivan Johnston',
-    contact_number: '+63 817 492 9909',
-  ),
-  EmergencyContact(
-    contact_name: 'Kim Ruiz',
-    contact_number: '+63 897 459 1746',
-  ),
-  EmergencyContact(
-    contact_name: 'Ruben Lee',
-    contact_number: '+63 813 434 6680',
-  ),
-  EmergencyContact(
-    contact_name: 'Zachary Murphy',
-    contact_number: '+63 909 978 1662',
-  ),
-  EmergencyContact(
-    contact_name: 'Shelia Mullins',
-    contact_number: '+63 817 373 5449',
-  ),
-];
-
 List<LocationInfo> _locations = [
   LocationInfo(
     location_id: 1,
@@ -80,20 +37,8 @@ List<LocationInfo> _locations = [
   ),
 ];
 
-List<EmergencyContact> getEmergencyContacts() {
-  return _emergencyContacts;
-}
-
 List<LocationInfo> getLocations() {
   return _locations;
-}
-
-void addEmergencyContacts(EmergencyContact contact) {
-  _emergencyContacts.add(contact);
-}
-
-void editEmergencyContact(EmergencyContact contact, int index) {
-  _emergencyContacts[index] = contact;
 }
 
 User? user;
