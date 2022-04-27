@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/incident_types.dart';
 
+const bgColor = Color(0xFFF4F4FA);
 const primaryColor = Color(0xFF1F2937);
 const accentColor = Color(0xFFE05A45);
 const chromeColor = Color(0xFFCCCCCC);

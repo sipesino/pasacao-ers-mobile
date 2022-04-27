@@ -127,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   Widget _buildTopContainer() => Expanded(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          color: Colors.white,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,

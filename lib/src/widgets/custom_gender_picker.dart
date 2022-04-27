@@ -60,6 +60,7 @@ class _CustomGenderPickerState extends State<CustomGenderPicker> {
         ),
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),

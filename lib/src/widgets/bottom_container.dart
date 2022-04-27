@@ -20,7 +20,7 @@ class BottomContainer extends StatelessWidget {
         Container(
           height: buttonHeight * 1.5,
           width: MediaQuery.of(context).size.width,
-          color: chromeColor,
+          color: Color(0xFFDEDEF3),
           child: displayHotlinesButton
               ? Center(
                   child: TextButton.icon(

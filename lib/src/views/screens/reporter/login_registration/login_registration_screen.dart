@@ -33,6 +33,7 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
       duration: 3000,
       splash: 'assets/images/logo.png',
       splashTransition: SplashTransition.fadeTransition,
+      backgroundColor: bgColor,
       pageTransitionType: PageTransitionType.fade,
       nextScreen: AbsorbPointer(
         absorbing: isLoading,
@@ -44,7 +45,6 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
             appBar: PreferredSize(
               preferredSize: Size.fromHeight(60.0),
               child: AppBar(
-                backgroundColor: Colors.white,
                 title: SizedBox(
                   height: 40,
                   width: 180,

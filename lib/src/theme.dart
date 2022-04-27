@@ -7,9 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 ThemeData lightThemeData(BuildContext context) {
   return ThemeData.light().copyWith(
     primaryColor: primaryColor,
-    scaffoldBackgroundColor: Color(0xFFF4F4FA),
+    scaffoldBackgroundColor: bgColor,
     appBarTheme: appBarTheme,
-    bottomAppBarColor: Color(0xFFF4F4FA),
+    bottomAppBarColor: bgColor,
+    backgroundColor: bgColor,
     iconTheme: const IconThemeData(color: primaryColor),
     textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme)
         .apply(bodyColor: primaryColor),
@@ -120,6 +121,6 @@ const TextTheme DefaultTextTheme = TextTheme(
 const appBarTheme = AppBarTheme(
   centerTitle: false,
   elevation: 0,
-  color: Color(0xFFF4F4FA),
+  color: bgColor,
   iconTheme: IconThemeData(color: primaryColor),
 );
