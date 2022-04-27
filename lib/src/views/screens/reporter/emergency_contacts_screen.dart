@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -45,10 +46,52 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: contacts.map((e) {
-                    return EmergencyContactCard2(
-                      contact_name: e.contact_name,
-                      contact_number: e.contact_number,
-                      index: contacts.indexOf(e),
+                    return Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: boxShadow,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Slidable(
+                            key: const ValueKey(0),
+                            endActionPane: ActionPane(
+                              motion: ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  onPressed: (context) {
+                                    showEditContactDialog(
+                                      context,
+                                      e,
+                                      contacts.indexOf(e),
+                                    );
+                                  },
+                                  backgroundColor: Color(0xFF0392CF),
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.edit,
+                                  label: 'Edit',
+                                ),
+                                SlidableAction(
+                                  onPressed: (context) {},
+                                  backgroundColor: Color(0xFFFE4A49),
+                                  foregroundColor: Colors.white,
+                                  icon: Icons.delete,
+                                  label: 'Delete',
+                                ),
+                              ],
+                            ),
+                            child: EmergencyContactCard2(
+                              contact_name: e.contact_name,
+                              contact_number: e.contact_number,
+                              index: contacts.indexOf(e),
+                            ),
+                          ),
+                        ),
+                      ),
                     );
                   }).toList(),
                 ),
@@ -84,6 +127,22 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
       builder: (BuildContext context) {
         return AddContactDialog(
           notify_parent: refresh,
+        );
+      },
+    );
+  }
+
+  void showEditContactDialog(
+      BuildContext context, EmergencyContact contact, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AddContactDialog(
+          editContact: true,
+          contact_name: contact.contact_name,
+          contact_number: contact.contact_number,
+          contact_id: contact.contact_id!,
+          index: index,
         );
       },
     );

@@ -68,60 +68,32 @@ class EmergencyContactCard2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      child: Material(
-        child: Container(
-          width: double.infinity,
-          height: 90,
-          padding: const EdgeInsets.all(20.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: boxShadow,
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      this.contact_name,
-                      style: DefaultTextTheme.headline4,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                    ),
-                    Text(
-                      this.contact_number,
-                      style: DefaultTextTheme.subtitle2,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                width: 20,
-                height: 20,
-                child: IconButton(
-                  padding: new EdgeInsets.all(0.0),
-                  onPressed: () {
-                    showAddContactDialog(context);
-                  },
-                  icon: Container(
-                    child: Icon(
-                      Icons.arrow_forward_ios_rounded,
-                      size: 20,
-                    ),
-                  ),
-                  iconSize: 20,
-                ),
-              )
-            ],
-          ),
+    return Material(
+      child: Container(
+        width: double.infinity,
+        height: 90,
+        padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: boxShadow,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              this.contact_name,
+              style: DefaultTextTheme.headline4,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
+            Text(
+              this.contact_number,
+              style: DefaultTextTheme.subtitle2,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+            ),
+          ],
         ),
       ),
     );
