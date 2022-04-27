@@ -20,17 +20,13 @@ class ResponderOperationsScreen extends StatelessWidget {
               color: accentColor,
             ),
             titleSpacing: 0,
-            title: Row(
-              children: [
-                Text(
-                  'Operations Responded',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+            title: Text(
+              'Operations Responded',
+              style: TextStyle(
+                color: primaryColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
