@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/data/data.dart';
+import 'package:pers/src/lifecycle_event_handler.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
@@ -19,7 +20,8 @@ class ResponderHomeScreen extends StatefulWidget {
   State<ResponderHomeScreen> createState() => _ResponderHomeScreenState();
 }
 
-class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
+class _ResponderHomeScreenState extends State<ResponderHomeScreen>
+    with WidgetsBindingObserver {
   final Connectivity _connectivity = Connectivity();
   bool? gotNewOperation;
   Operation? operation;
@@ -30,48 +32,26 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
   }
 
   @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
-    SharedPref pref = SharedPref();
+    WidgetsBinding.instance?.addObserver(
+      LifecycleEventHandler(
+        resumeCallBack: () async => setState(() {
+          checkOperationAvailable();
+        }),
+      ),
+    );
 
-    pref.read('user').then((value) {
+    checkOperationAvailable();
+
+    SharedPref().read('user').then((value) {
       user = User.fromJson(value);
-    });
-
-    pref
-        .read('gotNewOperation')
-        .then((value) => gotNewOperation = value.toLowerCase() == 'true');
-
-    pref.read('operation').then((value) {
-      if (value != 'null' && value.isNotEmpty) {
-        Map<String, dynamic> operation_data = jsonDecode(value);
-        operation = Operation(
-          operation_id: operation_data['operation_id'],
-          external_agency_id: operation_data['external_agency_id'],
-          dispatcher_id: operation_data['dispatcher_id'],
-          etd_base: operation_data['etd_base'],
-          eta_scene: operation_data['eta_scene'],
-          etd_scene: operation_data['etd_scene'],
-          eta_hospital: operation_data['eta_hospital'],
-          etd_hospital: operation_data['etd_hospital'],
-          eta_base: operation_data['eta_base'],
-          receiving_facility: operation_data['receiving_facility'],
-        );
-        Map<String, dynamic> report_data = jsonDecode(operation_data['report']);
-        final report = IncidentReport(
-          incident_id: report_data['incident_id'],
-          description: report_data['description'],
-          incident_type: report_data['incident_type'],
-          name: report_data['name'],
-          sex: report_data['sex'],
-          age: report_data['age'],
-          victim_status: report_data['victim_status'],
-          landmark: report_data['landmark'],
-          latitude: report_data['latitude'],
-          longitude: report_data['longitude'],
-        );
-        operation!.report = report;
-      }
     });
 
     _connectivity.checkConnectivity().then((status) {
@@ -161,6 +141,9 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
           borderRadius: BorderRadius.circular(10),
           color: Colors.white,
           boxShadow: boxShadow,
+          border: Border.all(
+            width: 1,
+          ),
         ),
         child: Center(
           child: Text(
@@ -174,5 +157,47 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
         ),
       ),
     );
+  }
+
+  void checkOperationAvailable() async {
+    String val = await SharedPref().read('gotNewOperation');
+    setState(() {
+      gotNewOperation = val.toLowerCase() == 'true';
+      print('>>> Got new operation: $gotNewOperation');
+    });
+    if (gotNewOperation!) {
+      String val = await SharedPref().read('operation');
+
+      if (val != 'null' && val.isNotEmpty) {
+        Map<String, dynamic> operation_data = jsonDecode(val);
+
+        operation = Operation(
+          operation_id: operation_data['operation_id'],
+          external_agency_id: operation_data['external_agency_id'],
+          dispatcher_id: operation_data['dispatcher_id'],
+          etd_base: operation_data['etd_base'],
+          eta_scene: operation_data['eta_scene'],
+          etd_scene: operation_data['etd_scene'],
+          eta_hospital: operation_data['eta_hospital'],
+          etd_hospital: operation_data['etd_hospital'],
+          eta_base: operation_data['eta_base'],
+          receiving_facility: operation_data['receiving_facility'],
+        );
+        Map<String, dynamic> report_data = jsonDecode(operation_data['report']);
+        final report = IncidentReport(
+          incident_id: report_data['incident_id'],
+          description: report_data['description'],
+          incident_type: report_data['incident_type'],
+          name: report_data['name'],
+          sex: report_data['sex'],
+          age: report_data['age'],
+          victim_status: report_data['victim_status'],
+          landmark: report_data['landmark'],
+          latitude: report_data['latitude'],
+          longitude: report_data['longitude'],
+        );
+        operation!.report = report;
+      }
+    }
   }
 }

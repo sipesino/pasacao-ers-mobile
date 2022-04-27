@@ -128,8 +128,32 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
               child: ListView(
                 padding: EdgeInsets.all(20),
                 children: [
-                  CustomLabel(
-                      label: 'Incident Type', value: args.incidentType!),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Hero(
+                          tag: '${args.incidentType!}-icon',
+                          child: Icon(
+                            args.icon,
+                            size: 30,
+                            color: accentColor,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      CustomLabel(
+                        label: 'Incident Type',
+                        value: args.incidentType!,
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                   _buildNotVictimCheckbox(),
                   const SizedBox(height: 10),

@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: () {
                         navigateToIncidentReportScreen(
                           context,
-                          FontAwesomeIcons.carCrash,
+                          incident_types[index].icon,
                           incident_types[index].label,
                         );
                       },
@@ -165,6 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
       '/reporter/home/report',
       arguments: ScreenArguments(
         incidentType: incidentType,
+        icon: icon,
       ),
     );
   }

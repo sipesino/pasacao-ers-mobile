@@ -26,6 +26,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         icon: '@mipmap/ic_launcher',
       ),
     ),
+    payload: message.data['"operation"'],
   );
   saveOperation(message);
   print(message.data);
@@ -52,6 +53,7 @@ void saveOperation(RemoteMessage message) {
   );
   SharedPref().save('gotNewOperation', 'true');
   SharedPref().save('operation', operation);
+  print('>> Operation saved');
 }
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -84,6 +86,7 @@ void setupFcm(void Function(String) onNewOperation) {
       print('>>> Converting to map');
       Map<String, dynamic> data = json.decode(payload);
       print('>>> Successfully converted');
+
       goToNextScreen(data);
     }
   });
@@ -112,6 +115,7 @@ void setupFcm(void Function(String) onNewOperation) {
       );
       print('>>> Initial notification received');
       // goToNextScreen(message.data);
+      saveOperation(message);
       onNewOperation(message.data['"operation"']);
     }
   });
@@ -144,8 +148,10 @@ void setupFcm(void Function(String) onNewOperation) {
   FirebaseMessaging.onMessageOpenedApp.listen(
     (message) {
       if (message != null) {
+        print('>>> onMessageOpenedApp fired');
         print(message.data);
         saveOperation(message);
+        onNewOperation(message.data['"operation"']);
         goToNextScreen(message.data['"operation"']);
       }
     },
@@ -165,15 +171,15 @@ Future<String> getFcmToken() async {
 
 void goToNextScreen(Map<String, dynamic> data) {
   if (data != null) {
-    IncidentReport report = IncidentReport.fromMap(data);
     Operation operation = Operation.fromMap(data);
+    IncidentReport report = IncidentReport.fromMap(data);
+    operation.report = report;
 
     print('>>> Report: $report');
     print('>>> Operation: $operation');
     navigatorKey.currentState?.pushNamed(
       '/responder/home/new_operation',
       arguments: ScreenArguments(
-        incident_report: report,
         operation: operation,
       ),
     );

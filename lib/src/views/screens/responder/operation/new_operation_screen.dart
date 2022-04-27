@@ -176,7 +176,7 @@ class _NewOperationState extends State<NewOperation> {
         ModalRoute.of(context)!.settings.arguments! as ScreenArguments;
     operation = args.operation;
 
-    sex = args.operation!.report!.sex;
+    if (args.operation!.report!.sex != null) sex = args.operation!.report!.sex;
 
     AppBar appBar = AppBar(
       elevation: 0,

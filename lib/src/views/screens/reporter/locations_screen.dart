@@ -24,21 +24,83 @@ class _LocationsScreenState extends State<LocationsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: LayoutBuilder(
-        builder: (context, constraint) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraint.maxHeight),
-              child: IntrinsicHeight(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: _buildColumn(),
-                ),
+    return Scaffold(
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            floating: true,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 65,
+            flexibleSpace: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Important Locations',
+                          style: DefaultTextTheme.headline4,
+                        ),
+                        Text(
+                          'List of emergency services locations',
+                          style: DefaultTextTheme.subtitle1,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  SizedBox(
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(
+                          context,
+                          '/reporter/home/map',
+                          arguments: ScreenArguments(
+                            latitude: null,
+                            longitude: null,
+                          ),
+                        );
+                      },
+                      child: Icon(
+                        CustomIcons.map,
+                        color: Colors.white,
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(accentColor),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          );
-        },
+          ),
+        ],
+        body: LayoutBuilder(
+          builder: (context, constraint) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                child: IntrinsicHeight(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: _buildColumn(),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -47,58 +109,6 @@ class _LocationsScreenState extends State<LocationsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Important Locations',
-                    style: DefaultTextTheme.headline4,
-                  ),
-                  Text(
-                    'List of emergency services locations',
-                    style: DefaultTextTheme.subtitle1,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 10),
-            SizedBox(
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/reporter/home/map',
-                    arguments: ScreenArguments(
-                      latitude: null,
-                      longitude: null,
-                    ),
-                  );
-                },
-                child: Icon(
-                  CustomIcons.map,
-                  color: Colors.white,
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(accentColor),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        // _buildLocationsStats(),
         Column(
           children: getLocations()
               .map(

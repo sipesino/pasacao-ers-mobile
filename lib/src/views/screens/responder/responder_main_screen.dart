@@ -103,7 +103,6 @@ class _ResponderMainScreenState extends State<ResponderMainScreen> {
       });
       isExternalAgency = user!.account_type!.toUpperCase() == 'BFP' ||
           user!.account_type!.toUpperCase() == 'PNP';
-      print(isExternalAgency);
       initPages();
       initNavigationButtons();
     });

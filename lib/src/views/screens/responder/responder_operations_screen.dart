@@ -9,46 +9,53 @@ class ResponderOperationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              CustomIcons.siren_2,
-              color: accentColor,
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                'Operations Responded',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
+      extendBody: true,
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (context, innerBoxIsScrolled) => [
+          SliverAppBar(
+            floating: true,
+            title: Row(
+              children: [
+                Icon(
+                  CustomIcons.siren_2,
+                  color: accentColor,
                 ),
-              ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Operations Responded',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          clipBehavior: Clip.none,
-          child: Column(
-            children: [
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-              IncidentCard(),
-            ],
+          ),
+        ],
+        body: Padding(
+          padding: EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            clipBehavior: Clip.none,
+            child: Column(
+              children: [
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+                IncidentCard(),
+              ],
+            ),
           ),
         ),
       ),

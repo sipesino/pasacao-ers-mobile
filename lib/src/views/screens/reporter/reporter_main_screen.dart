@@ -94,10 +94,11 @@ class _ReporterMainScreenState extends State<ReporterMainScreen> {
     return NavigationBarTheme(
       data: NavigationBarThemeData(
         indicatorColor: accentColor.withOpacity(0.2),
+        backgroundColor: Color(0xFFF4F4FA),
       ),
       child: NavigationBar(
         selectedIndex: _selectedIndex,
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFF4F4FA),
         animationDuration: Duration(milliseconds: 500),
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         height: 70,

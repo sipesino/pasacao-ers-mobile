@@ -282,6 +282,7 @@ class _OperationSummaryScreenState extends State<OperationSummaryScreen> {
             "eta_scene": operation!.eta_scene,
             "etd_scene": operation!.etd_scene,
             "eta_hospital": operation!.eta_hospital,
+            "etd_hospital": operation!.etd_hospital,
             "eta_base": operation!.eta_base,
             "receiving_facility": operation!.receiving_facility,
           };

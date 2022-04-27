@@ -20,9 +20,15 @@ class CustomLabel extends StatelessWidget {
         children: [
           Text(label),
           SizedBox(height: 5),
-          Text(
-            value,
-            style: DefaultTextTheme.headline4,
+          Hero(
+            tag: value,
+            child: Material(
+              type: MaterialType.transparency,
+              child: Text(
+                value,
+                style: DefaultTextTheme.headline4,
+              ),
+            ),
           ),
         ],
       ),
