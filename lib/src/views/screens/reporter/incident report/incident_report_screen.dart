@@ -85,12 +85,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('hey');
     final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
-    if (args != null)
-      incident_type = args.incidentType;
-    else
-      print('Null incident type');
+    incident_type = args.incidentType;
 
     Widget loadingIndicator = isLoading
         ? new Container(

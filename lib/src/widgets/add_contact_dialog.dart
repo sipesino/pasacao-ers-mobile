@@ -54,7 +54,6 @@ class _AddContactDialogState extends State<AddContactDialog> {
   //form field values
   String? contact_name;
   String? contact_number;
-  int? contact_id;
 
   @override
   void initState() {
@@ -159,7 +158,7 @@ class _AddContactDialogState extends State<AddContactDialog> {
                                     new EmergencyContact(
                                       contact_name: contact_name!,
                                       contact_number: contact_number!,
-                                      contact_id: contact_id!,
+                                      contact_id: widget.contact_id,
                                     ),
                                     widget.index,
                                   );
@@ -294,7 +293,6 @@ class _AddContactDialogState extends State<AddContactDialog> {
             ),
           );
         }
-        res.statusCode;
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -338,6 +336,7 @@ class _AddContactDialogState extends State<AddContactDialog> {
           contacts[index] = contact;
           final String encoded_contacts = EmergencyContact.encode(contacts);
           SharedPref().save('contacts', encoded_contacts);
+          widget.notify_parent!();
           Navigator.pop(context);
         }
       } else {

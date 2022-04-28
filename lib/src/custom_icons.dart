@@ -85,10 +85,12 @@ class CustomIcons {
       IconData(0xe81e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData siren_2 =
       IconData(0xe81f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData badge =
+  static const IconData directions =
       IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData firefighter =
+  static const IconData badge =
       IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData evacuation_point =
+  static const IconData firefighter =
       IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData evacuation_point =
+      IconData(0xe823, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

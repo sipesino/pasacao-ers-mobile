@@ -79,7 +79,6 @@ class _LoginRegistrationScreenState extends State<LoginRegistrationScreen> {
             body: ScopedModelDescendant<MainModel>(
               builder: (context, child, MainModel model) {
                 return TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
                   children: [
                     LoginScreen(
                       model: this.widget.model,

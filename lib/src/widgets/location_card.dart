@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
+import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/theme.dart';
@@ -63,7 +64,7 @@ class LocationCard extends StatelessWidget {
                     ),
                   ),
                   child: Icon(
-                    Icons.location_on,
+                    CustomIcons.directions,
                     color: Colors.white,
                     size: 20,
                   ),

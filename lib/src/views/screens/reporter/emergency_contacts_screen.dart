@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -6,6 +7,7 @@ import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/widgets/add_contact_dialog.dart';
 import 'package:pers/src/widgets/emergency_contact_card.dart';
+import 'package:http/http.dart' as http;
 
 class EmergencyContactsScreen extends StatefulWidget {
   const EmergencyContactsScreen({Key? key}) : super(key: key);
@@ -91,7 +93,13 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                               label: 'Edit',
                             ),
                             SlidableAction(
-                              onPressed: (context) {},
+                              onPressed: (context) {
+                                showDeleteContactDialog(
+                                  context,
+                                  e,
+                                  contacts.indexOf(e),
+                                );
+                              },
                               backgroundColor: Color(0xFFFE4A49),
                               foregroundColor: Colors.white,
                               icon: Icons.delete,
@@ -164,8 +172,89 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
           contact_number: contact.contact_number,
           contact_id: contact.contact_id!,
           index: index,
+          notify_parent: refresh,
         );
       },
     );
+  }
+
+  void showDeleteContactDialog(
+      BuildContext context, EmergencyContact contact, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete'),
+          content: Text('Remove ${contact.contact_name} as emergency contact?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                deleteContact(contact, index);
+              },
+              child: Text(
+                'YES',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'NO',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteContact(EmergencyContact contact, int index) {
+    final Connectivity _connectivity = Connectivity();
+
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+
+      if (_connectionStatus != ConnectivityResult.none) {
+        SharedPref pref = new SharedPref();
+        String token = await pref.read("token");
+
+        String url =
+            'http://143.198.92.250/api/emergencycontacts/${contact.contact_id}';
+
+        Map<String, dynamic> body = {
+          "contact_name": contact.contact_name,
+          "contact_number": contact.contact_number,
+        };
+
+        var res = await http.delete(
+          Uri.parse(url),
+          body: body,
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (res.statusCode == 200) {
+          setState(() {
+            contacts.removeAt(index);
+          });
+          final String encoded_contacts = EmergencyContact.encode(contacts);
+          SharedPref().save('contacts', encoded_contacts);
+          Navigator.pop(context);
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: new Text("No internet connection."),
+            backgroundColor: Colors.red,
+            duration: new Duration(seconds: 5),
+          ),
+        );
+      }
+    });
   }
 }

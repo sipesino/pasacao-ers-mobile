@@ -86,20 +86,11 @@ class _LocationsScreenState extends State<LocationsScreen> {
             ),
           ),
         ],
-        body: LayoutBuilder(
-          builder: (context, constraint) {
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraint.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: _buildColumn(),
-                  ),
-                ),
-              ),
-            );
-          },
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: _buildColumn(),
+          ),
         ),
       ),
     );
