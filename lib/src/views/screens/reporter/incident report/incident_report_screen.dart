@@ -324,8 +324,8 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
               "incident_type": incident_type,
               "sex": sex,
               "age": age,
-              "incident_status": "pending",
-              "victim_status": victim_status!.toLowerCase(),
+              "incident_status": "Pending",
+              "victim_status": victim_status!,
               "description": description,
               "account_id": user.id.toString(),
               "location_id": location_info.location_id.toString(),
@@ -522,7 +522,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                 SharedPref().read('contacts').then((value) {
                   print(value);
                   String message =
-                      "Emergency Alert:\nI encoutered $incident_type in these coordinates: $latitude, $longitude. Dae ko aram ang sasabihon ko igdi";
+                      "Emergency Alert:\nI encoutered $incident_type. I already reported it to the responders.";
                   if (value != 'null') {
                     List<EmergencyContact> contacts =
                         EmergencyContact.decode(value);

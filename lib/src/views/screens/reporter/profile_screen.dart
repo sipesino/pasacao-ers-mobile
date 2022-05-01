@@ -28,6 +28,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = true;
   List<EmergencyContact> contacts = [];
 
+  @override
+  void setState(VoidCallback fn) {
+    if (mounted) super.setState(fn);
+  }
+
   void getEmergencyContacts() async {
     final Connectivity _connectivity = Connectivity();
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
@@ -56,6 +57,7 @@ class OperationCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
+                  stopMusic();
                   viewOperationDetails(context);
                 },
                 child: Text('View Details'),

@@ -244,6 +244,23 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
           final String encoded_contacts = EmergencyContact.encode(contacts);
           SharedPref().save('contacts', encoded_contacts);
           Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: new Text("Emergency contact removed successfuly."),
+              backgroundColor: Colors.green,
+              duration: new Duration(seconds: 5),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: new Text("Error ${res.statusCode}"),
+              backgroundColor: Colors.red,
+              duration: new Duration(seconds: 5),
+            ),
+          );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

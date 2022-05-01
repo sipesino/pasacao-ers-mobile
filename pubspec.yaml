@@ -48,6 +48,7 @@ dependencies:
   provider: ^6.0.2
   page_transition: ^2.0.5
   flutter_slidable: ^1.2.0
+  audioplayers: ^0.20.1
 
 dev_dependencies:
   flutter_lints: ^1.0.0
@@ -70,6 +71,7 @@ flutter:
     - assets/images/mock_images/
     - assets/json/
     - assets/images/markers/
+    - assets/sounds/
 
   fonts:
     - family: CustomIcons

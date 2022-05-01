@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/constants.dart';
@@ -32,7 +33,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print('state = $state');
+    if (state == AppLifecycleState.resumed) checkOperationAvailable();
   }
 
   @override
@@ -45,6 +46,8 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
+
+    audioCache = AudioCache(fixedPlayer: audioPlayer);
 
     SharedPref().read('user').then((value) {
       user = User.fromJson(value);
@@ -117,9 +120,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
             ),
             SizedBox(height: 20),
             gotNewOperation ?? false
-                ? OperationCard(
-                    operation: operation!,
-                  )
+                ? displayNewOperation()
                 : displayNoOperationAssigned(),
           ],
         ),
@@ -127,8 +128,13 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
     );
   }
 
+  Widget displayNewOperation() {
+    return OperationCard(
+      operation: operation!,
+    );
+  }
+
   Widget displayNoOperationAssigned() {
-    final elevation = 3.0;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -159,7 +165,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
     String val = await SharedPref().read('gotNewOperation');
     setState(() {
       gotNewOperation = val.toLowerCase() == 'true';
-      print('>>> Got new operation: $gotNewOperation');
     });
     if (gotNewOperation!) {
       String val = await SharedPref().read('operation');

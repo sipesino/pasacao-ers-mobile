@@ -290,42 +290,37 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               // save user credentials inside local storage
               preferences.save("user", user);
 
-              if (user.account_type!.toUpperCase() == 'REPORTER') {
+              url = 'http://143.198.92.250/api/register_token';
+              body = {"account_id": user.id.toString(), "token": fbToken};
+
+              res = await http.post(
+                Uri.parse(url),
+                body: body,
+                headers: {
+                  "Authorization": "Bearer ${jsonResponse['token']}",
+                  "Connection": "Keep-Alive",
+                  "Keep-Alive": "timeout=5, max=1000",
+                },
+              ).catchError((error) {
+                print(error);
+              });
+
+              if (res != null && res.statusCode == 201) {
                 setState(() {
                   isLoading = false;
                 });
                 widget.notify_parent();
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/reporter/home',
-                  (Route<dynamic> route) => false,
-                );
-                return;
-              } else {
-                url = 'http://143.198.92.250/api/register_token';
-                body = {"account_id": user.id.toString(), "token": fbToken};
+                print(res.body);
+                print('>>> Token inserted');
 
-                print(body);
-                print(fbToken);
-
-                res = await http.post(
-                  Uri.parse(url),
-                  body: body,
-                  headers: {
-                    "Authorization": "Bearer ${jsonResponse['token']}",
-                    "Connection": "Keep-Alive",
-                    "Keep-Alive": "timeout=5, max=1000",
-                  },
-                ).catchError((error) {
-                  print(error);
-                });
-
-                if (res != null && res.statusCode == 201) {
-                  print(res.body);
-                  setState(() {
-                    isLoading = false;
-                  });
-                  print('>>> Token inserted');
+                if (user.account_type!.toUpperCase() == 'REPORTER') {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    '/reporter/home',
+                    (Route<dynamic> route) => false,
+                  );
+                  return;
+                } else {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/responder/home',
@@ -333,8 +328,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                   );
                   return;
                 }
-                print(res.statusCode);
-                print(res.body);
               }
             }
           }

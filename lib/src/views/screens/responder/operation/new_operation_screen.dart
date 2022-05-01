@@ -1055,86 +1055,99 @@ class _NewOperationState extends State<NewOperation> {
 
   Widget buildOperationInfo(
       BuildContext context, AppBar appBar, ScreenArguments args) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            buildTopBanner(),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: boxShadow,
-                  ),
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return LayoutBuilder(builder: (context, constraints) {
+      return SafeArea(
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: constraints.copyWith(
+                minHeight:
+                    constraints.maxHeight - appBar.preferredSize.height - 30,
+                maxHeight: double.infinity),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  buildTopBanner(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Operation Info',
-                              style: DefaultTextTheme.headline4,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() => _isExpanded = !_isExpanded);
-                            },
-                            child: Text(_isExpanded ? 'Hide' : 'Show'),
-                          )
-                        ],
-                      ),
-                      if (_isExpanded)
-                        Column(
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: boxShadow,
+                        ),
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            buildOperationDetail(
-                              field: 'Age',
-                              value: args.operation?.report?.age ?? 'Undefined',
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Operation Info',
+                                    style: DefaultTextTheme.headline4,
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() => _isExpanded = !_isExpanded);
+                                  },
+                                  child: Text(_isExpanded ? 'Hide' : 'Show'),
+                                )
+                              ],
                             ),
-                            buildOperationDetail(
-                              field: 'Sex',
-                              value:
-                                  args.operation?.report?.sex?.totTitleCase ??
-                                      'Undefined',
-                            ),
-                            buildOperationDetail(
-                              field: 'Victim Status',
-                              value: args.operation?.report?.victim_status
-                                      ?.totTitleCase ??
-                                  'Undefined',
-                            ),
-                            buildOperationDetail(
-                              field: 'Description',
-                              value: args.operation?.report?.description ??
-                                  'Undefined',
-                            ),
-                            buildOperationDetail(
-                              field: 'Landmark',
-                              value: args.operation?.report?.landmark ??
-                                  'Undefined',
-                            ),
+                            if (_isExpanded)
+                              Column(
+                                children: [
+                                  buildOperationDetail(
+                                    field: 'Age',
+                                    value: args.operation?.report?.age ??
+                                        'Undefined',
+                                  ),
+                                  buildOperationDetail(
+                                    field: 'Sex',
+                                    value: args.operation?.report?.sex
+                                            ?.totTitleCase ??
+                                        'Undefined',
+                                  ),
+                                  buildOperationDetail(
+                                    field: 'Victim Status',
+                                    value: args.operation?.report?.victim_status
+                                            ?.totTitleCase ??
+                                        'Undefined',
+                                  ),
+                                  buildOperationDetail(
+                                    field: 'Description',
+                                    value:
+                                        args.operation?.report?.description ??
+                                            'Undefined',
+                                  ),
+                                  buildOperationDetail(
+                                    field: 'Landmark',
+                                    value: args.operation?.report?.landmark ??
+                                        'Undefined',
+                                  ),
+                                ],
+                              ),
                           ],
                         ),
+                      ),
+                      SizedBox(height: 10),
+                      if (user!.account_type == 'responder')
+                        buildRespondButton(),
                     ],
                   ),
-                ),
-                SizedBox(height: 10),
-                if (user!.account_type == 'responder') buildRespondButton(),
-              ],
+                ],
+              ),
             ),
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget buildOperationDetail({required String field, required String value}) {
