@@ -1114,6 +1114,11 @@ class _NewOperationState extends State<NewOperation> {
                               Column(
                                 children: [
                                   buildOperationDetail(
+                                    field: 'Name',
+                                    value: args.operation?.report?.name ??
+                                        'Unknown',
+                                  ),
+                                  buildOperationDetail(
                                     field: 'Age',
                                     value: args.operation?.report?.age ??
                                         'Undefined',

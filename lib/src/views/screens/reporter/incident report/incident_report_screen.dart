@@ -6,21 +6,21 @@ import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/locations.dart';
+import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:http/http.dart' as http;
-import 'package:pers/src/views/screens/reporter/profile_screen.dart';
 import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_status_picker%20copy.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
-import 'package:telephony/telephony.dart';
 
 class IncidentReportScreen extends StatefulWidget {
   const IncidentReportScreen({Key? key}) : super(key: key);
@@ -75,11 +75,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
   final sexValidator = MultiValidator([
     RequiredValidator(errorText: 'Sex is required'),
   ]);
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void setState(VoidCallback fn) {
@@ -271,127 +266,136 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
       _connectivity.checkConnectivity().then((status) async {
         ConnectivityResult _connectionStatus = status;
-        setState(() {
-          isLoading = true;
-        });
-        //get user location coordinates
-        LocationData location_data = await Location().getLocation();
-        longitude = '${location_data.longitude}';
-        latitude = '${location_data.latitude}';
 
-        User user = User.fromJson(await SharedPref().read("user"));
+        PermissionHandler.checkLocationPermission();
 
-        if (!not_victim) {
-          name = "${user.first_name} ${user.last_name}";
-          sex = user.sex!;
-          age = calculateAge(DateTime.parse(user.birthday!)).toString();
-          victim_status = 'Conscious';
-        }
+        var _pstatus = await Permission.location.status;
 
-        if (_connectionStatus != ConnectivityResult.none) {
-          print('>>> Internet connection detected.');
+        if (_pstatus.isGranted) {
+          setState(() {
+            isLoading = true;
+          });
 
-          // get user credentials from shared preferences
-          SharedPref pref = new SharedPref();
-          String token = await pref.read("token");
+          //get user location coordinates
+          LocationData location_data = await Location().getLocation();
+          longitude = '${location_data.longitude}';
+          latitude = '${location_data.latitude}';
 
-          String url = 'http://143.198.92.250/api/locations';
+          User user = User.fromJson(await SharedPref().read("user"));
 
-          Map<String, dynamic> location_body = {
-            "location_type": "incident location",
-            "longitude": longitude,
-            "latitude": latitude,
-            "landmark": landmark,
-          };
+          if (!not_victim) {
+            name = "${user.first_name} ${user.last_name}";
+            sex = user.sex!;
+            age = calculateAge(DateTime.parse(user.birthday!)).toString();
+            victim_status = 'Conscious';
+          }
 
-          print(location_body);
+          if (_connectionStatus != ConnectivityResult.none) {
+            print('>>> Internet connection detected.');
 
-          var res = await http.post(
-            Uri.parse(url),
-            body: location_body,
-            headers: {
-              'Authorization': 'Bearer $token',
-            },
-          );
+            // get user credentials from shared preferences
+            SharedPref pref = new SharedPref();
+            String token = await pref.read("token");
 
-          if (res.statusCode == 200) {
-            print('Location inserted');
-            var jsonResponse = jsonDecode(res.body);
-            String url;
-            String incident_status;
-            LocationInfo location_info =
-                LocationInfo.fromMap(jsonResponse["data"]);
+            String url = 'http://143.198.92.250/api/locations';
 
-            if (incident_type!.toLowerCase() == 'fire incident') {
-              url = 'http://143.198.92.250/api/operation/send';
-              incident_status = 'Completed';
-            } else {
-              url = 'http://143.198.92.250/api/incidents';
-              incident_status = 'Pending';
-            }
-
-            Map<String, dynamic> body = {
-              "incident_type": incident_type,
-              "sex": sex.toLowerCase(),
-              "age": age,
-              "incident_status": incident_status,
-              "victim_status": victim_status!,
-              "description": description,
-              "account_id": user.id.toString(),
-              "location_id": location_info.location_id.toString(),
+            Map<String, dynamic> location_body = {
+              "location_type": "incident location",
+              "longitude": longitude,
+              "latitude": latitude,
               "landmark": landmark,
             };
 
-            print(body);
+            print(location_body);
 
-            res = await http.post(
+            var res = await http.post(
               Uri.parse(url),
-              body: body,
+              body: location_body,
               headers: {
                 'Authorization': 'Bearer $token',
-                "Connection": "Keep-Alive",
-                "Keep-Alive": "timeout=5, max=1000",
               },
             );
+
             if (res.statusCode == 200) {
-              jsonResponse = jsonDecode(res.body);
-              setState(() {
-                isLoading = false;
-              });
+              print('Location inserted');
+              var jsonResponse = jsonDecode(res.body);
+              String url;
+              String incident_status;
+              LocationInfo location_info =
+                  LocationInfo.fromMap(jsonResponse["data"]);
 
-              if (jsonResponse != null) {
-                await showSendToContactsDialog();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    behavior: SnackBarBehavior.floating,
-                    content: new Text("Incident reported successfuly."),
-                    backgroundColor: Colors.green,
-                    duration: new Duration(seconds: 5),
-                  ),
-                );
-                Navigator.of(context).pop();
-                return;
+              if (incident_type!.toLowerCase() == 'fire incident') {
+                url = 'http://143.198.92.250/api/operation/send';
+                incident_status = 'Completed';
+              } else {
+                url = 'http://143.198.92.250/api/incidents';
+                incident_status = 'Pending';
               }
-            } else {
-              print(res.statusCode);
-            }
-          }
-          setState(() {
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: new Text("Something went wrong."),
-              backgroundColor: Colors.red,
-              duration: new Duration(seconds: 5),
-            ),
-          );
 
-          print(res.statusCode);
-          print(res.body);
-        } else {
-          showNoInternetDialog();
+              Map<String, dynamic> body = {
+                "incident_type": incident_type,
+                if (!not_victim) "name": name,
+                "sex": sex.toLowerCase(),
+                "age": age,
+                "incident_status": incident_status,
+                "victim_status": victim_status!,
+                "description": description,
+                "account_id": user.id.toString(),
+                "location_id": location_info.location_id.toString(),
+                "landmark": landmark,
+              };
+
+              print(body);
+
+              res = await http.post(
+                Uri.parse(url),
+                body: body,
+                headers: {
+                  'Authorization': 'Bearer $token',
+                  "Connection": "Keep-Alive",
+                  "Keep-Alive": "timeout=5, max=1000",
+                },
+              );
+              if (res.statusCode == 200) {
+                jsonResponse = jsonDecode(res.body);
+                setState(() {
+                  isLoading = false;
+                });
+
+                if (jsonResponse != null) {
+                  await showSendToContactsDialog();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: new Text("Incident reported successfuly."),
+                      backgroundColor: Colors.green,
+                      duration: new Duration(seconds: 5),
+                    ),
+                  );
+                  Navigator.of(context).pop();
+                  return;
+                }
+              } else {
+                print(res.statusCode);
+              }
+            }
+            setState(() {
+              isLoading = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: new Text("Something went wrong."),
+                backgroundColor: Colors.red,
+                duration: new Duration(seconds: 5),
+              ),
+            );
+
+            print(res.statusCode);
+            print(res.body);
+          } else {
+            showNoInternetDialog();
+          }
         }
       });
     }

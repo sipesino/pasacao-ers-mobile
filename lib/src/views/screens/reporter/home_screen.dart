@@ -183,8 +183,6 @@ class _HomeScreenState extends State<HomeScreen> {
     IconData icon,
     String incidentType,
   ) async {
-    PermissionHandler.checkLocationPermission();
-
     Navigator.push(
       context,
       FadeInRoute(

@@ -168,7 +168,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         label: 'Email',
         prefixIcon: CustomIcons.mail,
         validator: emailValidator,
-        initialValue: 'jdlc@email.com',
       );
 
   Widget PasswordTextField() => CustomPasswordTextFormField(
@@ -179,7 +178,6 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
         onSaved: (value) {
           password = value;
         },
-        initialValue: 'password!',
       );
 
   Widget FormDivider() => Row(

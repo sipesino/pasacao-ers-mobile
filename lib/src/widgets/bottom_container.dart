@@ -18,16 +18,19 @@ class BottomContainer extends StatelessWidget {
     return Stack(
       children: [
         Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
           height: buttonHeight * 1.5,
           width: MediaQuery.of(context).size.width,
           color: Color(0xFFECECF4),
           child: displayHotlinesButton
-              ? Center(
+              ? Align(
+                  alignment: Alignment.bottomLeft,
                   child: TextButton.icon(
                     label: Text(
                       'Emergency Hotlines',
                       style: TextStyle(
                         color: accentColor,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                     icon: Icon(
@@ -38,66 +41,10 @@ class BottomContainer extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context)
                           .pushNamed('/reporter/home/hotlines');
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (context) {
-                      //     return Dialog(
-                      //       insetPadding: EdgeInsets.symmetric(
-                      //         vertical: 0,
-                      //         horizontal: 20,
-                      //       ),
-                      //       backgroundColor: Colors.transparent,
-                      //       child: Container(
-                      //         child: Column(
-                      //           mainAxisAlignment: MainAxisAlignment.center,
-                      //           mainAxisSize: MainAxisSize.min,
-                      //           children: [
-                      //             Card(
-                      //               child: Container(
-                      //                 width: double.infinity,
-                      //                 padding: EdgeInsets.all(10),
-                      //                 decoration: BoxDecoration(
-                      //                   color: Colors.white,
-                      //                   borderRadius:
-                      //                       BorderRadius.circular(10.0),
-                      //                 ),
-                      //                 child: Center(
-                      //                   child: Text(
-                      //                     'Emergency Hotlines',
-                      //                     style: DefaultTextTheme.headline5,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //             Flexible(
-                      //               child: SingleChildScrollView(
-                      //                 child: Column(
-                      //                   children: [
-                      //                     HotlineCard(
-                      //                       agency_name: 'Pasacao PNP',
-                      //                       hotline_number: '09123456789',
-                      //                       hotline_type: 'Police',
-                      //                     ),
-                      //                     HotlineCard(
-                      //                       agency_name: 'Pasacao BFP',
-                      //                       hotline_number:
-                      //                           '+(63) 987-654-3210',
-                      //                       hotline_type: 'Medic',
-                      //                     ),
-                      //                   ],
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       ),
-                      //     );
-                      //   },
-                      // );
                     },
                   ),
                 )
-              : Text(''),
+              : SizedBox.shrink(),
         ),
         Transform.translate(
           offset: Offset(MediaQuery.of(context).size.width - (buttonWidth + 20),
