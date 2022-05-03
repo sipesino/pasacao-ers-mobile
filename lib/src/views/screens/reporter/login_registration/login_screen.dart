@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
 import 'package:pers/src/globals.dart';
+import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:pers/src/scoped_model/main_scoped_model.dart';
@@ -314,6 +315,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                 print('>>> Token inserted');
 
                 if (user!.account_type!.toUpperCase() == 'REPORTER') {
+                  getEmergencyContacts();
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/reporter/home',
@@ -351,6 +353,40 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
           duration: new Duration(seconds: 3),
         ),
       );
+    });
+  }
+
+  void getEmergencyContacts() async {
+    List<EmergencyContact> contacts = [];
+    final Connectivity _connectivity = Connectivity();
+
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
+
+      if (_connectionStatus != ConnectivityResult.none) {
+        SharedPref pref = new SharedPref();
+        String token = await pref.read("token");
+        String url = 'http://143.198.92.250/api/emergencycontacts/${user!.id}';
+
+        var res = await http.get(
+          Uri.parse(url),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (res.statusCode == 200) {
+          var jsonResponse = jsonDecode(res.body);
+
+          for (var contact in jsonResponse['data']) {
+            contacts.add(EmergencyContact.fromJson(contact));
+          }
+          final String encoded_contacts = EmergencyContact.encode(contacts);
+          SharedPref().save('contacts', encoded_contacts);
+          SharedPref().reload();
+          return;
+        }
+      }
     });
   }
 }
