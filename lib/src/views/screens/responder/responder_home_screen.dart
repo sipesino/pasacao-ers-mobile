@@ -130,9 +130,13 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   }
 
   Widget displayNewOperation() {
-    return OperationCard(
-      operation: operation!,
-    );
+    if (operation != null) {
+      return OperationCard(
+        operation: operation!,
+      );
+    } else {
+      return displayNoOperationAssigned();
+    }
   }
 
   Widget displayNoOperationAssigned() {

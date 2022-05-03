@@ -9,7 +9,6 @@ class PermissionHandler {
     }
 
     var _pstatus = await Permission.location.status;
-    print("Location Permission: $_pstatus");
     if (!_pstatus.isGranted) {
       _pstatus = await Permission.location.request();
       print("Location Permission: $_pstatus");

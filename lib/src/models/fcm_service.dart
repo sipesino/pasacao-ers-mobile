@@ -101,9 +101,7 @@ void setupFcm(void Function(String) onNewOperation) {
       onSelectNotification: (String? payload) {
     if (payload != null || payload!.isNotEmpty) {
       print('>>> Payload: $payload');
-      print('>>> Converting to map');
       Map<String, dynamic> data = json.decode(payload);
-      print('>>> Successfully converted');
       goToNextScreen(data);
     }
   });

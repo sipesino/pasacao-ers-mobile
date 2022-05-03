@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -73,48 +74,65 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   ]);
 
   _saveEdits(String field, String value) async {
-    // get bearer token from shared preferences
-    SharedPref pref = new SharedPref();
-    String token = await pref.read("token");
+    final Connectivity _connectivity = Connectivity();
 
-    String url = "http://143.198.92.250/api/accounts/${user!.id}";
-    print(url);
-    Map body = {"$field": value};
+    _connectivity.checkConnectivity().then((status) async {
+      ConnectivityResult _connectionStatus = status;
 
-    Map<String, dynamic> jsonResponse;
+      if (_connectionStatus != ConnectivityResult.none) {
+        // get bearer token from shared preferences
+        SharedPref pref = new SharedPref();
+        String token = await pref.read("token");
 
-    var res = await http.put(Uri.parse(url), body: body, headers: {
-      'Authorization': 'Bearer $token',
-    });
+        String url = "http://143.198.92.250/api/accounts/${user!.id}";
+        print(url);
+        Map body = {"$field": value};
 
-    if (res.statusCode == 200) {
-      jsonResponse = jsonDecode(res.body);
-      if (jsonResponse.isNotEmpty) {
-        SharedPref preferences = SharedPref();
+        Map<String, dynamic> jsonResponse;
 
-        User user = User.fromMap(jsonResponse['data']);
-
-        print(user);
-
-        // save user credentials inside local storage
-        preferences.save("user", user);
-
-        setState(() {
-          preferences.reload();
-          isLoading = false;
+        var res = await http.put(Uri.parse(url), body: body, headers: {
+          'Authorization': 'Bearer $token',
         });
+
+        if (res.statusCode == 200) {
+          jsonResponse = jsonDecode(res.body);
+          if (jsonResponse.isNotEmpty) {
+            SharedPref preferences = SharedPref();
+
+            User user = User.fromMap(jsonResponse['data']);
+
+            print(user);
+
+            // save user credentials inside local storage
+            preferences.save("user", user);
+
+            setState(() {
+              preferences.reload();
+              isLoading = false;
+            });
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: new Text('Profile successfuly updated'),
+              backgroundColor: Colors.green,
+              duration: new Duration(seconds: 3),
+            ),
+          );
+        } else {
+          print(res.body);
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: new Text("No internet connection."),
+            backgroundColor: Colors.red,
+            duration: new Duration(seconds: 5),
+          ),
+        );
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          content: new Text('Profile successfuly updated'),
-          backgroundColor: Colors.green,
-          duration: new Duration(seconds: 3),
-        ),
-      );
-    } else {
-      print(res.body);
-    }
+    });
   }
 
   @override

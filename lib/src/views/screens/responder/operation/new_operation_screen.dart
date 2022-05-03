@@ -159,10 +159,16 @@ class _NewOperationState extends State<NewOperation> {
     locationSubscription =
         location?.onLocationChanged.listen((LocationData cLoc) {
       current_location = cLoc;
-      setPolylines();
+
       setState(() {
         bearing = current_location!.heading!;
+        if (!_isResponding) {
+          nd_latitude = operation!.report!.latitude!;
+          nd_longitude = operation!.report!.longitude!;
+        }
       });
+
+      setPolylines();
     });
 
     _setCustomMarker();
@@ -484,14 +490,15 @@ class _NewOperationState extends State<NewOperation> {
                           default:
                             type = 'hospital';
                         }
+
                         getBytesFromAsset('assets/images/markers/$type.png', 80)
                             .then((onValue) {
                           receivingFacilityMarker =
                               BitmapDescriptor.fromBytes(onValue);
 
                           setState(() {
-                            operation!.report!.latitude = val.latitude;
-                            operation!.report!.longitude = val.longitude;
+                            nd_latitude = val.latitude;
+                            nd_longitude = val.longitude;
                             _isInitialized = false;
                           });
 
@@ -785,15 +792,17 @@ class _NewOperationState extends State<NewOperation> {
                       setState(() {
                         nd_latitude = mdrrmo_latitude;
                         nd_longitude = mdrrmo_longitude;
+                        _isInitialized = false;
                       });
 
                       _setNewDestination(
                         'base',
-                        receiving_facility!,
+                        "MDRRMO Pasacao (Base)",
                         BitmapDescriptor.fromBytes(onValue),
                         mdrrmo_latitude,
                         mdrrmo_longitude,
                       );
+
                       etd_hospital = DateTime.now().toString();
                       index = 7;
                       pageController.nextPage(
@@ -1380,8 +1389,8 @@ class _NewOperationState extends State<NewOperation> {
         current_location!.longitude!,
       ),
       PointLatLng(
-        double.parse(operation!.report!.latitude!),
-        double.parse(operation!.report!.longitude!),
+        double.parse(nd_latitude!),
+        double.parse(nd_longitude!),
       ),
     );
 
@@ -1474,37 +1483,6 @@ class _NewOperationState extends State<NewOperation> {
     });
   }
 
-  void getDirections(
-    LocationData curLoc,
-    String latitude,
-    String longitude,
-  ) async {
-    try {
-      Dio dio = new Dio();
-      String baseUrl = 'https://maps.googleapis.com/maps/api/directions/json?';
-
-      final response = await dio.get(
-        baseUrl,
-        queryParameters: {
-          'origin': '${curLoc.latitude},${curLoc.longitude}',
-          'destination': '$latitude, $longitude',
-          'key': googleAPIKey,
-        },
-      );
-
-      if (response.statusCode == 200) {
-        setState(() {
-          _info = Directions.fromMap(response.data);
-          setPolylines();
-        });
-      } else {
-        print(response.statusCode);
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
   void setInitialLocation() async {
     current_location = await location?.getLocation();
     setState(() {
@@ -1556,12 +1534,10 @@ class _NewOperationState extends State<NewOperation> {
       )
     };
 
+    setPolylines();
+
     setState(() {
       _markers = _mrkrs;
     });
-
-    // if (args.operation.report.latitude != null) {
-    //   getDirections(current_location, latitude, longitude);
-    // }
   }
 }

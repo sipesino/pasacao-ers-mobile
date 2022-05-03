@@ -14,6 +14,7 @@ import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
 import 'package:http/http.dart' as http;
+import 'package:pers/src/views/screens/reporter/profile_screen.dart';
 import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_status_picker%20copy.dart';
@@ -316,19 +317,23 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
             print('Location inserted');
             var jsonResponse = jsonDecode(res.body);
             String url;
+            String incident_status;
             LocationInfo location_info =
                 LocationInfo.fromMap(jsonResponse["data"]);
 
-            if (incident_type!.toLowerCase() == 'fire incident')
+            if (incident_type!.toLowerCase() == 'fire incident') {
               url = 'http://143.198.92.250/api/operation/send';
-            else
+              incident_status = 'Completed';
+            } else {
               url = 'http://143.198.92.250/api/incidents';
+              incident_status = 'Pending';
+            }
 
             Map<String, dynamic> body = {
               "incident_type": incident_type,
               "sex": sex.toLowerCase(),
               "age": age,
-              "incident_status": "Pending",
+              "incident_status": incident_status,
               "victim_status": victim_status!,
               "description": description,
               "account_id": user.id.toString(),
@@ -523,6 +528,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           actions: [
             TextButton(
               onPressed: () {
+                getEmergencyContacts();
                 SharedPref().read('contacts').then((value) {
                   print(value);
                   String message =
