@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pers/src/data/data.dart';
+import 'package:pers/src/models/emergency_contact.dart';
 import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/views/screens/responder/operation/operation_summary.dart';
 import 'firebase_options.dart';
@@ -23,6 +28,7 @@ import 'package:pers/src/views/screens/reporter/reporter_main_screen.dart';
 import 'package:pers/src/views/screens/responder/operation/new_operation_screen.dart';
 import 'package:pers/src/views/screens/responder/responder_main_screen.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -36,18 +42,53 @@ void main() async {
 
   SharedPref prefs = SharedPref();
   String data = await prefs.read('user');
-  User? user;
   if (data != 'null') user = User.fromJson(await data);
   Paint.enableDithering = true;
   String account_type = 'reporter';
   if (user != null) {
-    if (user.account_type != null &&
-        user.account_type!.toLowerCase() != 'reporter') {
+    if (user!.account_type != null &&
+        user!.account_type!.toLowerCase() != 'reporter') {
       account_type = 'responder';
+    } else {
+      getEmergencyContacts();
     }
   }
 
   runApp(MERS(initialRoute: user != null ? '/$account_type/home' : '/'));
+}
+
+void getEmergencyContacts() async {
+  List<EmergencyContact> contacts = [];
+  final Connectivity _connectivity = Connectivity();
+
+  _connectivity.checkConnectivity().then((status) async {
+    ConnectivityResult _connectionStatus = status;
+
+    if (_connectionStatus != ConnectivityResult.none) {
+      SharedPref pref = new SharedPref();
+      String token = await pref.read("token");
+      user = User.fromJson(await pref.read('user'));
+      String url = 'http://143.198.92.250/api/emergencycontacts/${user!.id}';
+
+      var res = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (res.statusCode == 200) {
+        var jsonResponse = jsonDecode(res.body);
+
+        for (var contact in jsonResponse['data']) {
+          contacts.add(EmergencyContact.fromJson(contact));
+        }
+        final String encoded_contacts = EmergencyContact.encode(contacts);
+        SharedPref().save('contacts', encoded_contacts);
+        return;
+      }
+    }
+  });
 }
 
 class MERS extends StatefulWidget {

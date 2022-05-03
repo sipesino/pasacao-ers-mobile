@@ -6,40 +6,55 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:pers/main.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/models/incident_report.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
+import 'package:pers/src/models/user.dart';
 
 AudioPlayer? audioPlayer;
-AudioCache audioCache = AudioCache();
-final String path = 'sounds/alert_sound.mp3';
+
+void playAlertSound() async {
+  AudioCache cache = new AudioCache();
+  audioPlayer = await cache.play("sounds/alert_sound.mp3");
+}
+
+void stopAlertSound() {
+  if (audioPlayer != null) audioPlayer!.stop();
+}
 
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  flutterLocalNotificationsPlugin.show(
-    message.hashCode,
-    message.data['title'],
-    message.data['body'],
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        channel.id,
-        channel.name,
-        channelDescription: 'channel description',
-        color: Colors.blue,
-        playSound: true,
-        icon: '@mipmap/ic_launcher',
+  SharedPref().read('user').then((value) {
+    user = User.fromJson(value);
+    flutterLocalNotificationsPlugin.show(
+      message.hashCode,
+      message.data['title'],
+      message.data['body'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channelDescription: 'channel description',
+          color: Colors.blue,
+          icon: '@mipmap/ic_launcher',
+        ),
       ),
-    ),
-    payload: message.data['"operation"'],
-  );
-  saveOperation(message);
-  print(message.data);
-  print('>>> Background notification received');
+      payload: user?.account_type!.toLowerCase() == 'reporter'
+          ? ''
+          : message.data['"operation"'],
+    );
+    playAlertSound();
+
+    if (user!.account_type!.toLowerCase() != 'reporter') {
+      saveOperation(message);
+    }
+    print('>>> Background notification received');
+  });
   await Firebase.initializeApp();
 }
 
 void saveOperation(RemoteMessage message) {
-  playMusic();
   Map<String, dynamic> data = jsonDecode(message.data['"operation"']);
   final operation = Operation(
     operation_id: data['operation_id'],
@@ -70,19 +85,7 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   description:
       'This channel is used for important notifications.', // description
   importance: Importance.max,
-  playSound: true,
 );
-
-playMusic() async {
-  audioPlayer = await audioCache.loop(path);
-}
-
-stopMusic() async {
-  if (audioPlayer != null)
-    await audioPlayer!.stop();
-  else
-    print('null audio player');
-}
 
 void setupFcm(void Function(String) onNewOperation) {
   var initializationSettingsAndroid =
@@ -96,7 +99,7 @@ void setupFcm(void Function(String) onNewOperation) {
   //when the app is in foreground state and you click on notification.
   flutterLocalNotificationsPlugin.initialize(initializationSettings,
       onSelectNotification: (String? payload) {
-    if (payload != null) {
+    if (payload != null || payload!.isNotEmpty) {
       print('>>> Payload: $payload');
       print('>>> Converting to map');
       Map<String, dynamic> data = json.decode(payload);
@@ -108,7 +111,6 @@ void setupFcm(void Function(String) onNewOperation) {
   //When the app is terminated, i.e., app is neither in foreground or background.
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     //Its compulsory to check if RemoteMessage instance is null or not.
-
     if (message != null) {
       print(message.data);
       flutterLocalNotificationsPlugin.show(
@@ -121,32 +123,54 @@ void setupFcm(void Function(String) onNewOperation) {
             channel.name,
             channelDescription: 'channel description',
             color: Colors.blue,
-            playSound: true,
             icon: '@mipmap/ic_launcher',
           ),
         ),
-        payload: message.data['"operation"'],
+        payload: user!.account_type!.toLowerCase() == 'reporter'
+            ? ''
+            : message.data['"operation"'],
       );
       print('>>> Initial notification received');
-      saveOperation(message);
-      onNewOperation(message.data['"operation"']);
+      // goToNextScreen(message.data);
+      if (user!.account_type!.toLowerCase() != 'reporter') {
+        saveOperation(message);
+        onNewOperation(message.data['"operation"']);
+      }
     }
   });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    saveOperation(message);
-    print(message.data);
-    onNewOperation(message.data['"operation"']);
+    if (user!.account_type!.toLowerCase() != 'reporter') {
+      playAlertSound();
+      saveOperation(message);
+      onNewOperation(message.data['"operation"']);
+    } else {
+      flutterLocalNotificationsPlugin.show(
+        message.hashCode,
+        message.data['title'],
+        message.data['body'],
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channelDescription: 'channel description',
+            color: Colors.blue,
+            icon: '@mipmap/ic_launcher',
+          ),
+        ),
+        payload: user!.account_type!.toLowerCase() == 'reporter'
+            ? ''
+            : message.data['"operation"'],
+      );
+    }
     print('>>> Foreground notification received');
   });
 
-  //When the app is in the background and the , but not terminated.
+  //When the app is in the background, but not terminated.
   FirebaseMessaging.onMessageOpenedApp.listen(
     (message) {
-      if (message != null) {
+      if (user!.account_type!.toLowerCase() != 'reporter') {
         print('>>> onMessageOpenedApp fired');
-        print(message.data);
-        // saveOperation(message);
         onNewOperation(message.data['"operation"']);
         goToNextScreen(message.data['"operation"']);
       }
@@ -165,13 +189,12 @@ Future<String> getFcmToken() async {
   return Future.value(token);
 }
 
-void goToNextScreen(Map<String, dynamic> data) {
+void goToNextScreen(Map<String, dynamic>? data) {
   if (data != null) {
     Operation operation = Operation.fromMap(data);
     IncidentReport report = IncidentReport.fromMap(data);
     operation.report = report;
 
-    stopMusic();
     print('>>> Report: $report');
     print('>>> Operation: $operation');
     navigatorKey.currentState?.pushNamed(

@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:pers/src/constants.dart';
 import 'package:pers/src/custom_icons.dart';
 import 'package:pers/src/data/data.dart';
 import 'package:pers/src/fade_route_transition.dart';
+import 'package:pers/src/models/fcm_service.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
 import 'package:pers/src/models/shared_prefs.dart';
@@ -33,6 +37,24 @@ class _HomeScreenState extends State<HomeScreen> {
         user = User.fromJson(value);
         isLoading = false;
       });
+    });
+
+    Connectivity().checkConnectivity().then((status) {
+      ConnectivityResult _connectionStatus = status;
+      if (_connectionStatus != ConnectivityResult.none) {
+        try {
+          InternetAddress.lookup('example.com').then((value) {
+            final result = value;
+            if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+              setupFcm((val) {});
+            }
+          });
+        } on SocketException catch (_) {
+          print('not connected');
+        }
+      } else {
+        print("No internet connection");
+      }
     });
   }
 

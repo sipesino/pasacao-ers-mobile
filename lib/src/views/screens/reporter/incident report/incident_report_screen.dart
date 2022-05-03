@@ -18,6 +18,7 @@ import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_label.dart';
 import 'package:pers/src/widgets/custom_status_picker%20copy.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
+import 'package:telephony/telephony.dart';
 
 class IncidentReportScreen extends StatefulWidget {
   const IncidentReportScreen({Key? key}) : super(key: key);
@@ -37,7 +38,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
 
   String? name;
   String? incident_type;
-  String sex = 'Male';
+  String sex = 'male';
   String? age;
   String? description;
   String? victim_status;
@@ -314,15 +315,18 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
           if (res.statusCode == 200) {
             print('Location inserted');
             var jsonResponse = jsonDecode(res.body);
-
+            String url;
             LocationInfo location_info =
                 LocationInfo.fromMap(jsonResponse["data"]);
 
-            String url = 'http://143.198.92.250/api/incidents';
+            if (incident_type!.toLowerCase() == 'fire incident')
+              url = 'http://143.198.92.250/api/operation/send';
+            else
+              url = 'http://143.198.92.250/api/incidents';
 
             Map<String, dynamic> body = {
               "incident_type": incident_type,
-              "sex": sex,
+              "sex": sex.toLowerCase(),
               "age": age,
               "incident_status": "Pending",
               "victim_status": victim_status!,
@@ -350,6 +354,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
               });
 
               if (jsonResponse != null) {
+                await showSendToContactsDialog();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     behavior: SnackBarBehavior.floating,
@@ -358,7 +363,6 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                     duration: new Duration(seconds: 5),
                   ),
                 );
-                await showSendToContactsDialog();
                 Navigator.of(context).pop();
                 return;
               }
@@ -514,7 +518,7 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Incident Report.'),
+          title: Text('Incident Report'),
           content: Text('Do you want to notify your emergency contacts?'),
           actions: [
             TextButton(
@@ -531,10 +535,18 @@ class _IncidentReportScreenState extends State<IncidentReportScreen> {
                         recepients.add(element.contact_number));
                     _sendSMS(message, recepients);
                   } else {
-                    print('You have no contacts');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        behavior: SnackBarBehavior.floating,
+                        content:
+                            new Text("You don't have emergency contacts set."),
+                        backgroundColor: Colors.red,
+                        duration: new Duration(seconds: 5),
+                      ),
+                    );
                   }
+                  Navigator.of(context).pop();
                 });
-                Navigator.of(context).pop();
               },
               child: Text(
                 'YES',

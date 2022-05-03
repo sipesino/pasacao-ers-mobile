@@ -21,6 +21,7 @@ import 'package:pers/src/models/locations.dart';
 import 'package:pers/src/models/operation.dart';
 import 'package:pers/src/models/permission_handler.dart';
 import 'package:pers/src/models/screen_arguments.dart';
+import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/theme.dart';
 import 'package:pers/src/widgets/custom_gender_picker.dart';
 import 'package:pers/src/widgets/custom_text_form_field.dart';
@@ -1061,10 +1062,10 @@ class _NewOperationState extends State<NewOperation> {
           child: ConstrainedBox(
             constraints: constraints.copyWith(
                 minHeight:
-                    constraints.maxHeight - appBar.preferredSize.height - 30,
+                    constraints.maxHeight - appBar.preferredSize.height - 70,
                 maxHeight: double.infinity),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20.0, 0, 20, 20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1137,8 +1138,7 @@ class _NewOperationState extends State<NewOperation> {
                         ),
                       ),
                       SizedBox(height: 10),
-                      if (user!.account_type == 'responder')
-                        buildRespondButton(),
+                      buildRespondButton(),
                     ],
                   ),
                 ],
@@ -1196,25 +1196,35 @@ class _NewOperationState extends State<NewOperation> {
           ),
         ),
         onPressed: () async {
-          setState(() {
-            _isResponding = true;
-          });
-          final GoogleMapController controller = await _controller.future;
+          if (user!.account_type == 'responder') {
+            setState(() {
+              _isResponding = true;
+            });
+            final GoogleMapController controller = await _controller.future;
 
-          controller.animateCamera(
-            CameraUpdate.newCameraPosition(
-              CameraPosition(
-                target: LatLng(
-                  current_location!.latitude!,
-                  current_location!.longitude!,
+            controller.animateCamera(
+              CameraUpdate.newCameraPosition(
+                CameraPosition(
+                  target: LatLng(
+                    current_location!.latitude!,
+                    current_location!.longitude!,
+                  ),
+                  zoom: 50,
+                  bearing: bearing,
                 ),
-                zoom: 50,
-                bearing: bearing,
               ),
-            ),
-          );
+            );
+          } else {
+            SharedPref prefs = SharedPref();
+            prefs.remove('operation');
+            prefs.save('gotNewOperation', 'false');
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/responder/home',
+              (Route<dynamic> route) => false,
+            );
+          }
         },
-        child: Text('Respond'),
+        child: Text(user!.account_type == 'responder' ? 'Respond' : 'Resolve'),
       ),
     );
   }

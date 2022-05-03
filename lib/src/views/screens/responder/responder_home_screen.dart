@@ -33,7 +33,10 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) checkOperationAvailable();
+    if (state == AppLifecycleState.resumed) {
+      checkOperationAvailable();
+      print('resumed');
+    }
   }
 
   @override
@@ -46,8 +49,6 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
-
-    audioCache = AudioCache(fixedPlayer: audioPlayer);
 
     SharedPref().read('user').then((value) {
       user = User.fromJson(value);
@@ -171,33 +172,36 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen>
 
       if (val != 'null' && val.isNotEmpty) {
         Map<String, dynamic> operation_data = jsonDecode(val);
+        setState(() {
+          operation = Operation(
+            operation_id: operation_data['operation_id'],
+            external_agency_id: operation_data['external_agency_id'],
+            dispatcher_id: operation_data['dispatcher_id'],
+            etd_base: operation_data['etd_base'],
+            eta_scene: operation_data['eta_scene'],
+            etd_scene: operation_data['etd_scene'],
+            eta_hospital: operation_data['eta_hospital'],
+            etd_hospital: operation_data['etd_hospital'],
+            eta_base: operation_data['eta_base'],
+            receiving_facility: operation_data['receiving_facility'],
+          );
 
-        operation = Operation(
-          operation_id: operation_data['operation_id'],
-          external_agency_id: operation_data['external_agency_id'],
-          dispatcher_id: operation_data['dispatcher_id'],
-          etd_base: operation_data['etd_base'],
-          eta_scene: operation_data['eta_scene'],
-          etd_scene: operation_data['etd_scene'],
-          eta_hospital: operation_data['eta_hospital'],
-          etd_hospital: operation_data['etd_hospital'],
-          eta_base: operation_data['eta_base'],
-          receiving_facility: operation_data['receiving_facility'],
-        );
-        Map<String, dynamic> report_data = jsonDecode(operation_data['report']);
-        final report = IncidentReport(
-          incident_id: report_data['incident_id'],
-          description: report_data['description'],
-          incident_type: report_data['incident_type'],
-          name: report_data['name'],
-          sex: report_data['sex'],
-          age: report_data['age'],
-          victim_status: report_data['victim_status'],
-          landmark: report_data['landmark'],
-          latitude: report_data['latitude'],
-          longitude: report_data['longitude'],
-        );
-        operation!.report = report;
+          Map<String, dynamic> report_data =
+              jsonDecode(operation_data['report']);
+          final report = IncidentReport(
+            incident_id: report_data['incident_id'],
+            description: report_data['description'],
+            incident_type: report_data['incident_type'],
+            name: report_data['name'],
+            sex: report_data['sex'],
+            age: report_data['age'],
+            victim_status: report_data['victim_status'],
+            landmark: report_data['landmark'],
+            latitude: report_data['latitude'],
+            longitude: report_data['longitude'],
+          );
+          operation!.report = report;
+        });
       }
     }
   }

@@ -57,7 +57,7 @@ class OperationCard extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  stopMusic();
+                  stopAlertSound();
                   viewOperationDetails(context);
                 },
                 child: Text('View Details'),

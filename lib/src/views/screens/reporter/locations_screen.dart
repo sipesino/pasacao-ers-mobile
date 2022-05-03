@@ -49,6 +49,7 @@ class _LocationsScreenState extends State<LocationsScreen> {
                         Text(
                           'List of emergency services locations',
                           style: DefaultTextTheme.subtitle1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -86,19 +87,16 @@ class _LocationsScreenState extends State<LocationsScreen> {
             ),
           ),
         ],
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: _buildColumn(),
-          ),
-        ),
+        body: _buildColumn(),
       ),
     );
   }
 
   _buildColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+    return ListView(
+      padding: const EdgeInsets.all(20.0),
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
       children: [
         Column(
           children: getLocations()

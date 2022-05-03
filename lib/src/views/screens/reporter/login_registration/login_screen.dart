@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:pers/src/custom_icons.dart';
+import 'package:pers/src/data/data.dart';
 import 'package:pers/src/globals.dart';
 import 'package:pers/src/models/shared_prefs.dart';
 import 'package:pers/src/models/user.dart';
@@ -36,7 +37,6 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
-  late User user;
   String? email;
   String? password;
   String? fbToken;
@@ -285,13 +285,13 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               // save bearer token in the local storage
               preferences.save("token", jsonResponse["token"]);
 
-              User user = User.fromMap(jsonResponse["user"]);
+              user = User.fromMap(jsonResponse["user"]);
 
               // save user credentials inside local storage
               preferences.save("user", user);
 
               url = 'http://143.198.92.250/api/register_token';
-              body = {"account_id": user.id.toString(), "token": fbToken};
+              body = {"account_id": user!.id.toString(), "token": fbToken};
 
               res = await http.post(
                 Uri.parse(url),
@@ -313,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                 print(res.body);
                 print('>>> Token inserted');
 
-                if (user.account_type!.toUpperCase() == 'REPORTER') {
+                if (user!.account_type!.toUpperCase() == 'REPORTER') {
                   Navigator.pushNamedAndRemoveUntil(
                     context,
                     '/reporter/home',

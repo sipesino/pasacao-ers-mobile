@@ -31,17 +31,17 @@ class LocationCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
+                    location.location_type!,
+                    style: DefaultTextTheme.subtitle2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
                     location.location_name!,
                     style: DefaultTextTheme.headline5,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     location.address!,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '3km away',
-                    style: DefaultTextTheme.subtitle2,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

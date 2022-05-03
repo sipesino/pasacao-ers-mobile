@@ -389,7 +389,7 @@ class _MapScreenState extends State<MapScreen> {
                       margin: EdgeInsets.all(20),
                       padding: EdgeInsets.all(15),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: boxShadow,
                       ),
